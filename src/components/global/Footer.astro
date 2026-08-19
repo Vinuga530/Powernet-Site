@@ -1,0 +1,123 @@
+---
+// Footer.astro
+---
+
+<footer class="footer">
+  <div class="container footer-container">
+    <div class="grid-12">
+      <div class="footer-brand">
+        <div class="logo">
+          <span class="logo-text">POWERNET</span>
+        </div>
+        <p class="footer-desc text-small">
+          Integrated engineering and technology solutions for Sri Lanka's critical operations.
+        </p>
+      </div>
+      
+      <div class="footer-links">
+        <h4 class="text-label">Services</h4>
+        <ul>
+          <li><a href="/services#data-voice">Data & Voice</a></li>
+          <li><a href="/services#power-ups">Power & UPS</a></li>
+          <li><a href="/services#fire-protection">Fire Protection</a></li>
+          <li><a href="/services#security-systems">Security Systems</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-links">
+        <h4 class="text-label">Company</h4>
+        <ul>
+          <li><a href="/about">About</a></li>
+          <li><a href="/projects">Projects</a></li>
+          <li><a href="/careers">Careers</a></li>
+          <li><a href="/contact">Contact</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-contact">
+        <h4 class="text-label">Contact</h4>
+        <p class="text-small">
+          <a href="mailto:powernet@powernet.lk">powernet@powernet.lk</a>
+        </p>
+        <div class="social-links">
+          <a href="#" aria-label="LinkedIn">LinkedIn</a>
+          <a href="#" aria-label="Facebook">Facebook</a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="footer-bottom">
+      <p class="text-small">&copy; {new Date().getFullYear()} Powernet (Pvt) Ltd. All Rights Reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    background-color: var(--color-surface);
+    padding: var(--space-2xl) 0 var(--space-md);
+    margin-top: var(--space-3xl);
+  }
+
+  .footer-brand {
+    grid-column: span 4;
+  }
+
+  .logo-text {
+    font-size: var(--text-h3);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .footer-desc {
+    margin-top: var(--space-md);
+    color: var(--color-muted);
+  }
+
+  .footer-links {
+    grid-column: span 2;
+  }
+
+  .footer-links h4, .footer-contact h4 {
+    margin-bottom: var(--space-md);
+  }
+
+  .footer-links ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .footer-links a {
+    font-size: var(--text-small);
+    color: var(--color-muted);
+    transition: color 0.3s;
+  }
+
+  .footer-links a:hover {
+    color: var(--color-brand);
+  }
+
+  .footer-contact {
+    grid-column: span 4;
+  }
+
+  .social-links {
+    margin-top: var(--space-md);
+    display: flex;
+    gap: var(--space-md);
+  }
+
+  .social-links a {
+    font-size: var(--text-small);
+    color: var(--color-foreground);
+  }
+
+  .footer-bottom {
+    margin-top: var(--space-2xl);
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--color-border);
+    color: var(--color-muted);
+  }
+</style>

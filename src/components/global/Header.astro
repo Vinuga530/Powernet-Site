@@ -1,0 +1,146 @@
+---
+import { Image } from 'astro:assets';
+import logoImg from '../../assets/images/icons/colored small bg removed.png';
+
+const pathname = new URL(Astro.request.url).pathname;
+const isHome = pathname === '/' || pathname === '/index.html';
+---
+
+<header class={`header ${isHome ? 'header-transparent-dark' : ''}`}>
+  <div class="container header-container">
+    <div class="logo">
+      <a href="/" class="logo-link">
+        <Image src={logoImg} alt="Powernet Logo" class="logo-img" />
+      </a>
+    </div>
+    
+    <nav class="desktop-nav">
+      <ul class="nav-list">
+        <li><a href="/services" class="nav-link"><span class="nav-link-inner" data-text="Services"><span class="nav-text">Services</span></span></a></li>
+        <li><a href="/projects" class="nav-link"><span class="nav-link-inner" data-text="Projects"><span class="nav-text">Projects</span></span></a></li>
+        <li><a href="/about" class="nav-link"><span class="nav-link-inner" data-text="About"><span class="nav-text">About</span></span></a></li>
+        <li><a href="/contact" class="nav-link"><span class="nav-link-inner" data-text="Contact"><span class="nav-text">Contact</span></span></a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a href="/contact" class="btn-primary">START A PROJECT</a>
+    </div>
+  </div>
+</header>
+
+<style>
+  .header {
+    position: absolute; /* Blends with background as requested */
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 100;
+    padding: var(--space-md) 0;
+  }
+
+  .header-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .logo-link {
+    display: block;
+    height: 64px;
+  }
+
+  .logo-img {
+    width: auto;
+    height: 100%;
+    object-fit: contain;
+    object-position: left;
+    transition: filter 0.3s ease;
+  }
+
+  /* When over dark hero, invert or brighten the logo and text */
+  .header-transparent-dark .logo-img {
+    filter: brightness(0) invert(1);
+  }
+
+  .header-transparent-dark .nav-link {
+    color: var(--color-dark-foreground);
+  }
+
+  .nav-list {
+    display: flex;
+    gap: var(--space-lg);
+    list-style: none;
+  }
+
+  .nav-link {
+    font-family: var(--font-mono); /* Engineered personality */
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-foreground);
+    text-decoration: none;
+    display: inline-block;
+    padding: 0.5rem 0;
+  }
+
+  .nav-link-inner {
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: top;
+  }
+
+  .nav-text {
+    display: inline-block;
+    transition: transform 0.4s cubic-bezier(0.76, 0, 0.24, 1);
+  }
+
+  /* Hover personality - metric.ca style rolling text */
+  .nav-link-inner::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 100%;
+    left: 0;
+    color: var(--color-brand);
+    transition: transform 0.4s cubic-bezier(0.76, 0, 0.24, 1);
+  }
+
+  .nav-link:hover .nav-text {
+    transform: translateY(-100%);
+  }
+
+  .nav-link:hover .nav-link-inner::after {
+    transform: translateY(-100%);
+  }
+
+  .header-transparent-dark .nav-link:hover .nav-link-inner::after {
+    color: var(--color-brand);
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-brand);
+    color: #fff;
+    padding: 0.75rem 1.5rem;
+    font-size: var(--text-small);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-radius: 2px;
+    transition: background-color 0.3s ease;
+  }
+
+  .btn-primary:hover {
+    background-color: var(--color-brand-dark);
+  }
+
+  @media (max-width: 1024px) {
+    .desktop-nav {
+      display: none; /* We'll need a mobile menu later */
+    }
+  }
+</style>

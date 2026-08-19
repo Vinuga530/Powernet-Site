@@ -1,0 +1,51 @@
+/* Typography Styles */
+h1, .text-display-xl {
+  font-size: var(--text-display-xl);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+h2, .text-display {
+  font-size: var(--text-display);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+
+h3, .text-h1 {
+  font-size: var(--text-h1);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+h4, .text-h2 {
+  font-size: var(--text-h2);
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.text-body-large {
+  font-size: var(--text-body-large);
+  line-height: 1.6;
+}
+
+.text-body {
+  font-size: var(--text-body);
+  line-height: 1.6;
+}
+
+.text-label {
+  font-size: var(--text-label);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+}
+
+.text-technical-meta {
+  font-family: var(--font-mono);
+  font-size: var(--text-technical-meta);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-muted);
+}
