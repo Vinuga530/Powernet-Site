@@ -164,7 +164,7 @@ import projectImg from '../assets/images/photos/a guy fixing a server pc.jpg';
   .bg-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to right, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.3) 100%);
+    background: linear-gradient(to right, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0) 100%);
   }
 
   .hero-content {
@@ -338,26 +338,4 @@ import projectImg from '../assets/images/photos/a guy fixing a server pc.jpg';
   }
 </style>
 
-<script>
-  import { gsap } from "gsap";
-  import { ScrollTrigger } from "gsap/ScrollTrigger";
-  
-  gsap.registerPlugin(ScrollTrigger);
 
-  // Simple initial animation for hero
-  window.addEventListener("DOMContentLoaded", () => {
-    const tl = gsap.timeline();
-    tl.to(".text-reveal-inner", {
-      y: "0%",
-      duration: 1,
-      ease: "power4.out",
-      stagger: 0.15
-    })
-    .to(".fade-in", {
-      opacity: 1,
-      y: 0,
-      duration: 0.8,
-      ease: "power2.out"
-    }, "-=0.5");
-  });
-</script>
