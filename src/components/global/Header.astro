@@ -1,6 +1,6 @@
 ---
 import { Image } from 'astro:assets';
-import logoImg from '../../assets/images/icons/powernet-logo.png';
+import logoImg from '../../assets/images/icons/Just the logo colored.jpg';
 
 const pathname = new URL(Astro.request.url).pathname;
 const isHome = pathname === '/' || pathname === '/index.html';
@@ -16,15 +16,15 @@ const isHome = pathname === '/' || pathname === '/index.html';
     
     <nav class="desktop-nav fade-in stagger-2">
       <ul class="nav-list">
-        <li><a href="/services" class="nav-link"><span class="nav-link-inner" data-text="Services"><span class="nav-text">Services</span></span></a></li>
-        <li><a href="/projects" class="nav-link"><span class="nav-link-inner" data-text="Projects"><span class="nav-text">Projects</span></span></a></li>
-        <li><a href="/about" class="nav-link"><span class="nav-link-inner" data-text="About"><span class="nav-text">About</span></span></a></li>
-        <li><a href="/contact" class="nav-link"><span class="nav-link-inner" data-text="Contact"><span class="nav-text">Contact</span></span></a></li>
+        <li><a href="/services" class="nav-link">Services</a></li>
+        <li><a href="/projects" class="nav-link">Projects</a></li>
+        <li><a href="/about" class="nav-link">About</a></li>
+        <li><a href="/contact" class="nav-link">Contact</a></li>
       </ul>
     </nav>
 
     <div class="header-actions fade-in stagger-3">
-      <a href="/contact" class="btn-primary"><span>START A PROJECT</span></a>
+      <a href="/contact" class="btn-primary">START A PROJECT <span class="cta-arrow">&#8599;</span></a>
     </div>
   </div>
 </header>
@@ -46,15 +46,15 @@ const isHome = pathname === '/' || pathname === '/index.html';
   }
 
   .logo-link {
-    display: block;
-    height: 48px;
+    display: flex;
+    align-items: center;
+    width: clamp(180px, 15vw, 230px);
   }
 
   .logo-img {
-    width: auto;
-    height: 100%;
+    width: 100%;
+    height: auto;
     object-fit: contain;
-    object-position: left;
   }
 
   /* Removed logo inversion to keep full color */
@@ -79,71 +79,62 @@ const isHome = pathname === '/' || pathname === '/index.html';
     text-decoration: none;
     display: inline-block;
     padding: 0.5rem 0;
-  }
-
-  .nav-link-inner {
     position: relative;
-    display: inline-block;
-    overflow: hidden;
-    vertical-align: top;
+    opacity: 0.9;
+    transition: opacity 0.2s ease;
   }
 
-  .nav-text {
-    display: inline-block;
-    transition: transform 0.4s cubic-bezier(0.76, 0, 0.24, 1);
-  }
-
-  /* Hover personality - metric.ca style rolling text */
-  .nav-link-inner::after {
-    content: attr(data-text);
+  .nav-link::after {
+    content: '';
     position: absolute;
-    top: 100%;
+    bottom: 0;
     left: 0;
-    color: var(--color-brand);
-    transition: transform 0.4s cubic-bezier(0.76, 0, 0.24, 1);
+    width: 100%;
+    height: 1px;
+    background-color: var(--color-brand);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s cubic-bezier(0.76, 0, 0.24, 1);
   }
 
-  .nav-link:hover .nav-text {
-    transform: translateY(-100%);
+  .nav-link:hover {
+    opacity: 1;
   }
 
-  .nav-link:hover .nav-link-inner::after {
-    transform: translateY(-100%);
+  .nav-link:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
   }
 
-  .header-transparent-dark .nav-link:hover .nav-link-inner::after {
-    color: var(--color-brand);
+  .header-transparent-dark .nav-link {
+    color: var(--color-dark-foreground);
   }
 
   .btn-primary {
-    position: relative;
-    overflow: hidden;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background-color: var(--color-brand);
+    background-color: transparent;
+    border: 1px solid var(--color-brand);
     color: #fff;
-    padding: 0.75rem 1.5rem;
+    padding: 0.5rem 1.25rem;
     font-size: var(--text-small);
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     border-radius: 2px;
-    z-index: 1;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    will-change: transform;
   }
 
-  .btn-primary::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background-color: var(--color-brand-dark);
-    transform: translateY(100%);
-    transition: transform 0.4s cubic-bezier(0.76, 0, 0.24, 1);
-    z-index: -1;
+  .cta-arrow {
+    margin-left: 0.5rem;
+    font-size: 1.1em;
   }
 
-  .btn-primary:hover::before {
-    transform: translateY(0);
+  .btn-primary:hover {
+    background-color: var(--color-brand);
+    transform: translateY(-2px);
   }
 
   @media (max-width: 1024px) {
