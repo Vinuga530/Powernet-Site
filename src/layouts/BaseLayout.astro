@@ -27,6 +27,13 @@ const { title, description = "Powernet (Pvt) Ltd — Sri Lanka's trusted one-sto
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
   </head>
   <body>
+    <div id="initial-loader" class="loader-overlay">
+      <div class="loader-dots">
+        <div class="dot dot-1"></div>
+        <div class="dot dot-2"></div>
+        <div class="dot dot-3"></div>
+      </div>
+    </div>
     <Header />
     <main id="swup" class="transition-fade">
       <slot />
@@ -34,13 +41,32 @@ const { title, description = "Powernet (Pvt) Ltd — Sri Lanka's trusted one-sto
     <Footer />
     
     <script>
-      document.addEventListener('DOMContentLoaded', () => {
-        // Initial hero reveal stagger
-        setTimeout(() => {
-          document.querySelectorAll('.hero-section').forEach(el => el.classList.add('is-revealed'));
-          document.querySelectorAll('.header').forEach(el => el.classList.add('is-revealed'));
-        }, 50);
+      // Hide loader logic
+      const hideLoader = () => {
+        const loader = document.getElementById('initial-loader');
+        if (loader && !loader.classList.contains('is-hidden')) {
+          loader.classList.add('is-hidden');
+          
+          // Slight delay to allow loader to fade out before hero entrance
+          setTimeout(() => {
+            document.querySelectorAll('.hero-section').forEach(el => el.classList.add('is-revealed'));
+            document.querySelectorAll('.header').forEach(el => el.classList.add('is-revealed'));
+          }, 400);
+        }
+      };
 
+      // Check if hero image exists and wait for it
+      const heroImg = document.querySelector('.bg-img');
+      if (heroImg && !heroImg.complete) {
+        heroImg.addEventListener('load', hideLoader);
+        setTimeout(hideLoader, 1500); // safety fallback
+      } else {
+        // Run immediately if no image or already loaded
+        document.addEventListener('DOMContentLoaded', hideLoader);
+        setTimeout(hideLoader, 50); // safety fallback if DOMContentLoaded already fired
+      }
+
+      document.addEventListener('DOMContentLoaded', () => {
         // Scroll Observer
         const observerOptions = {
           root: null,
@@ -73,5 +99,44 @@ const { title, description = "Powernet (Pvt) Ltd — Sri Lanka's trusted one-sto
   }
   html.is-animating .transition-fade {
     opacity: 0;
+  }
+
+  /* Loader Styles */
+  .loader-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    background-color: #050505;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+  }
+
+  .loader-overlay.is-hidden {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .loader-dots {
+    display: flex;
+    gap: 8px;
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    background-color: var(--color-brand);
+    border-radius: 50%;
+    animation: pulse-dot 1s cubic-bezier(0.76, 0, 0.24, 1) infinite;
+  }
+
+  .dot-1 { animation-delay: 0s; }
+  .dot-2 { animation-delay: 0.15s; }
+  .dot-3 { animation-delay: 0.3s; }
+
+  @keyframes pulse-dot {
+    0%, 100% { transform: scale(0.4); opacity: 0.3; }
+    50% { transform: scale(1); opacity: 1; }
   }
 </style>

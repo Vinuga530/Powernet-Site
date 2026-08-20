@@ -82,6 +82,7 @@ const isHome = pathname === '/' || pathname === '/index.html';
     position: relative;
     opacity: 0.9;
     transition: opacity 0.2s ease;
+    transition-delay: 0s !important;
   }
 
   .nav-link::after {
@@ -95,6 +96,7 @@ const isHome = pathname === '/' || pathname === '/index.html';
     transform: scaleX(0);
     transform-origin: right;
     transition: transform 0.3s cubic-bezier(0.76, 0, 0.24, 1);
+    transition-delay: 0s !important;
   }
 
   .nav-link:hover {
@@ -124,6 +126,7 @@ const isHome = pathname === '/' || pathname === '/index.html';
     letter-spacing: 0.05em;
     border-radius: 2px;
     transition: background-color 0.3s ease, transform 0.3s ease;
+    transition-delay: 0s !important;
     will-change: transform;
   }
 
