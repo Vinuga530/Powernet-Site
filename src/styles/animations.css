@@ -49,10 +49,7 @@
   transform: translateY(0);
 }
 
-/* Base transitions */
-.transition-all {
-  transition: all 0.3s ease;
-}
+
 
 /* Stagger Utilities */
 .stagger-1 { transition-delay: 0.1s; }

@@ -1,6 +1,6 @@
 ---
 import { Image } from 'astro:assets';
-import logoImg from '../../assets/images/icons/colored small bg removed.png';
+import logoImg from '../../assets/images/icons/powernet-logo.png';
 
 const pathname = new URL(Astro.request.url).pathname;
 const isHome = pathname === '/' || pathname === '/index.html';
@@ -55,7 +55,6 @@ const isHome = pathname === '/' || pathname === '/index.html';
     height: 100%;
     object-fit: contain;
     object-position: left;
-    transition: filter 0.3s ease;
   }
 
   /* Removed logo inversion to keep full color */
