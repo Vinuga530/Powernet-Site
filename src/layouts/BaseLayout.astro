@@ -34,7 +34,33 @@ const { title, description = "Powernet (Pvt) Ltd — Sri Lanka's trusted one-sto
     <Footer />
     
     <script>
-      // Global initialization can go here or in specific components
+      document.addEventListener('DOMContentLoaded', () => {
+        // Initial hero reveal stagger
+        setTimeout(() => {
+          document.querySelectorAll('.hero-section').forEach(el => el.classList.add('is-revealed'));
+          document.querySelectorAll('.header').forEach(el => el.classList.add('is-revealed'));
+        }, 50);
+
+        // Scroll Observer
+        const observerOptions = {
+          root: null,
+          rootMargin: '0px 0px -10% 0px',
+          threshold: 0
+        };
+
+        const observer = new IntersectionObserver((entries, observer) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-revealed');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, observerOptions);
+
+        document.querySelectorAll('.scroll-reveal').forEach(el => {
+          observer.observe(el);
+        });
+      });
     </script>
   </body>
 </html>
