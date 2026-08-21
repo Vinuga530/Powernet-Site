@@ -2,8 +2,8 @@
 h1, .text-display-xl {
   font-size: var(--text-display-xl);
   font-weight: 700;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
 }
 
 h2, .text-display {

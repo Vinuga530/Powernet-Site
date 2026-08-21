@@ -142,10 +142,10 @@ import projectImg from '../assets/images/photos/a guy fixing a server pc.jpg';
   }
   .hero-section {
     position: relative;
-    min-height: 100vh;
+    min-height: 100svh;
     display: flex;
     align-items: center;
-    color: var(--color-dark-foreground); /* Forces text white on hero */
+    color: var(--color-dark-foreground);
   }
 
   .hero-bg {
@@ -159,18 +159,25 @@ import projectImg from '../assets/images/photos/a guy fixing a server pc.jpg';
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: 60% center;
   }
 
   .bg-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to right, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0) 100%);
+    background: linear-gradient(
+      90deg,
+      rgba(0,0,0,0.68) 0%,
+      rgba(0,0,0,0.40) 45%,
+      rgba(0,0,0,0.10) 75%,
+      rgba(0,0,0,0) 100%
+    );
   }
 
   .hero-content {
     position: relative;
     z-index: 10;
-    padding-top: var(--space-3xl);
+    /* Removed large padding-top to let flexbox center it properly, maintaining balanced space from header */
   }
 
   .hero-title {
@@ -178,7 +185,10 @@ import projectImg from '../assets/images/photos/a guy fixing a server pc.jpg';
   }
 
   .hero-subtitle {
-    max-width: 600px;
+    max-width: 650px;
+    font-size: clamp(1rem, 1.3vw, 1.3rem);
+    line-height: 1.5;
+    margin-top: 28px;
     opacity: 0.9;
   }
 

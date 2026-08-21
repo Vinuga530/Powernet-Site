@@ -23,6 +23,11 @@ const isHome = pathname === '/' || pathname === '/index.html';
       </ul>
     </nav>
 
+    <button class="mobile-menu-btn fade-in stagger-2" aria-label="Toggle menu" aria-expanded="false">
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+    </button>
+
     <div class="header-actions fade-in stagger-3">
       <a href="/contact" class="btn-primary">START A PROJECT <span class="cta-arrow">&#8599;</span></a>
     </div>
@@ -40,18 +45,18 @@ const isHome = pathname === '/' || pathname === '/index.html';
   }
 
   .header-container {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    justify-content: space-between;
   }
 
   .logo {
-    flex-shrink: 0;
+    justify-self: start;
   }
 
   .logo-link {
     display: block;
-    width: clamp(180px, 15vw, 220px);
+    width: clamp(110px, 9vw, 150px);
   }
 
   .logo-img {
@@ -59,6 +64,14 @@ const isHome = pathname === '/' || pathname === '/index.html';
     width: 100%;
     height: auto;
     object-fit: contain;
+  }
+
+  .desktop-nav {
+    justify-self: center;
+  }
+
+  .header-actions {
+    justify-self: end;
   }
 
   /* Removed logo inversion to keep full color */
@@ -140,12 +153,59 @@ const isHome = pathname === '/' || pathname === '/index.html';
 
   .btn-primary:hover {
     background-color: var(--color-brand);
-    transform: translateY(-2px);
+    color: #fff;
+  }
+
+  /* Mobile Menu Styles */
+  .mobile-menu-btn {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 6px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    z-index: 101;
+    justify-self: end;
+  }
+
+  .hamburger-line {
+    width: 24px;
+    height: 2px;
+    background-color: var(--color-foreground);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+
+  .header-transparent-dark .hamburger-line {
+    background-color: var(--color-dark-foreground);
   }
 
   @media (max-width: 1024px) {
-    .desktop-nav {
-      display: none; /* We'll need a mobile menu later */
+    .header-container {
+      grid-template-columns: 1fr auto; /* Logo and Hamburger */
+    }
+    
+    .desktop-nav, .header-actions {
+      display: none;
+    }
+
+    .mobile-menu-btn {
+      display: flex;
     }
   }
 </style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const btn = document.querySelector('.mobile-menu-btn');
+    if(btn) {
+      btn.addEventListener('click', () => {
+        const expanded = btn.getAttribute('aria-expanded') === 'true' || false;
+        btn.setAttribute('aria-expanded', !expanded);
+        // Minimal toggle logic for future mobile menu
+        // Right now we just toggle the button state
+      });
+    }
+  });
+</script>
