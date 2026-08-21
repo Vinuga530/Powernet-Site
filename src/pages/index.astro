@@ -1,27 +1,42 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import { Image, Picture } from 'astro:assets';
-import heroImg from '../assets/images/photos/guy working on a project on site.jpg';
-import projectImg from '../assets/images/photos/a guy fixing a server pc.jpg';
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { Image, Picture } from "astro:assets";
+import heroImg from "../assets/images/photos/guy working on a project on site.jpg";
+import projectImg from "../assets/images/photos/a guy fixing a server pc.jpg";
 ---
 
-<BaseLayout title="Powernet (Pvt) Ltd | Premium Infrastructure Solutions Sri Lanka">
-  
+<BaseLayout title="Powernet (Pvt) Ltd | Power and Infrastructure Solutions">
   <section class="hero-section hero-dark-overlay">
     <div class="hero-bg image-reveal-wrapper is-revealed">
-      <Picture src={heroImg} alt="Powernet Infrastructure" class="image-reveal-inner bg-img" formats={["avif", "webp"]} quality={75} widths={[640, 1024, 1600, 1920]} sizes="100vw" loading="eager" fetchpriority="high" />
+      <Picture
+        src={heroImg}
+        alt="Powernet Infrastructure"
+        class="image-reveal-inner bg-img"
+        formats={["avif", "webp"]}
+        quality={75}
+        widths={[640, 1024, 1600, 1920]}
+        sizes="100vw"
+        loading="eager"
+        fetchpriority="high"
+      />
       <div class="bg-overlay"></div>
     </div>
-    
+
     <div class="container hero-content">
       <div class="hero-text-wrapper">
         <h1 class="hero-title text-display-xl">
-          <span class="text-reveal-wrapper"><span class="text-reveal-inner stagger-2">INFRASTRUCTURE,</span></span><br>
-          <span class="text-reveal-wrapper"><span class="text-reveal-inner stagger-3">CONNECTED.</span></span>
+          <span class="text-reveal-wrapper"
+            ><span class="text-reveal-inner stagger-2">INFRASTRUCTURE,</span
+            ></span
+          ><br />
+          <span class="text-reveal-wrapper"
+            ><span class="text-reveal-inner stagger-3">CONNECTED.</span></span
+          >
         </h1>
-        
+
         <p class="hero-subtitle text-body-large fade-in stagger-4">
-          Integrated engineering and technology solutions for Sri Lanka's critical operations.
+          Integrated engineering and technology solutions for Sri Lanka's
+          critical operations.
         </p>
       </div>
     </div>
@@ -55,11 +70,13 @@ import projectImg from '../assets/images/photos/a guy fixing a server pc.jpg';
     <div class="container">
       <div class="grid-12">
         <div class="pos-left fade-in stagger-1">
-          <h2 class="text-display">NOT JUST ANOTHER IT COMPANY.</h2>
+          <h2 class="text-display">Infrastructure, Built for your needs.</h2>
         </div>
         <div class="pos-right fade-in stagger-2">
           <p class="text-body-large">
-            A client may require networking, electrical, UPS, CCTV, fire protection, air conditioning, interior work, and IT systems. Powernet coordinates these scopes as a single, integrated project.
+            A client may require networking, electrical, UPS, CCTV, fire
+            protection, air conditioning, interior work, and IT systems.
+            Powernet coordinates these scopes as a single, integrated project.
           </p>
         </div>
       </div>
@@ -70,52 +87,91 @@ import projectImg from '../assets/images/photos/a guy fixing a server pc.jpg';
   <section class="section-services scroll-reveal">
     <div class="container">
       <div class="section-header fade-in">
-        <span class="text-label">01 // Disciplines</span>
+        <span class="text-label">What Do We Offer?</span>
       </div>
-      
+
       <div class="service-row fade-in stagger-1">
         <div class="service-num"><span class="text-h4">01</span></div>
         <div class="service-title"><h3 class="text-h1">Data & Voice</h3></div>
-        <div class="service-desc"><p>Structured CAT5/CAT6, fiber optic, LAN/WAN and wireless network implementations for enterprise environments.</p></div>
+        <div class="service-desc">
+          <p>
+            Structured CAT5/CAT6, fiber optic, LAN/WAN and wireless network
+            implementations for enterprise environments.
+          </p>
+        </div>
       </div>
       <div class="service-row fade-in stagger-2">
         <div class="service-num"><span class="text-h4">02</span></div>
         <div class="service-title"><h3 class="text-h1">Power & UPS</h3></div>
-        <div class="service-desc"><p>Electrical design, installation and reliable backup power infrastructure for mission-critical facilities.</p></div>
+        <div class="service-desc">
+          <p>
+            Electrical design, installation and reliable backup power
+            infrastructure for mission-critical facilities.
+          </p>
+        </div>
       </div>
       <div class="service-row fade-in stagger-3">
         <div class="service-num"><span class="text-h4">03</span></div>
-        <div class="service-title"><h3 class="text-h1">Fire Protection</h3></div>
-        <div class="service-desc"><p>Detection, alarm, hydrant and suppression systems designed for commercial and industrial safety requirements.</p></div>
+        <div class="service-title">
+          <h3 class="text-h1">Fire Protection</h3>
+        </div>
+        <div class="service-desc">
+          <p>
+            Detection, alarm, hydrant and suppression systems designed for
+            commercial and industrial safety requirements.
+          </p>
+        </div>
       </div>
       <div class="service-row fade-in stagger-4">
         <div class="service-num"><span class="text-h4">04</span></div>
-        <div class="service-title"><h3 class="text-h1">Security Systems</h3></div>
-        <div class="service-desc"><p>Integrated CCTV, PA and access control solutions for safer, smarter operations.</p></div>
+        <div class="service-title">
+          <h3 class="text-h1">Security Systems</h3>
+        </div>
+        <div class="service-desc">
+          <p>
+            Integrated CCTV, PA and access control solutions for safer, smarter
+            operations.
+          </p>
+        </div>
       </div>
-      
+
       <div class="services-cta fade-in stagger-4">
-        <a href="/services" class="btn-secondary">View All Disciplines &rarr;</a>
+        <a href="/services" class="btn-secondary"
+          >Check out our all services &rarr;</a
+        >
       </div>
     </div>
   </section>
 
-  <!-- Featured Projects -->
+  <!-- Featured Projects section to be changed later into a CMS bsed upload of projects -->
   <section class="section-projects scroll-reveal">
     <div class="container">
       <div class="section-header fade-in">
-        <span class="text-label">02 // Success Stories</span>
+        <span class="text-label">Our Success Stories</span>
       </div>
-      
+
       <div class="grid-12">
         <div class="project-left fade-in stagger-1">
-          <h2 class="text-display">WORLD BANK<br>SRI LANKA</h2>
-          <p class="text-technical-meta project-meta">Medium-voltage cabling • Internal wiring • Earthing</p>
-          <a href="/projects" class="btn-secondary mt-md">View Case Study &rarr;</a>
+          <h2 class="text-display">WORLD BANK<br />SRI LANKA</h2>
+          <p class="text-technical-meta project-meta">
+            Medium-voltage cabling • Internal wiring • Earthing
+          </p>
+          <a href="/projects" class="btn-secondary mt-md"
+            >View Case Study &rarr;</a
+          >
         </div>
         <div class="project-right">
           <div class="image-reveal-wrapper project-image">
-            <Picture src={projectImg} alt="World Bank Project" class="image-reveal-inner" formats={["avif", "webp"]} quality={75} widths={[400, 800, 1200]} sizes="(max-width: 1024px) 100vw, 50vw" loading="lazy" />
+            <Picture
+              src={projectImg}
+              alt="World Bank Project"
+              class="image-reveal-inner"
+              formats={["avif", "webp"]}
+              quality={75}
+              widths={[400, 800, 1200]}
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              loading="lazy"
+            />
           </div>
         </div>
       </div>
@@ -125,13 +181,14 @@ import projectImg from '../assets/images/photos/a guy fixing a server pc.jpg';
   <!-- CTA Section -->
   <section class="section-cta scroll-reveal">
     <div class="container fade-in">
-      <h2 class="text-display-xl">LET'S BUILD<br>WHAT'S NEXT.</h2>
+      <h2 class="text-display-xl">LET'S BUILD<br />WHAT'S NEXT.</h2>
       <div class="cta-actions">
-        <a href="/contact" class="btn-primary"><span>DISCUSS A PROJECT &rarr;</span></a>
+        <a href="/contact" class="btn-primary"
+          ><span>DISCUSS A PROJECT &rarr;</span></a
+        >
       </div>
     </div>
   </section>
-
 </BaseLayout>
 
 <style>
@@ -167,10 +224,10 @@ import projectImg from '../assets/images/photos/a guy fixing a server pc.jpg';
     inset: 0;
     background: linear-gradient(
       90deg,
-      rgba(0,0,0,0.72) 0%,
-      rgba(0,0,0,0.40) 45%,
-      rgba(0,0,0,0.15) 70%,
-      rgba(0,0,0,0) 100%
+      rgba(0, 0, 0, 0.72) 0%,
+      rgba(0, 0, 0, 0.4) 45%,
+      rgba(0, 0, 0, 0.15) 70%,
+      rgba(0, 0, 0, 0) 100%
     );
   }
 
@@ -235,7 +292,7 @@ import projectImg from '../assets/images/photos/a guy fixing a server pc.jpg';
     display: flex;
     align-items: center;
   }
-  
+
   /* Services Overview */
   .section-services {
     padding: var(--space-3xl) 0;
@@ -330,9 +387,10 @@ import projectImg from '../assets/images/photos/a guy fixing a server pc.jpg';
   .section-cta .btn-primary:hover {
     background-color: var(--color-surface);
   }
-  
+
   @media (max-width: 1024px) {
-    .pos-left, .pos-right {
+    .pos-left,
+    .pos-right {
       grid-column: 1 / -1;
     }
     .pos-right {
@@ -342,10 +400,10 @@ import projectImg from '../assets/images/photos/a guy fixing a server pc.jpg';
       flex-direction: column;
       gap: var(--space-sm);
     }
-    .service-num, .service-title, .service-desc {
+    .service-num,
+    .service-title,
+    .service-desc {
       width: 100%;
     }
   }
 </style>
-
-

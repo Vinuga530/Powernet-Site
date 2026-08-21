@@ -1,35 +1,78 @@
 ---
-import { Image } from 'astro:assets';
-import logoImg from '../../assets/images/icons/powernet-logo.png';
+import { Image } from "astro:assets";
+import logoImg from "../../assets/images/icons/powernet-logo.png";
 
 const pathname = new URL(Astro.request.url).pathname;
-const isHome = pathname === '/' || pathname === '/index.html';
+const isHome = pathname === "/" || pathname === "/index.html";
 ---
 
-<header class={`header ${isHome ? 'header-transparent-dark' : ''}`}>
+<header class={`header ${isHome ? "header-transparent-dark" : ""}`}>
   <div class="container header-container">
     <div class="logo fade-in stagger-1">
       <a href="/" class="logo-link">
-        <Image src={logoImg} alt="Powernet Logo" class="logo-img" loading="eager" fetchpriority="high" />
+        <Image
+          src={logoImg}
+          alt="Powernet Logo"
+          class="logo-img"
+          loading="eager"
+          fetchpriority="high"
+        />
       </a>
     </div>
-    
+
     <nav class="desktop-nav fade-in stagger-2">
       <ul class="nav-list">
-        <li><a href="/services" class="nav-link">Services</a></li>
-        <li><a href="/projects" class="nav-link">Projects</a></li>
-        <li><a href="/about" class="nav-link">About</a></li>
-        <li><a href="/contact" class="nav-link">Contact</a></li>
+        <li>
+          <a href="/services" class="nav-link">
+            <span class="nav-text">
+              <span>Services</span>
+              <span aria-hidden="true">Services</span>
+            </span>
+          </a>
+        </li>
+
+        <li>
+          <a href="/projects" class="nav-link">
+            <span class="nav-text">
+              <span>Projects</span>
+              <span aria-hidden="true">Projects</span>
+            </span>
+          </a>
+        </li>
+
+        <li>
+          <a href="/about" class="nav-link">
+            <span class="nav-text">
+              <span>About</span>
+              <span aria-hidden="true">About</span>
+            </span>
+          </a>
+        </li>
+
+        <li>
+          <a href="/contact" class="nav-link">
+            <span class="nav-text">
+              <span>Contact</span>
+              <span aria-hidden="true">Contact</span>
+            </span>
+          </a>
+        </li>
       </ul>
     </nav>
 
-    <button class="mobile-menu-btn fade-in stagger-2" aria-label="Toggle menu" aria-expanded="false">
+    <button
+      class="mobile-menu-btn fade-in stagger-2"
+      aria-label="Toggle menu"
+      aria-expanded="false"
+    >
       <span class="hamburger-line"></span>
       <span class="hamburger-line"></span>
     </button>
 
     <div class="header-actions fade-in stagger-3">
-      <a href="/contact" class="btn-primary">START A PROJECT <span class="cta-arrow">&#8599;</span></a>
+      <a href="/contact" class="btn-primary"
+        >START A PROJECT <span class="cta-arrow">&#8599;</span></a
+      >
     </div>
   </div>
 </header>
@@ -87,42 +130,44 @@ const isHome = pathname === '/' || pathname === '/index.html';
   }
 
   .nav-link {
-    font-family: var(--font-mono); /* Engineered personality */
+    font-family: var(--font-mono);
     font-size: 0.85rem;
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: var(--color-foreground);
     text-decoration: none;
-    display: inline-block;
-    padding: 0.5rem 0;
-    position: relative;
+
+    display: inline-flex;
+    height: 1.2em;
+    overflow: hidden;
+
     opacity: 0.9;
     transition: opacity 0.2s ease;
-    transition-delay: 0s !important;
+  }
+  .nav-text {
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  .nav-link::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 1px;
-    background-color: var(--color-brand);
-    transform: scaleX(0);
-    transform-origin: right;
-    transition: transform 0.3s cubic-bezier(0.76, 0, 0.24, 1);
-    transition-delay: 0s !important;
+  .nav-text > span {
+    display: block;
+    height: 1.2em;
+    line-height: 1.2em;
+    flex-shrink: 0;
+  }
+
+  .nav-text > span:last-child {
+    color: var(--color-brand);
   }
 
   .nav-link:hover {
     opacity: 1;
   }
 
-  .nav-link:hover::after {
-    transform: scaleX(1);
-    transform-origin: left;
+  .nav-link:hover .nav-text {
+    transform: translateY(-1.2em);
   }
 
   .header-transparent-dark .nav-link {
@@ -142,7 +187,9 @@ const isHome = pathname === '/' || pathname === '/index.html';
     text-transform: uppercase;
     letter-spacing: 0.05em;
     border-radius: 2px;
-    transition: background-color 0.3s ease, transform 0.3s ease;
+    transition:
+      background-color 0.3s ease,
+      transform 0.3s ease;
     transition-delay: 0s !important;
   }
 
@@ -174,7 +221,9 @@ const isHome = pathname === '/' || pathname === '/index.html';
     width: 24px;
     height: 2px;
     background-color: var(--color-foreground);
-    transition: transform 0.3s ease, opacity 0.3s ease;
+    transition:
+      transform 0.3s ease,
+      opacity 0.3s ease;
   }
 
   .header-transparent-dark .hamburger-line {
@@ -185,8 +234,9 @@ const isHome = pathname === '/' || pathname === '/index.html';
     .header-container {
       grid-template-columns: 1fr auto; /* Logo and Hamburger */
     }
-    
-    .desktop-nav, .header-actions {
+
+    .desktop-nav,
+    .header-actions {
       display: none;
     }
 
@@ -197,12 +247,12 @@ const isHome = pathname === '/' || pathname === '/index.html';
 </style>
 
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const btn = document.querySelector('.mobile-menu-btn');
-    if(btn) {
-      btn.addEventListener('click', () => {
-        const expanded = btn.getAttribute('aria-expanded') === 'true' || false;
-        btn.setAttribute('aria-expanded', !expanded);
+  document.addEventListener("DOMContentLoaded", () => {
+    const btn = document.querySelector(".mobile-menu-btn");
+    if (btn) {
+      btn.addEventListener("click", () => {
+        const expanded = btn.getAttribute("aria-expanded") === "true" || false;
+        btn.setAttribute("aria-expanded", !expanded);
         // Minimal toggle logic for future mobile menu
         // Right now we just toggle the button state
       });
