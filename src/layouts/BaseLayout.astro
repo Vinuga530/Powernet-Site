@@ -47,11 +47,8 @@ const { title, description = "Powernet (Pvt) Ltd — Sri Lanka's trusted one-sto
         if (loader && !loader.classList.contains('is-hidden')) {
           loader.classList.add('is-hidden');
           
-          // Slight delay to allow loader to fade out before hero entrance
-          setTimeout(() => {
-            document.querySelectorAll('.hero-section').forEach(el => el.classList.add('is-revealed'));
-            document.querySelectorAll('.header').forEach(el => el.classList.add('is-revealed'));
-          }, 400);
+          document.querySelectorAll('.hero-section').forEach(el => el.classList.add('is-revealed'));
+          document.querySelectorAll('.header').forEach(el => el.classList.add('is-revealed'));
         }
       };
 
@@ -59,11 +56,10 @@ const { title, description = "Powernet (Pvt) Ltd — Sri Lanka's trusted one-sto
       const heroImg = document.querySelector('.bg-img');
       if (heroImg && !heroImg.complete) {
         heroImg.addEventListener('load', hideLoader);
-        setTimeout(hideLoader, 1500); // safety fallback
+        setTimeout(hideLoader, 500); // safety fallback reduced to 500ms
       } else {
         // Run immediately if no image or already loaded
-        document.addEventListener('DOMContentLoaded', hideLoader);
-        setTimeout(hideLoader, 50); // safety fallback if DOMContentLoaded already fired
+        hideLoader();
       }
 
       document.addEventListener('DOMContentLoaded', () => {

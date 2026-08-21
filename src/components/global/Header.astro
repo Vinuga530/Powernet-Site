@@ -10,7 +10,7 @@ const isHome = pathname === '/' || pathname === '/index.html';
   <div class="container header-container">
     <div class="logo fade-in stagger-1">
       <a href="/" class="logo-link">
-        <Image src={logoImg} alt="Powernet Logo" class="logo-img" />
+        <Image src={logoImg} alt="Powernet Logo" class="logo-img" loading="eager" fetchpriority="high" />
       </a>
     </div>
     
@@ -131,7 +131,6 @@ const isHome = pathname === '/' || pathname === '/index.html';
     border-radius: 2px;
     transition: background-color 0.3s ease, transform 0.3s ease;
     transition-delay: 0s !important;
-    will-change: transform;
   }
 
   .cta-arrow {
