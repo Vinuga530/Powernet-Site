@@ -4,6 +4,12 @@ import logoImg from "../../assets/images/icons/powernet-logo.png";
 
 const pathname = new URL(Astro.request.url).pathname;
 const isHome = pathname === "/" || pathname === "/index.html";
+const navItems = [
+  { href: "/services", label: "Services" },
+  { href: "/projects", label: "Projects" },
+  { href: "/about", label: "About" },
+  { href: "/contact", label: "Contact" },
+];
 ---
 
 <header class={`header ${isHome ? "header-transparent-dark" : ""}`}>
@@ -22,44 +28,33 @@ const isHome = pathname === "/" || pathname === "/index.html";
 
     <nav class="desktop-nav fade-in stagger-2">
       <ul class="nav-list">
-        <li>
-          <a href="/services" class="nav-link">
-            <span class="nav-text">
-              <span>Services</span>
-              <span aria-hidden="true">Services</span>
-            </span>
-          </a>
-        </li>
+        {
+          navItems.map((item) => (
+            <li>
+              <a href={item.href} class="nav-link">
+                <span class="nav-word">
+                  <span class="nav-layer nav-layer-top">
+                    {Array.from(item.label).map((letter, index) => (
+                      <span class="nav-char" style={`--i:${index}`}>
+                        {letter}
+                      </span>
+                    ))}
+                  </span>
 
-        <li>
-          <a href="/projects" class="nav-link">
-            <span class="nav-text">
-              <span>Projects</span>
-              <span aria-hidden="true">Projects</span>
-            </span>
-          </a>
-        </li>
-
-        <li>
-          <a href="/about" class="nav-link">
-            <span class="nav-text">
-              <span>About</span>
-              <span aria-hidden="true">About</span>
-            </span>
-          </a>
-        </li>
-
-        <li>
-          <a href="/contact" class="nav-link">
-            <span class="nav-text">
-              <span>Contact</span>
-              <span aria-hidden="true">Contact</span>
-            </span>
-          </a>
-        </li>
+                  <span class="nav-layer nav-layer-bottom" aria-hidden="true">
+                    {Array.from(item.label).map((letter, index) => (
+                      <span class="nav-char" style={`--i:${index}`}>
+                        {letter}
+                      </span>
+                    ))}
+                  </span>
+                </span>
+              </a>
+            </li>
+          ))
+        }
       </ul>
     </nav>
-
     <button
       class="mobile-menu-btn fade-in stagger-2"
       aria-label="Toggle menu"
@@ -138,38 +133,52 @@ const isHome = pathname === "/" || pathname === "/index.html";
     color: var(--color-foreground);
     text-decoration: none;
 
-    display: inline-flex;
+    display: inline-block;
     height: 1.2em;
     overflow: hidden;
 
     opacity: 0.9;
-    transition: opacity 0.2s ease;
-  }
-  .nav-text {
-    display: flex;
-    flex-direction: column;
-    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  .nav-text > span {
+  .nav-word {
+    position: relative;
     display: block;
     height: 1.2em;
     line-height: 1.2em;
-    flex-shrink: 0;
   }
 
-  .nav-text > span:last-child {
-    color: var(--color-brand);
+  .nav-layer {
+    display: flex;
+    white-space: nowrap;
+  }
+
+  .nav-layer-bottom {
+    position: absolute;
+    left: 0;
+    top: 100%;
+  }
+
+  .nav-char {
+    display: inline-block;
+
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+
+    transition-delay: calc(var(--i) * 35ms);
+  }
+
+  /* Original letters leave upward */
+  .nav-link:hover .nav-layer-top .nav-char {
+    transform: translateY(-100%);
+  }
+
+  /* New letters enter from below */
+  .nav-link:hover .nav-layer-bottom .nav-char {
+    transform: translateY(-100%);
   }
 
   .nav-link:hover {
     opacity: 1;
   }
-
-  .nav-link:hover .nav-text {
-    transform: translateY(-1.2em);
-  }
-
   .header-transparent-dark .nav-link {
     color: var(--color-dark-foreground);
   }
