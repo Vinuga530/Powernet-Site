@@ -203,6 +203,7 @@ import projectImg from "../assets/images/photos/a guy fixing a server pc.jpg";
     display: flex;
     align-items: center;
     color: var(--color-dark-foreground);
+    overflow: hidden;
   }
 
   .hero-bg {
@@ -210,6 +211,7 @@ import projectImg from "../assets/images/photos/a guy fixing a server pc.jpg";
     inset: 0;
     z-index: -1;
     background-color: #111;
+    will-change: transform;
   }
 
   .bg-img {
@@ -407,3 +409,33 @@ import projectImg from "../assets/images/photos/a guy fixing a server pc.jpg";
     }
   }
 </style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReducedMotion || window.innerWidth < 768) return;
+
+    const heroBg = document.querySelector('.hero-bg');
+    if (!(heroBg instanceof HTMLElement)) return;
+
+    let ticking = false;
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const scrolled = Math.max(0, window.scrollY);
+          // Animate only while hero section is in view
+          if (scrolled < window.innerHeight * 1.5) {
+            const yPos = scrolled * 0.16; // 16% parallax depth
+            // Overscale slightly to prevent edges from showing
+            heroBg.style.transform = `translate3d(0, ${yPos}px, 0) scale(1.05)`;
+          }
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll(); // Initialize on load
+  });
+</script>
