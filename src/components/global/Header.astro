@@ -162,23 +162,25 @@ const navItems = [
   .nav-link {
     font-family: var(--font-mono);
     font-size: 0.95rem;
-    font-weight: 500;
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.06em;
     color: var(--color-foreground);
     text-decoration: none;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
 
     display: inline-block;
     height: 1.2em;
     overflow: hidden;
 
     opacity: 0.9;
-    transition: color 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    transition: color 0.6s cubic-bezier(0.22, 1, 0.36, 1), text-shadow 0.6s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .header.scrolled .nav-link,
   .header.header-transparent-dark.scrolled .nav-link {
     color: #1a1a1a;
+    text-shadow: none;
   }
 
   .nav-word {
