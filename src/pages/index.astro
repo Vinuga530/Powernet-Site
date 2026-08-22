@@ -49,21 +49,49 @@ import projectImg from "../assets/images/photos/a guy fixing a server pc.jpg";
           <span class="strip-eyebrow">OWNERSHIP</span>
           <span class="strip-value">100%</span>
           <span class="strip-desc">Sri Lankan</span>
+          <svg class="stats-icon stats-icon-1" viewBox="0 0 100 100" fill="none" stroke="#202020" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path class="draw-path" d="M42 12 C 45 8, 48 8, 50 12 C 55 22, 60 28, 65 38 C 72 50, 75 65, 62 82 C 55 90, 40 92, 32 82 C 25 72, 28 55, 34 45 C 38 38, 40 25, 42 12 Z" />
+            <circle class="draw-accent" cx="42" cy="65" r="2.5" fill="var(--color-brand)" stroke="none" />
+          </svg>
         </div>
         <div class="strip-item fade-in stagger-2">
           <span class="strip-eyebrow">TEAM</span>
           <span class="strip-value">150+</span>
           <span class="strip-desc">Permanent Staff</span>
+          <svg class="stats-icon stats-icon-2" viewBox="0 0 100 100" fill="none" stroke="#202020" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path class="draw-path" d="M30 45 C 30 25, 70 25, 70 45 L 75 45 L 75 50 L 25 50 L 25 45 Z" />
+            <path class="draw-path" d="M50 22 L 50 45" />
+            <path class="draw-path" d="M35 50 L 35 65 C 35 75, 20 85, 20 100" />
+            <path class="draw-path" d="M65 50 L 65 65 C 65 75, 80 85, 80 100" />
+            <path class="draw-path" d="M35 65 L 50 75 L 65 65" />
+            <circle class="draw-accent" cx="50" cy="75" r="2.5" fill="var(--color-brand)" stroke="none" />
+          </svg>
         </div>
         <div class="strip-item fade-in stagger-3">
           <span class="strip-eyebrow">CAPACITY</span>
           <span class="strip-value">200+</span>
           <span class="strip-desc">Contractual Personnel</span>
+          <svg class="stats-icon stats-icon-3" viewBox="0 0 100 100" fill="none" stroke="#202020" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path class="draw-path" d="M30 15 L 70 15 L 70 85 L 30 85 Z" />
+            <path class="draw-path" d="M30 30 L 70 30" />
+            <path class="draw-path" d="M30 45 L 70 45" />
+            <path class="draw-path" d="M30 60 L 70 60" />
+            <path class="draw-path" d="M40 22.5 L 42 22.5" />
+            <path class="draw-path" d="M40 37.5 L 42 37.5" />
+            <path class="draw-path" d="M40 52.5 L 42 52.5" />
+            <path class="draw-path" d="M55 70 C 55 90, 85 70, 85 90" />
+            <circle class="draw-accent" cx="85" cy="90" r="2.5" fill="var(--color-brand)" stroke="none" />
+          </svg>
         </div>
         <div class="strip-item fade-in stagger-4">
           <span class="strip-eyebrow">COVERAGE</span>
           <span class="strip-value">Islandwide</span>
           <span class="strip-desc">Delivery</span>
+          <svg class="stats-icon stats-icon-4" viewBox="0 0 100 100" fill="none" stroke="#202020" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path class="draw-path" d="M15 85 C 30 85, 25 55, 45 60 C 65 65, 55 45, 75 35" />
+            <path class="draw-path" d="M75 35 C 65 25, 65 10, 75 10 C 85 10, 85 25, 75 35 Z" />
+            <circle class="draw-accent" cx="75" cy="18" r="2.5" fill="var(--color-brand)" stroke="none" />
+          </svg>
         </div>
       </div>
     </div>
@@ -292,6 +320,7 @@ import projectImg from "../assets/images/photos/a guy fixing a server pc.jpg";
     gap: 8px;
     padding: var(--space-xl) var(--space-lg);
     border-left: 1px solid var(--color-border);
+    position: relative;
   }
 
   .strip-item:first-child {
@@ -337,6 +366,27 @@ import projectImg from "../assets/images/photos/a guy fixing a server pc.jpg";
     }
     .strip-item:nth-child(even) {
       border-left: 1px solid var(--color-border);
+    }
+  }
+
+  /* Stats Icons */
+  .stats-icon {
+    position: absolute;
+    right: var(--space-lg);
+    top: 50%;
+    transform: translateY(-50%);
+    width: 80px;
+    height: 70px;
+    pointer-events: none;
+    opacity: 0.22;
+  }
+  
+  @media (max-width: 768px) {
+    .stats-icon {
+      right: var(--space-md);
+      width: 60px;
+      height: 55px;
+      opacity: 0.15;
     }
   }
 
@@ -496,5 +546,66 @@ import projectImg from "../assets/images/photos/a guy fixing a server pc.jpg";
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll(); // Initialize on load
+
+    // Stats Animation Logic
+    const credibilityStrip = document.querySelector('.credibility-strip');
+    const svgIcons = document.querySelectorAll('.stats-icon');
+    
+    if (credibilityStrip && svgIcons.length > 0) {
+      if (prefersReducedMotion) {
+        svgIcons.forEach(svg => {
+          const accent = svg.querySelector('.draw-accent');
+          if (accent) accent.style.opacity = '1';
+        });
+      } else {
+        const svgAnimations = [];
+        
+        svgIcons.forEach(svg => {
+          const paths = svg.querySelectorAll('.draw-path');
+          const accent = svg.querySelector('.draw-accent');
+          
+          if (accent) accent.style.opacity = '0';
+          
+          const pathData = Array.from(paths).map(path => {
+            const length = path.getTotalLength();
+            path.style.strokeDasharray = length;
+            path.style.strokeDashoffset = length;
+            path.getBoundingClientRect(); // trigger reflow
+            return { el: path, length: length };
+          });
+          
+          svgAnimations.push({ svg, paths: pathData, accent });
+        });
+        
+        const animateIcon = (iconData) => {
+          let currentDelay = 0;
+          iconData.paths.forEach(p => {
+            p.el.style.transition = `stroke-dashoffset 700ms cubic-bezier(0.22, 1, 0.36, 1) ${currentDelay}ms`;
+            p.el.style.strokeDashoffset = '0';
+            currentDelay += 120; // short internal delay
+          });
+          
+          if (iconData.accent) {
+            iconData.accent.style.transition = `opacity 500ms ease ${currentDelay}ms`;
+            iconData.accent.style.opacity = '1';
+          }
+        };
+
+        const observer = new IntersectionObserver((entries, obs) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              obs.unobserve(entry.target);
+              svgAnimations.forEach((iconData, index) => {
+                setTimeout(() => {
+                  animateIcon(iconData);
+                }, index * 160); // sequence delay
+              });
+            }
+          });
+        }, { threshold: 0.35 });
+
+        observer.observe(credibilityStrip);
+      }
+    }
   });
 </script>
