@@ -46,20 +46,24 @@ import projectImg from "../assets/images/photos/a guy fixing a server pc.jpg";
     <div class="container">
       <div class="strip-grid">
         <div class="strip-item fade-in stagger-1">
-          <span class="text-label">Established</span>
-          <span class="text-h4">100% Sri Lankan</span>
+          <span class="strip-eyebrow">OWNERSHIP</span>
+          <span class="strip-value">100%</span>
+          <span class="strip-desc">Sri Lankan</span>
         </div>
         <div class="strip-item fade-in stagger-2">
-          <span class="text-label">Workforce</span>
-          <span class="text-h4">150+ Permanent Staff</span>
+          <span class="strip-eyebrow">TEAM</span>
+          <span class="strip-value">150+</span>
+          <span class="strip-desc">Permanent Staff</span>
         </div>
         <div class="strip-item fade-in stagger-3">
-          <span class="text-label">Capacity</span>
-          <span class="text-h4">200+ Contractual</span>
+          <span class="strip-eyebrow">CAPACITY</span>
+          <span class="strip-value">200+</span>
+          <span class="strip-desc">Contractual Personnel</span>
         </div>
         <div class="strip-item fade-in stagger-4">
-          <span class="text-label">Reach</span>
-          <span class="text-h4">Island-Wide Delivery</span>
+          <span class="strip-eyebrow">COVERAGE</span>
+          <span class="strip-value">Islandwide</span>
+          <span class="strip-desc">Delivery</span>
         </div>
       </div>
     </div>
@@ -271,31 +275,68 @@ import projectImg from "../assets/images/photos/a guy fixing a server pc.jpg";
 
   /* Credibility Strip */
   .credibility-strip {
-    background-color: var(--color-brand);
-    color: white;
-    padding: var(--space-lg) 0;
+    background-color: var(--color-background);
+    padding: 100px 0 var(--space-3xl);
   }
 
   .strip-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: var(--space-md);
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
   }
 
   .strip-item {
     display: flex;
     flex-direction: column;
-    gap: var(--space-xs);
+    gap: 8px;
+    padding: var(--space-xl) var(--space-lg);
+    border-left: 1px solid var(--color-border);
   }
 
-  .strip-item .text-label {
-    opacity: 0.8;
+  .strip-item:first-child {
+    border-left: none;
+  }
+
+  .strip-eyebrow {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-brand);
+  }
+
+  .strip-value {
+    font-size: clamp(2rem, 3vw, 2.75rem);
+    font-weight: 500;
+    line-height: 1.1;
+    color: var(--color-foreground);
+    letter-spacing: -0.02em;
+  }
+
+  .strip-desc {
+    font-size: 0.95rem;
+    color: var(--color-muted);
+    line-height: 1.4;
   }
 
   @media (max-width: 768px) {
+    .credibility-strip {
+      padding: 80px 0 var(--space-2xl);
+    }
     .strip-grid {
       grid-template-columns: repeat(2, 1fr);
-      row-gap: var(--space-xl);
+      border-bottom: none;
+    }
+    .strip-item {
+      padding: var(--space-lg) var(--space-md);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .strip-item:nth-child(odd) {
+      border-left: none;
+    }
+    .strip-item:nth-child(even) {
+      border-left: 1px solid var(--color-border);
     }
   }
 
