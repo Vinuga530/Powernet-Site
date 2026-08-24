@@ -13,8 +13,8 @@ const navItems = [
 ---
 
 <header id="main-header" class={`header ${isHome ? "header-transparent-dark" : ""}`}>
-  <div class="header-wrapper">
-    <div class="logo-container fade-in stagger-1">
+  <div class="container header-container">
+    <div class="logo fade-in stagger-1">
       <a href="/" class="logo-link">
         <Image
           src={logoImg}
@@ -26,203 +26,143 @@ const navItems = [
       </a>
     </div>
 
-    <div class="nav-container fade-in stagger-2">
-      <nav class="desktop-nav">
-        <ul class="nav-list">
-          {
-            navItems.map((item) => (
-              <li>
-                <a href={item.href} class="nav-link">
-                  <span class="nav-word">
-                    <span class="nav-layer nav-layer-top">
-                      {Array.from(item.label).map((letter, index) => (
-                        <span class="nav-char" style={`--i:${index}`}>
-                          {letter}
-                        </span>
-                      ))}
-                    </span>
-
-                    <span class="nav-layer nav-layer-bottom" aria-hidden="true">
-                      {Array.from(item.label).map((letter, index) => (
-                        <span class="nav-char" style={`--i:${index}`}>
-                          {letter}
-                        </span>
-                      ))}
-                    </span>
+    <nav class="desktop-nav fade-in stagger-2">
+      <ul class="nav-list">
+        {
+          navItems.map((item) => (
+            <li>
+              <a href={item.href} class="nav-link">
+                <span class="nav-word">
+                  <span class="nav-layer nav-layer-top">
+                    {Array.from(item.label).map((letter, index) => (
+                      <span class="nav-char" style={`--i:${index}`}>
+                        {letter}
+                      </span>
+                    ))}
                   </span>
-                </a>
-              </li>
-            ))
-          }
-        </ul>
-      </nav>
-      
-      <button
-        class="mobile-menu-btn"
-        aria-label="Toggle menu"
-        aria-expanded="false"
-      >
-        <span class="hamburger-line"></span>
-        <span class="hamburger-line"></span>
-      </button>
 
-      <div class="header-actions">
-        <a href="/contact" class="btn-primary">
-          <span class="cta-accent" aria-hidden="true"></span>
-          <span class="cta-word">
-            <span class="cta-layer cta-layer-top">
-              {Array.from("LET'S TALK").map((letter, index) => (
-                <span class="cta-char" style={`--i:${index}`}>
-                  {letter === " " ? "\u00A0" : letter}
+                  <span class="nav-layer nav-layer-bottom" aria-hidden="true">
+                    {Array.from(item.label).map((letter, index) => (
+                      <span class="nav-char" style={`--i:${index}`}>
+                        {letter}
+                      </span>
+                    ))}
+                  </span>
                 </span>
-              ))}
-            </span>
-            <span class="cta-layer cta-layer-bottom" aria-hidden="true">
-              {Array.from("LET'S TALK").map((letter, index) => (
-                <span class="cta-char" style={`--i:${index}`}>
-                  {letter === " " ? "\u00A0" : letter}
-                </span>
-              ))}
-            </span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+    <button
+      class="mobile-menu-btn fade-in stagger-2"
+      aria-label="Toggle menu"
+      aria-expanded="false"
+    >
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+    </button>
+
+    <div class="header-actions fade-in stagger-3">
+      <a href="/contact" class="btn-primary">
+        <span class="cta-accent" aria-hidden="true"></span>
+        <span class="cta-word">
+          <span class="cta-layer cta-layer-top">
+            {Array.from("LET'S TALK").map((letter, index) => (
+              <span class="cta-char" style={`--i:${index}`}>
+                {letter === " " ? "\u00A0" : letter}
+              </span>
+            ))}
           </span>
-        </a>
-      </div>
+          <span class="cta-layer cta-layer-bottom" aria-hidden="true">
+            {Array.from("LET'S TALK").map((letter, index) => (
+              <span class="cta-char" style={`--i:${index}`}>
+                {letter === " " ? "\u00A0" : letter}
+              </span>
+            ))}
+          </span>
+        </span>
+      </a>
     </div>
   </div>
 </header>
 
 <style>
-  :root {
-    --hdr-anim: 0.65s cubic-bezier(0.16, 1, 0.3, 1);
-    
-    --logo-w-init: 210px;
-    --logo-h-init: 90px;
-    --logo-w-scroll: 145px;
-    
-    --nav-h-init: 90px;
-    --hdr-h-scroll: 60px;
-    
-    --hdr-gap: 24px;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    :root {
-      --hdr-anim: 0.01s linear;
-    }
-  }
-
   .header {
     position: fixed;
     top: 0;
-    left: 0;
+    left: 50%;
+    transform: translateX(-50%);
     width: 100%;
+    max-width: 100%;
     z-index: 100;
     padding: 24px 0;
-    pointer-events: none; /* Let clicks pass through transparent gaps */
-    transition: padding var(--hdr-anim);
+    background-color: transparent;
+    border-radius: 0;
+    border: 1px solid transparent;
+    transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .header.scrolled {
-    padding: 18px 0;
-  }
-
-  .header-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
+    top: 18px;
+    padding: 14px 0;
+    width: calc(100% - 48px);
     max-width: 1180px;
-    margin: 0 auto;
-    padding: 0 24px;
-    gap: var(--hdr-gap);
-    pointer-events: auto; /* Re-enable clicks on the header parts */
-    transition: gap var(--hdr-anim);
-  }
-
-  .header.scrolled .header-wrapper {
-    gap: 0;
-  }
-
-  .logo-container, .nav-container {
     background-color: rgba(255, 255, 255, 0.98);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
+    border-radius: 26px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
     border: 1px solid rgba(0, 0, 0, 0.02);
-    transition: 
-      width var(--hdr-anim),
-      height var(--hdr-anim),
-      border-radius var(--hdr-anim),
-      padding var(--hdr-anim),
-      border-color var(--hdr-anim),
-      margin var(--hdr-anim);
   }
 
-  .logo-container {
-    display: flex;
+  .header-container {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    justify-content: center;
-    width: var(--logo-w-init);
-    height: var(--logo-h-init);
-    border-radius: 26px;
-    flex-shrink: 0;
-    padding: 0 24px;
-    /* Create stacking context to overlap cleanly */
-    position: relative;
-    z-index: 2;
+  }
+
+  .logo {
+    justify-self: start;
   }
 
   .logo-link {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
+    display: block;
+    width: clamp(145px, 9vw, 170px);
+    transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .header.scrolled .logo-link {
+    width: clamp(120px, 8vw, 140px);
   }
 
   .logo-img {
+    display: block;
     width: 100%;
-    height: 100%;
+    height: auto;
     object-fit: contain;
   }
 
-  .nav-container {
-    display: flex;
-    align-items: center;
-    height: var(--nav-h-init);
-    border-radius: 26px;
-    flex-grow: 1;
-    padding: 0 12px 0 32px;
-    position: relative;
-    z-index: 1;
-  }
-
   .desktop-nav {
-    margin: 0 auto; /* Center navigation in available space */
+    justify-self: center;
   }
 
-  .header.scrolled .logo-container {
-    width: var(--logo-w-scroll);
-    height: var(--hdr-h-scroll);
-    border-radius: 26px 0 0 26px;
-    border-right-color: transparent;
-    padding: 0 16px 0 24px;
-    margin-right: -1px; /* Tiny overlap to prevent backdrop-filter seam */
+  .header-actions {
+    justify-self: end;
   }
 
-  .header.scrolled .nav-container {
-    height: var(--hdr-h-scroll);
-    border-radius: 0 26px 26px 0;
-    border-left-color: transparent;
-    padding: 0 12px 0 24px;
+  /* Removed logo inversion to keep full color */
+
+  .header-transparent-dark .nav-link {
+    color: var(--color-dark-foreground);
   }
 
-  /* Typography and Link animations */
   .nav-list {
     display: flex;
     gap: 48px;
     list-style: none;
-    transition: gap var(--hdr-anim);
+    transition: gap 0.6s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .header.scrolled .nav-list {
@@ -235,13 +175,22 @@ const navItems = [
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: #1a1a1a; /* Always dark because container is always white */
+    color: var(--color-foreground);
     text-decoration: none;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+
     display: inline-block;
     height: 1.2em;
     overflow: hidden;
+
     opacity: 0.9;
-    transition: opacity 0.3s ease;
+    transition: color 0.6s cubic-bezier(0.22, 1, 0.36, 1), text-shadow 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .header.scrolled .nav-link,
+  .header.header-transparent-dark.scrolled .nav-link {
+    color: #1a1a1a;
+    text-shadow: none;
   }
 
   .nav-word {
@@ -264,21 +213,29 @@ const navItems = [
 
   .nav-char {
     display: inline-block;
+
     transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+
     transition-delay: calc(var(--i) * 35ms);
   }
 
+  /* Original letters leave upward */
   .nav-link:hover .nav-layer-top .nav-char {
     transform: translateY(-100%);
   }
+
+  /* New letters enter from below */
   .nav-link:hover .nav-layer-bottom .nav-char {
     transform: translateY(-100%);
   }
+
   .nav-link:hover {
     opacity: 1;
   }
+  .header-transparent-dark .nav-link {
+    color: var(--color-dark-foreground);
+  }
 
-  /* Button animations */
   .btn-primary {
     display: inline-flex;
     align-items: center;
@@ -292,7 +249,7 @@ const navItems = [
     text-transform: uppercase;
     letter-spacing: 0.05em;
     border-radius: 2px;
-    transition: transform 0.3s ease, border-radius var(--hdr-anim);
+    transition: transform 0.3s ease, border-radius 0.6s cubic-bezier(0.22, 1, 0.36, 1);
     transition-delay: 0s !important;
     gap: 12px;
   }
@@ -327,23 +284,30 @@ const navItems = [
     line-height: 1.2em;
     overflow: hidden;
   }
+
   .cta-layer {
     display: flex;
     white-space: nowrap;
   }
+
   .cta-layer-bottom {
     position: absolute;
     left: 0;
     top: 100%;
   }
+
   .cta-char {
     display: inline-block;
     transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
     transition-delay: calc(var(--i) * 25ms);
   }
+
+  /* Original letters leave upward */
   .btn-primary:hover .cta-layer-top .cta-char {
     transform: translateY(-100%);
   }
+
+  /* New letters enter from below */
   .btn-primary:hover .cta-layer-bottom .cta-char {
     transform: translateY(-100%);
   }
@@ -359,50 +323,40 @@ const navItems = [
     cursor: pointer;
     padding: 8px;
     z-index: 101;
+    justify-self: end;
   }
 
   .hamburger-line {
     width: 24px;
     height: 2px;
-    background-color: #1a1a1a; /* Dark lines because container is white */
-    transition: transform 0.3s ease, opacity 0.3s ease;
+    background-color: var(--color-foreground);
+    transition:
+      transform 0.3s ease,
+      opacity 0.3s ease,
+      background-color 0.6s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  /* Mobile View - simpler permanent compact header */
+  .header-transparent-dark .hamburger-line {
+    background-color: var(--color-dark-foreground);
+  }
+
+  .header.scrolled .hamburger-line,
+  .header.header-transparent-dark.scrolled .hamburger-line {
+    background-color: #1a1a1a;
+  }
+
   @media (max-width: 1024px) {
-    .header-wrapper {
-      gap: 0;
-      padding: 0 16px;
+    .header-container {
+      grid-template-columns: 1fr auto; /* Logo and Hamburger */
     }
-    
-    .logo-container, .header.scrolled .logo-container {
-      width: auto;
-      height: 60px;
-      padding: 0 16px;
-      border-radius: 20px 0 0 20px;
-      border-right-color: transparent;
-      margin-right: -1px;
-    }
-    
-    .logo-link {
-      width: 120px; 
-    }
-    
-    .nav-container, .header.scrolled .nav-container {
-      height: 60px;
-      border-radius: 0 20px 20px 0;
-      padding: 0 16px;
-      border-left-color: transparent;
-    }
-    
+
     .desktop-nav,
     .header-actions {
       display: none;
     }
-    
+
     .mobile-menu-btn {
       display: flex;
-      margin-left: auto;
     }
   }
 </style>
@@ -414,24 +368,18 @@ const navItems = [
       btn.addEventListener("click", () => {
         const expanded = btn.getAttribute("aria-expanded") === "true" || false;
         btn.setAttribute("aria-expanded", !expanded);
+        // Minimal toggle logic for future mobile menu
+        // Right now we just toggle the button state
       });
     }
 
     const header = document.getElementById("main-header");
     if (header) {
-      let ticking = false;
-      
       const handleScroll = () => {
-        if (!ticking) {
-          window.requestAnimationFrame(() => {
-            if (window.scrollY > 80) {
-              header.classList.add("scrolled");
-            } else {
-              header.classList.remove("scrolled");
-            }
-            ticking = false;
-          });
-          ticking = true;
+        if (window.scrollY > 80) {
+          header.classList.add("scrolled");
+        } else {
+          header.classList.remove("scrolled");
         }
       };
       
