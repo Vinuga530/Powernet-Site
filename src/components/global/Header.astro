@@ -26,8 +26,9 @@ const navItems = [
       </a>
     </div>
 
-    <nav class="desktop-nav fade-in stagger-2">
-      <ul class="nav-list">
+    <div class="nav-pill fade-in stagger-2">
+      <nav class="desktop-nav">
+        <ul class="nav-list">
         {
           navItems.map((item) => (
             <li>
@@ -54,36 +55,37 @@ const navItems = [
           ))
         }
       </ul>
-    </nav>
-    <button
-      class="mobile-menu-btn fade-in stagger-2"
-      aria-label="Toggle menu"
-      aria-expanded="false"
-    >
-      <span class="hamburger-line"></span>
-      <span class="hamburger-line"></span>
-    </button>
+      </nav>
+      <button
+        class="mobile-menu-btn"
+        aria-label="Toggle menu"
+        aria-expanded="false"
+      >
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
 
-    <div class="header-actions fade-in stagger-3">
-      <a href="/contact" class="btn-primary">
-        <span class="cta-accent" aria-hidden="true"></span>
-        <span class="cta-word">
-          <span class="cta-layer cta-layer-top">
-            {Array.from("LET'S TALK").map((letter, index) => (
-              <span class="cta-char" style={`--i:${index}`}>
-                {letter === " " ? "\u00A0" : letter}
-              </span>
-            ))}
+      <div class="header-actions">
+        <a href="/contact" class="btn-primary">
+          <span class="cta-accent" aria-hidden="true"></span>
+          <span class="cta-word">
+            <span class="cta-layer cta-layer-top">
+              {Array.from("LET'S TALK").map((letter, index) => (
+                <span class="cta-char" style={`--i:${index}`}>
+                  {letter === " " ? "\u00A0" : letter}
+                </span>
+              ))}
+            </span>
+            <span class="cta-layer cta-layer-bottom" aria-hidden="true">
+              {Array.from("LET'S TALK").map((letter, index) => (
+                <span class="cta-char" style={`--i:${index}`}>
+                  {letter === " " ? "\u00A0" : letter}
+                </span>
+              ))}
+            </span>
           </span>
-          <span class="cta-layer cta-layer-bottom" aria-hidden="true">
-            {Array.from("LET'S TALK").map((letter, index) => (
-              <span class="cta-char" style={`--i:${index}`}>
-                {letter === " " ? "\u00A0" : letter}
-              </span>
-            ))}
-          </span>
-        </span>
-      </a>
+        </a>
+      </div>
     </div>
   </div>
 </header>
@@ -105,21 +107,37 @@ const navItems = [
   }
 
   .header.scrolled {
-    top: 18px;
-    padding: 14px 0;
-    width: calc(100% - 48px);
-    max-width: 1180px;
-    /* Removed white pill styling to prevent the navbar from turning white */
+    /* Removed pill styling from here since it's on .nav-pill now */
   }
 
   .header-container {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
+    display: flex;
+    justify-content: space-between;
     align-items: center;
+    width: 100%;
+    max-width: 1180px;
+    margin: 0 auto;
+    gap: 24px;
+    pointer-events: auto;
+  }
+
+  .nav-pill {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 26px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(0, 0, 0, 0.02);
+    padding: 0 24px;
+    height: 64px;
+    flex-grow: 1;
   }
 
   .logo {
-    justify-self: start;
+    flex-shrink: 0;
     background-color: #ffffff;
     border-radius: 18px;
     padding: 14px 24px;
@@ -147,17 +165,27 @@ const navItems = [
   }
 
   .desktop-nav {
-    justify-self: center;
+    margin: 0 auto;
   }
 
   .header-actions {
-    justify-self: end;
+    /* Keep defaults */
   }
 
-  /* Removed logo inversion to keep full color */
-
-  .header-transparent-dark .nav-link {
-    color: var(--color-dark-foreground);
+  .nav-link {
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #1a1a1a;
+    text-shadow: none;
+    text-decoration: none;
+    display: inline-block;
+    height: 1.2em;
+    overflow: hidden;
+    opacity: 0.9;
+    transition: color 0.6s cubic-bezier(0.22, 1, 0.36, 1), text-shadow 0.6s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .nav-list {
@@ -171,27 +199,10 @@ const navItems = [
     gap: 32px;
   }
 
-  .nav-link {
-    font-family: var(--font-mono);
-    font-size: 0.95rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--color-foreground);
-    text-decoration: none;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
-
-    display: inline-block;
-    height: 1.2em;
-    overflow: hidden;
-
-    opacity: 0.9;
-    transition: color 0.6s cubic-bezier(0.22, 1, 0.36, 1), text-shadow 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-
   .header.scrolled .nav-link,
   .header.header-transparent-dark.scrolled .nav-link {
-    /* Kept intentionally blank to preserve white text on scroll */
+    color: #1a1a1a;
+    text-shadow: none;
   }
 
   .nav-word {
@@ -330,7 +341,7 @@ const navItems = [
   .hamburger-line {
     width: 24px;
     height: 2px;
-    background-color: var(--color-foreground);
+    background-color: #1a1a1a;
     transition:
       transform 0.3s ease,
       opacity 0.3s ease,
@@ -341,14 +352,9 @@ const navItems = [
     background-color: var(--color-dark-foreground);
   }
 
-  .header.scrolled .hamburger-line,
-  .header.header-transparent-dark.scrolled .hamburger-line {
-    /* Kept intentionally blank to preserve white hamburger on scroll */
-  }
-
   @media (max-width: 1024px) {
     .header-container {
-      grid-template-columns: 1fr auto; /* Logo and Hamburger */
+      padding: 0 16px;
     }
 
     .desktop-nav,
@@ -358,6 +364,11 @@ const navItems = [
 
     .mobile-menu-btn {
       display: flex;
+    }
+
+    .nav-pill {
+      flex-grow: 0;
+      justify-content: center;
     }
   }
 </style>
