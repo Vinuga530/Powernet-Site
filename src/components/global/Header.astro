@@ -179,17 +179,27 @@ const navItems = [
   .logo {
     flex-shrink: 0;
     background-color: #ffffff;
-    border-radius: 0 0 8px 8px;
-    padding: 8px 16px 6px 16px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    border-radius: 0 0 24px 0;
+    padding: 24px 40px 24px 24px;
     position: relative;
     z-index: 10;
     pointer-events: auto;
   }
 
+  .logo::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 100%;
+    width: 50vw;
+    background-color: #ffffff;
+    z-index: -1;
+  }
+
   .logo-link {
     display: block;
-    width: clamp(130px, 8.5vw, 160px);
+    width: clamp(145px, 9vw, 170px);
   }
 
   .logo-img {
