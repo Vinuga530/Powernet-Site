@@ -171,17 +171,16 @@ const navItems = [
     align-items: center;
     justify-content: flex-end;
     gap: 48px;
-    padding-top: 12px;
+    padding-top: 16px;
     flex-grow: 1;
     pointer-events: auto;
   }
 
   .logo {
     flex-shrink: 0;
-    background-color: #ffffff;
-    border-radius: 0 0 24px 0;
-    padding: 24px 40px 24px 24px;
     position: relative;
+    /* Balanced padding so the logo feels comfortably housed */
+    padding: 16px 40px 16px 24px;
     z-index: 10;
     pointer-events: auto;
   }
@@ -191,10 +190,13 @@ const navItems = [
     position: absolute;
     top: 0;
     bottom: 0;
-    right: 100%;
+    /* Extend from the absolute left of the screen */
+    right: 0;
     width: 50vw;
     background-color: #ffffff;
     z-index: -1;
+    /* Architectural angled cut-out on the right edge */
+    clip-path: polygon(0 0, 100% 0, 100% 70%, 94% 100%, 0 100%);
   }
 
   .logo-link {
@@ -217,15 +219,15 @@ const navItems = [
     position: fixed;
     top: 24px;
     left: 50%;
-    transform: translate(-50%, -150%);
+    transform: translate(-50%, -120%);
     z-index: 1000;
     opacity: 0;
     visibility: hidden;
-    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), 
-                opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1),
-                visibility 0.5s;
-    width: 100%;
-    max-width: fit-content;
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), 
+                opacity 0.3s ease,
+                visibility 0.3s;
+    width: max-content;
+    max-width: calc(100vw - 32px);
     pointer-events: none;
   }
 
@@ -239,20 +241,20 @@ const navItems = [
   .floating-nav-inner {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     background-color: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border-radius: 40px;
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    padding: 0 8px 0 32px;
-    height: 64px;
-    gap: 40px;
+    border-radius: 20px; /* Restrained curve */
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    padding: 0 12px 0 28px;
+    height: 56px;
+    gap: 32px;
   }
   
   .floating-nav-inner .btn-primary {
-    border-radius: 32px;
+    border-radius: 28px;
     padding: 10px 16px;
   }
 
@@ -272,11 +274,6 @@ const navItems = [
     transition: color 0.6s cubic-bezier(0.22, 1, 0.36, 1), text-shadow 0.6s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  .header-transparent-dark .nav-link {
-    color: #1a1a1a;
-    text-shadow: none;
-  }
-
   .floating-nav .nav-link {
     color: #1a1a1a;
     text-shadow: none;
@@ -287,6 +284,10 @@ const navItems = [
     gap: 48px;
     list-style: none;
     transition: gap 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .floating-nav .nav-list {
+    gap: 32px;
   }
 
   .nav-word {
@@ -435,13 +436,10 @@ const navItems = [
     
     .floating-nav {
       top: 16px;
-      width: calc(100% - 32px);
-      max-width: 100%;
     }
     
     .floating-nav-inner {
       padding: 0 24px;
-      border-radius: 24px;
       justify-content: center;
     }
     
@@ -465,30 +463,50 @@ const navItems = [
 
     // Direction-aware floating nav logic
     const floatingNav = document.getElementById("floating-nav");
+    if (!floatingNav) return;
+
     let lastScrollY = window.scrollY;
+    let ticking = false;
     
-    if (floatingNav) {
-      const handleScroll = () => {
-        const currentScrollY = window.scrollY;
-        const scrollThreshold = 150; // Don't show when close to top
-        
-        // At the top area -> hide
-        if (currentScrollY <= scrollThreshold) {
-          floatingNav.classList.remove("visible");
-        } 
-        // Scrolling up and past threshold -> show
-        else if (currentScrollY < lastScrollY - 5) {
-          floatingNav.classList.add("visible");
-        } 
-        // Scrolling down -> hide
-        else if (currentScrollY > lastScrollY + 5) {
-          floatingNav.classList.remove("visible");
-        }
-        
-        lastScrollY = currentScrollY;
-      };
+    // Thresholds
+    const TOP_THRESHOLD = 150; 
+    const SCROLL_DELTA_THRESHOLD = 20; 
+    
+    let scrollAnchor = window.scrollY;
+    let lastDirection = 0; // 1 for down, -1 for up
+
+    const updateNav = () => {
+      const currentScrollY = window.scrollY;
+      const delta = currentScrollY - lastScrollY;
       
-      window.addEventListener("scroll", handleScroll, { passive: true });
-    }
+      const currentDirection = delta === 0 ? 0 : Math.sign(delta);
+      
+      if (currentDirection !== 0 && currentDirection !== lastDirection) {
+        scrollAnchor = currentScrollY;
+        lastDirection = currentDirection;
+      }
+      
+      const distanceFromAnchor = Math.abs(currentScrollY - scrollAnchor);
+
+      if (currentScrollY <= TOP_THRESHOLD) {
+        floatingNav.classList.remove("visible");
+      } 
+      else if (currentDirection === -1 && distanceFromAnchor >= SCROLL_DELTA_THRESHOLD) {
+        floatingNav.classList.add("visible");
+      } 
+      else if (currentDirection === 1 && distanceFromAnchor >= SCROLL_DELTA_THRESHOLD) {
+        floatingNav.classList.remove("visible");
+      }
+      
+      lastScrollY = currentScrollY;
+      ticking = false;
+    };
+
+    window.addEventListener("scroll", () => {
+      if (!ticking) {
+        window.requestAnimationFrame(updateNav);
+        ticking = true;
+      }
+    }, { passive: true });
   });
 </script>
