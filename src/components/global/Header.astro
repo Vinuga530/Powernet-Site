@@ -179,7 +179,8 @@ const navItems = [
   .logo {
     flex-shrink: 0;
     position: relative;
-    /* Balanced padding so the logo feels comfortably housed */
+    /* Disconnect from top edge to make it a pure left-side horizontal protrusion */
+    margin-top: 24px;
     padding: 16px 40px 16px 24px;
     z-index: 10;
     pointer-events: auto;
