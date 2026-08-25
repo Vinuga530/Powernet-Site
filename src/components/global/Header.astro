@@ -177,32 +177,26 @@ const navItems = [
   }
 
   .logo {
-    flex-shrink: 0;
-    position: relative;
-    /* Disconnect from top edge to make it a pure left-side horizontal protrusion */
-    margin-top: 24px;
-    padding: 10px 24px 10px 16px;
+    position: absolute;
+    left: 0;
+    top: 24px;
+    width: 260px;
+    height: 76px;
+    background-color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* 10% of 260px is 26px, hitting the exact 20-30px angled termination requirement */
+    clip-path: polygon(0 0, 100% 0, 100% 65%, 90% 100%, 0 100%);
     z-index: 10;
     pointer-events: auto;
   }
 
-  .logo::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    /* Extend from the absolute left of the screen */
-    right: 0;
-    width: 50vw;
-    background-color: #ffffff;
-    z-index: -1;
-    /* Architectural angled cut-out on the right edge */
-    clip-path: polygon(0 0, 100% 0, 100% 65%, 88% 100%, 0 100%);
-  }
-
   .logo-link {
     display: block;
-    width: clamp(125px, 8vw, 155px);
+    width: 145px;
+    /* Shift slightly left within the 260px box to account for the angle on the right */
+    transform: translateX(-4px);
   }
 
   .logo-img {
@@ -421,6 +415,12 @@ const navItems = [
       padding: 0 16px;
     }
     
+    .logo {
+      width: 220px;
+      height: 64px;
+      top: 16px;
+    }
+
     .original-nav-container {
       padding-top: 24px;
       gap: 24px;
