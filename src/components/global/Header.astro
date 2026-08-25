@@ -171,7 +171,7 @@ const navItems = [
     align-items: center;
     justify-content: flex-end;
     gap: 48px;
-    padding-top: 32px;
+    padding-top: 24px;
     flex-grow: 1;
     pointer-events: auto;
   }
@@ -179,9 +179,9 @@ const navItems = [
   .logo {
     flex-shrink: 0;
     background-color: #ffffff;
-    border-radius: 0 0 18px 18px;
-    padding: 28px 24px 16px 24px;
-    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04);
+    border-radius: 0 0 12px 12px;
+    padding: 12px 20px 10px 20px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06), 0 2px 4px rgba(0, 0, 0, 0.04);
     position: relative;
     z-index: 10;
     pointer-events: auto;
@@ -252,8 +252,8 @@ const navItems = [
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: #1a1a1a;
-    text-shadow: none;
+    color: var(--color-foreground, #ffffff);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
     text-decoration: none;
     display: inline-block;
     height: 1.2em;
@@ -262,10 +262,21 @@ const navItems = [
     transition: color 0.6s cubic-bezier(0.22, 1, 0.36, 1), text-shadow 0.6s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
+  .header-transparent-dark .nav-link {
+    color: var(--color-dark-foreground, #1a1a1a);
+    text-shadow: none;
+  }
+
+  .floating-nav .nav-link {
+    color: var(--color-dark-foreground, #1a1a1a);
+    text-shadow: none;
+  }
+
   .nav-list {
     display: flex;
-    gap: 40px;
+    gap: 48px;
     list-style: none;
+    transition: gap 0.6s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .nav-word {
