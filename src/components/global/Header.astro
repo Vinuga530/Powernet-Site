@@ -180,34 +180,60 @@ const navItems = [
     position: absolute;
     top: 0;
     left: 0;
-    width: 280px;
-    height: 78px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 28px 0 20px;
-    background: #ffffff;
-    clip-path: polygon(
-      0 0,
-      100% 0,
-      100% 72%,
-      92% 100%,
-      0 100%
+    width: 290px;
+    height: 82px;
+    z-index: 50;
+    isolation: isolate;
+  }
+
+  .logo::after {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    top: 14px;
+    right: -16px;
+    width: 38px;
+    height: 66px;
+    pointer-events: none;
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.18) 0%,
+      rgba(255, 255, 255, 0.07) 45%,
+      rgba(255, 255, 255, 0) 100%
     );
-    z-index: 20;
-    pointer-events: auto;
+    filter: blur(7px);
+    opacity: 0.65;
   }
 
   .logo-link {
-    display: block;
+    position: relative;
+    z-index: 2;
     width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    padding: 0 38px 0 22px;
+    background: rgba(255, 255, 255, 0.985);
+    clip-path: polygon(
+      0 0,
+      100% 0,
+      100% 70%,
+      92% 100%,
+      0 100%
+    );
+    filter: drop-shadow(6px 8px 15px rgba(0, 0, 0, 0.10));
+    text-decoration: none;
   }
 
   .logo-img {
-    width: 170px;
+    display: block;
+    width: 178px;
     max-width: 100%;
     height: auto;
-    display: block;
+    object-fit: contain;
+    transform: translateX(-4px);
   }
 
   .desktop-nav {
@@ -420,13 +446,30 @@ const navItems = [
     }
     
     .logo {
-      width: 220px;
-      height: 68px;
-      padding: 0 24px 0 16px;
+      width: 245px;
+      height: 72px;
+    }
+
+    .logo-link {
+      padding: 0 32px 0 18px;
+      clip-path: polygon(
+        0 0,
+        100% 0,
+        100% 72%,
+        92% 100%,
+        0 100%
+      );
     }
 
     .logo-img {
-      width: 145px;
+      width: 150px;
+      transform: translateX(-3px);
+    }
+
+    .logo::after {
+      right: -12px;
+      width: 30px;
+      height: 56px;
     }
 
     .original-nav-container {
