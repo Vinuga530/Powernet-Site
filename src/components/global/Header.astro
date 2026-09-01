@@ -12,7 +12,10 @@ const navItems = [
 ];
 ---
 
-<header id="main-header" class={`header ${isHome ? "header-transparent-dark" : ""}`}>
+<header
+  id="main-header"
+  class={`header ${isHome ? "header-transparent-dark" : ""}`}
+>
   <div class="container header-container">
     <div class="logo fade-in stagger-1">
       <a href="/" class="logo-link">
@@ -29,6 +32,74 @@ const navItems = [
     <div class="original-nav-container fade-in stagger-2">
       <nav class="desktop-nav">
         <ul class="nav-list">
+          {
+            navItems.map((item) => (
+              <li>
+                <a href={item.href} class="nav-link">
+                  <span class="nav-word">
+                    <span class="nav-layer nav-layer-top">
+                      {Array.from(item.label).map((letter, index) => (
+                        <span class="nav-char" style={`--i:${index}`}>
+                          {letter}
+                        </span>
+                      ))}
+                    </span>
+                    <span class="nav-layer nav-layer-bottom" aria-hidden="true">
+                      {Array.from(item.label).map((letter, index) => (
+                        <span class="nav-char" style={`--i:${index}`}>
+                          {letter}
+                        </span>
+                      ))}
+                    </span>
+                  </span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+      <button
+        class="mobile-menu-btn"
+        aria-label="Toggle menu"
+        aria-expanded="false"
+      >
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+
+      <div class="header-actions">
+        <a href="/contact" class="btn-primary">
+          <span class="cta-accent" aria-hidden="true"></span>
+          <span class="cta-word">
+            <span class="cta-layer cta-layer-top">
+              {
+                Array.from("LET'S TALK").map((letter, index) => (
+                  <span class="cta-char" style={`--i:${index}`}>
+                    {letter === " " ? "\u00A0" : letter}
+                  </span>
+                ))
+              }
+            </span>
+            <span class="cta-layer cta-layer-bottom" aria-hidden="true">
+              {
+                Array.from("LET'S TALK").map((letter, index) => (
+                  <span class="cta-char" style={`--i:${index}`}>
+                    {letter === " " ? "\u00A0" : letter}
+                  </span>
+                ))
+              }
+            </span>
+          </span>
+        </a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div id="floating-nav" class="floating-nav" aria-hidden="true">
+  <div class="floating-nav-inner">
+    <nav class="desktop-nav">
+      <ul class="nav-list">
         {
           navItems.map((item) => (
             <li>
@@ -53,69 +124,13 @@ const navItems = [
             </li>
           ))
         }
-        </ul>
-      </nav>
-      <button class="mobile-menu-btn" aria-label="Toggle menu" aria-expanded="false">
-        <span class="hamburger-line"></span>
-        <span class="hamburger-line"></span>
-      </button>
-
-      <div class="header-actions">
-        <a href="/contact" class="btn-primary">
-          <span class="cta-accent" aria-hidden="true"></span>
-          <span class="cta-word">
-            <span class="cta-layer cta-layer-top">
-              {Array.from("LET'S TALK").map((letter, index) => (
-                <span class="cta-char" style={`--i:${index}`}>
-                  {letter === " " ? "\u00A0" : letter}
-                </span>
-              ))}
-            </span>
-            <span class="cta-layer cta-layer-bottom" aria-hidden="true">
-              {Array.from("LET'S TALK").map((letter, index) => (
-                <span class="cta-char" style={`--i:${index}`}>
-                  {letter === " " ? "\u00A0" : letter}
-                </span>
-              ))}
-            </span>
-          </span>
-        </a>
-      </div>
-    </div>
-  </div>
-</header>
-
-<div id="floating-nav" class="floating-nav" aria-hidden="true">
-  <div class="floating-nav-inner">
-    <nav class="desktop-nav">
-      <ul class="nav-list">
-      {
-        navItems.map((item) => (
-          <li>
-            <a href={item.href} class="nav-link">
-              <span class="nav-word">
-                <span class="nav-layer nav-layer-top">
-                  {Array.from(item.label).map((letter, index) => (
-                    <span class="nav-char" style={`--i:${index}`}>
-                      {letter}
-                    </span>
-                  ))}
-                </span>
-                <span class="nav-layer nav-layer-bottom" aria-hidden="true">
-                  {Array.from(item.label).map((letter, index) => (
-                    <span class="nav-char" style={`--i:${index}`}>
-                      {letter}
-                    </span>
-                  ))}
-                </span>
-              </span>
-            </a>
-          </li>
-        ))
-      }
       </ul>
     </nav>
-    <button class="mobile-menu-btn" aria-label="Toggle menu" aria-expanded="false">
+    <button
+      class="mobile-menu-btn"
+      aria-label="Toggle menu"
+      aria-expanded="false"
+    >
       <span class="hamburger-line"></span>
       <span class="hamburger-line"></span>
     </button>
@@ -124,18 +139,22 @@ const navItems = [
         <span class="cta-accent" aria-hidden="true"></span>
         <span class="cta-word">
           <span class="cta-layer cta-layer-top">
-            {Array.from("LET'S TALK").map((letter, index) => (
-              <span class="cta-char" style={`--i:${index}`}>
-                {letter === " " ? "\u00A0" : letter}
-              </span>
-            ))}
+            {
+              Array.from("LET'S TALK").map((letter, index) => (
+                <span class="cta-char" style={`--i:${index}`}>
+                  {letter === " " ? "\u00A0" : letter}
+                </span>
+              ))
+            }
           </span>
           <span class="cta-layer cta-layer-bottom" aria-hidden="true">
-            {Array.from("LET'S TALK").map((letter, index) => (
-              <span class="cta-char" style={`--i:${index}`}>
-                {letter === " " ? "\u00A0" : letter}
-              </span>
-            ))}
+            {
+              Array.from("LET'S TALK").map((letter, index) => (
+                <span class="cta-char" style={`--i:${index}`}>
+                  {letter === " " ? "\u00A0" : letter}
+                </span>
+              ))
+            }
           </span>
         </span>
       </a>
@@ -144,9 +163,12 @@ const navItems = [
 </div>
 
 <style>
+  /* ========================================
+     MAIN HEADER LAYOUT
+     ======================================== */
   .header {
     position: absolute;
-    top: 0;
+    top: 24px; /* Detached from the top edge */
     left: 0;
     width: 100%;
     z-index: 100;
@@ -157,12 +179,11 @@ const navItems = [
 
   .header-container {
     display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    width: 100%;
+    justify-content: space-between; /* Pushes Logo left, Nav/CTA right */
+    align-items: center;
+    width: 90%;
     max-width: 1180px;
     margin: 0 auto;
-    gap: 24px;
     pointer-events: none;
   }
 
@@ -170,100 +191,63 @@ const navItems = [
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: 48px;
-    padding-top: 16px;
-    flex-grow: 1;
+    gap: 16px; /* Space between Nav Capsule and CTA Capsule */
     pointer-events: auto;
   }
 
   /* ========================================
-     POWERNET LEFT EDGE LOGO
+     LOGO ISLAND
      ======================================== */
-
   .logo {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 320px;
-    height: 82px;
+    position: relative; /* Removed absolute positioning */
     z-index: 50;
+    pointer-events: auto;
   }
 
   .logo-link {
-    width: 100%;
-    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
-    padding: 0 38px 0 24px;
+    padding: 12px 28px;
     background: rgba(255, 255, 255, 0.98);
-    /* IMPORTANT:
-       square on left,
-       capsule-shaped on right */
-    border-radius: 0 42px 42px 0;
+    border-radius: 50px; /* Full pill shape */
     text-decoration: none;
-    box-shadow: 8px 8px 24px rgba(0, 0, 0, 0.10);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: transform 0.3s ease;
   }
 
   .logo-img {
     display: block;
-    width: 175px;
+    width: 160px;
     max-width: 100%;
     height: auto;
     object-fit: contain;
-    /* slight optical adjustment */
-    transform: translateX(-4px);
   }
 
+  /* ========================================
+     NAVIGATION ISLAND
+     ======================================== */
   .desktop-nav {
+    background: rgba(20, 20, 20, 0.85); /* Dark capsule */
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 50px;
+    padding: 12px 32px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
     margin: 0;
   }
 
-  .floating-nav {
-    position: fixed;
-    top: 24px;
-    left: 50%;
-    transform: translate(-50%, -120%);
-    z-index: 1000;
-    opacity: 0;
-    visibility: hidden;
-    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), 
-                opacity 0.3s ease,
-                visibility 0.3s;
-    width: max-content;
-    max-width: calc(100vw - 32px);
-    pointer-events: none;
-  }
-
-  .floating-nav.visible {
-    transform: translate(-50%, 0);
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
-  }
-
-  .floating-nav-inner {
+  .nav-list {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-radius: 20px; /* Restrained curve */
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    padding: 0 12px 0 28px;
-    height: 56px;
-    gap: 32px;
-  }
-  
-  .floating-nav-inner .btn-primary {
-    border-radius: 28px;
-    padding: 10px 16px;
+    gap: 36px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    transition: gap 0.6s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .nav-link {
@@ -279,23 +263,9 @@ const navItems = [
     height: 1.2em;
     overflow: hidden;
     opacity: 0.9;
-    transition: color 0.6s cubic-bezier(0.22, 1, 0.36, 1), text-shadow 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-
-  .floating-nav .nav-link {
-    color: #1a1a1a;
-    text-shadow: none;
-  }
-
-  .nav-list {
-    display: flex;
-    gap: 48px;
-    list-style: none;
-    transition: gap 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-
-  .floating-nav .nav-list {
-    gap: 32px;
+    transition:
+      color 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+      text-shadow 0.6s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .nav-word {
@@ -322,18 +292,19 @@ const navItems = [
     transition-delay: calc(var(--i) * 35ms);
   }
 
-  .nav-link:hover .nav-layer-top .nav-char {
-    transform: translateY(-100%);
-  }
-
+  .nav-link:hover .nav-layer-top .nav-char,
   .nav-link:hover .nav-layer-bottom .nav-char {
     transform: translateY(-100%);
   }
 
   .nav-link:hover {
     opacity: 1;
+    color: var(--color-brand, #e63946); /* Inherits your brand color on hover */
   }
 
+  /* ========================================
+     CTA ISLAND
+     ======================================== */
   .btn-primary {
     display: inline-flex;
     align-items: center;
@@ -341,19 +312,22 @@ const navItems = [
     background-color: var(--color-brand);
     border: 1px solid var(--color-brand);
     color: #fff;
-    padding: 12px 20px;
+    padding: 12px 24px;
     font-size: var(--text-small);
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    border-radius: 2px;
-    transition: transform 0.3s ease, border-radius 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    border-radius: 50px; /* Full pill shape */
+    transition:
+      transform 0.3s ease,
+      border-radius 0.6s cubic-bezier(0.22, 1, 0.36, 1);
     transition-delay: 0s !important;
     gap: 12px;
+    box-shadow: 0 8px 24px rgba(230, 57, 70, 0.2); /* Soft glow using brand color */
   }
 
   .btn-primary:hover {
-    background-color: var(--color-brand);
+    transform: translateY(-2px);
   }
 
   .cta-accent {
@@ -362,13 +336,14 @@ const navItems = [
     height: 7px;
     border-radius: 50%;
     background: #fff;
-    transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1),
-                border-radius 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    transition:
+      width 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+      border-radius 0.4s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .btn-primary:hover .cta-accent {
     width: 28px;
-    border-radius: 2px;
+    border-radius: 4px; /* Slightly softer than 2px */
   }
 
   .cta-word {
@@ -396,56 +371,100 @@ const navItems = [
     transition-delay: calc(var(--i) * 25ms);
   }
 
-  .btn-primary:hover .cta-layer-top .cta-char {
-    transform: translateY(-100%);
-  }
-
+  .btn-primary:hover .cta-layer-top .cta-char,
   .btn-primary:hover .cta-layer-bottom .cta-char {
     transform: translateY(-100%);
   }
 
+  /* ========================================
+     FLOATING SCROLL NAV
+     ======================================== */
+  .floating-nav {
+    position: fixed;
+    top: 24px;
+    left: 50%;
+    transform: translate(-50%, -150%);
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.3s ease,
+      visibility 0.3s;
+    width: max-content;
+    max-width: calc(100vw - 32px);
+    pointer-events: none;
+  }
+
+  .floating-nav.visible {
+    transform: translate(-50%, 0);
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .floating-nav-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(20, 20, 20, 0.95); /* Matched to dark capsule */
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-radius: 50px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 8px 12px 8px 32px; /* Asymmetric padding to wrap the button cleanly */
+    gap: 32px;
+  }
+
+  .floating-nav-inner .desktop-nav {
+    background: transparent;
+    box-shadow: none;
+    border: none;
+    padding: 0;
+  }
+
+  .floating-nav .nav-list {
+    gap: 28px;
+  }
+
+  /* ========================================
+     MOBILE & RESPONSIVE
+     ======================================== */
   .mobile-menu-btn {
     display: none;
     flex-direction: column;
     justify-content: center;
     gap: 6px;
-    background: transparent;
-    border: none;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50px;
     cursor: pointer;
-    padding: 8px;
+    padding: 12px 16px;
     z-index: 101;
+    backdrop-filter: blur(8px);
   }
 
   .hamburger-line {
-    width: 24px;
+    width: 20px;
     height: 2px;
-    background-color: #1a1a1a;
-    transition: transform 0.3s ease, opacity 0.3s ease;
+    background-color: #ffffff;
+    transition:
+      transform 0.3s ease,
+      opacity 0.3s ease;
   }
 
   @media (max-width: 1024px) {
-    .header-container {
-      padding: 0 16px;
-    }
-    
-    .logo {
-      width: 280px;
-      height: 72px;
+    .header {
+      top: 16px;
     }
 
     .logo-link {
-      padding: 0 32px 0 20px;
-      border-radius: 0 36px 36px 0;
+      padding: 10px 24px;
     }
 
     .logo-img {
-      width: 150px;
-      transform: translateX(-3px);
-    }
-
-    .original-nav-container {
-      padding-top: 24px;
-      gap: 24px;
+      width: 130px;
     }
 
     .desktop-nav,
@@ -456,16 +475,16 @@ const navItems = [
     .mobile-menu-btn {
       display: flex;
     }
-    
+
     .floating-nav {
       top: 16px;
     }
-    
+
     .floating-nav-inner {
-      padding: 0 24px;
-      justify-content: center;
+      padding: 8px 24px;
+      gap: 0;
     }
-    
+
     .floating-nav-inner .desktop-nav,
     .floating-nav-inner .header-actions {
       display: none;
@@ -477,10 +496,10 @@ const navItems = [
   document.addEventListener("DOMContentLoaded", () => {
     // Mobile menu toggle
     const btns = document.querySelectorAll(".mobile-menu-btn");
-    btns.forEach(btn => {
+    btns.forEach((btn) => {
       btn.addEventListener("click", () => {
         const expanded = btn.getAttribute("aria-expanded") === "true";
-        btns.forEach(b => b.setAttribute("aria-expanded", !expanded));
+        btns.forEach((b) => b.setAttribute("aria-expanded", !expanded));
       });
     });
 
@@ -490,46 +509,54 @@ const navItems = [
 
     let lastScrollY = window.scrollY;
     let ticking = false;
-    
+
     // Thresholds
-    const TOP_THRESHOLD = 150; 
-    const SCROLL_DELTA_THRESHOLD = 20; 
-    
+    const TOP_THRESHOLD = 150;
+    const SCROLL_DELTA_THRESHOLD = 20;
+
     let scrollAnchor = window.scrollY;
     let lastDirection = 0; // 1 for down, -1 for up
 
     const updateNav = () => {
       const currentScrollY = window.scrollY;
       const delta = currentScrollY - lastScrollY;
-      
+
       const currentDirection = delta === 0 ? 0 : Math.sign(delta);
-      
+
       if (currentDirection !== 0 && currentDirection !== lastDirection) {
         scrollAnchor = currentScrollY;
         lastDirection = currentDirection;
       }
-      
+
       const distanceFromAnchor = Math.abs(currentScrollY - scrollAnchor);
 
       if (currentScrollY <= TOP_THRESHOLD) {
         floatingNav.classList.remove("visible");
-      } 
-      else if (currentDirection === -1 && distanceFromAnchor >= SCROLL_DELTA_THRESHOLD) {
+      } else if (
+        currentDirection === -1 &&
+        distanceFromAnchor >= SCROLL_DELTA_THRESHOLD
+      ) {
         floatingNav.classList.add("visible");
-      } 
-      else if (currentDirection === 1 && distanceFromAnchor >= SCROLL_DELTA_THRESHOLD) {
+      } else if (
+        currentDirection === 1 &&
+        distanceFromAnchor >= SCROLL_DELTA_THRESHOLD
+      ) {
         floatingNav.classList.remove("visible");
       }
-      
+
       lastScrollY = currentScrollY;
       ticking = false;
     };
 
-    window.addEventListener("scroll", () => {
-      if (!ticking) {
-        window.requestAnimationFrame(updateNav);
-        ticking = true;
-      }
-    }, { passive: true });
+    window.addEventListener(
+      "scroll",
+      () => {
+        if (!ticking) {
+          window.requestAnimationFrame(updateNav);
+          ticking = true;
+        }
+      },
+      { passive: true },
+    );
   });
 </script>
