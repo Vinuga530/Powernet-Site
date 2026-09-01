@@ -917,13 +917,24 @@ import mapIcon from "../assets/images/icons/map.svg";
       }
     }
 
-    // Automatically splits button text for the letter-by-letter hover wave
-    document.querySelectorAll('.hover-stagger .btn-text-wrapper').forEach(wrapper => {
+  });
+</script>
+
+<script>
+  const initButtonHover = () => {
+    const buttons = document.querySelectorAll('.hover-stagger .btn-text-wrapper');
+    
+    buttons.forEach(wrapper => {
+      // Prevent double-firing if Astro ViewTransitions are used
+      if (wrapper.dataset.initialized) return; 
+      
       const text = wrapper.textContent.trim();
       wrapper.innerHTML = ''; 
+      
       text.split('').forEach((char, i) => {
         const span = document.createElement('span');
         span.className = 'char';
+        
         if (char === ' ') {
           span.innerHTML = '&nbsp;';
           span.dataset.char = '';
@@ -931,9 +942,23 @@ import mapIcon from "../assets/images/icons/map.svg";
           span.textContent = char;
           span.dataset.char = char;
         }
+        
         span.style.setProperty('--char-index', i);
         wrapper.appendChild(span);
       });
+      
+      wrapper.dataset.initialized = 'true';
     });
-  });
+  };
+
+  // Trigger for standard page loads
+  document.addEventListener('DOMContentLoaded', initButtonHover);
+  
+  // Trigger for Astro ViewTransitions (if enabled)
+  document.addEventListener('astro:page-load', initButtonHover);
+  
+  // Fallback just in case the DOM is already ready when the script parses
+  if (document.readyState === 'interactive' || document.readyState === 'complete') {
+    initButtonHover();
+  }
 </script>
