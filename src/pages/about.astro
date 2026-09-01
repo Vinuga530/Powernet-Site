@@ -1,0 +1,73 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="About Us | Powernet (Pvt) Ltd">
+  <section class="section-about scroll-reveal" style="padding: var(--space-3xl) 0;">
+    <div class="container">
+      <div class="section-header fade-in">
+        <span class="text-label">About Us</span>
+      </div>
+      
+      <div class="grid-12" style="margin-top: var(--space-2xl);">
+        <div class="about-content fade-in stagger-1" style="grid-column: span 7;">
+          <h1 class="text-display">100% Sri Lankan Owned Company</h1>
+          <p class="text-body-large" style="margin-top: var(--space-md); color: var(--color-muted);">
+            Powernet is a fully Sri Lankan owned enterprise delivering integrated engineering and technology solutions. We specialize in comprehensive infrastructures catering to a diverse spectrum of businesses.
+          </p>
+          <div class="stats-row" style="display: flex; gap: var(--space-xl); margin-top: var(--space-2xl); flex-wrap: wrap;">
+            <div>
+              <span class="text-display" style="display: block; color: var(--color-brand);">Rs. 120M</span>
+              <span class="text-label">Annual Turnover</span>
+            </div>
+            <div>
+              <span class="text-display" style="display: block; color: var(--color-brand);">150</span>
+              <span class="text-label">Permanent Staff</span>
+            </div>
+            <div>
+              <span class="text-display" style="display: block; color: var(--color-brand);">200</span>
+              <span class="text-label">Contractual Staff</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="about-board fade-in stagger-2" style="grid-column: 9 / -1; background-color: var(--color-surface); padding: var(--space-xl); border: 1px solid var(--color-border); align-self: start;">
+          <h3 class="text-h1" style="margin-bottom: var(--space-lg);">Board of Directors</h3>
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: var(--space-md); padding: 0;">
+            <li class="text-body-large">Mr. M. A. W. P. Silva</li>
+            <li class="text-body-large">Mr. M. A. C. P. Silva</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-clients scroll-reveal" style="padding: var(--space-3xl) 0; background-color: var(--color-surface);">
+    <div class="container fade-in">
+      <div class="section-header">
+        <span class="text-label">Top Corporate Clients</span>
+      </div>
+      
+      <div class="clients-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: var(--space-xl); margin-top: var(--space-2xl);">
+        <div class="client-card" style="padding: var(--space-md); border-bottom: 1px solid var(--color-border);">
+          <h4 class="text-h4">Hemas Holdings</h4>
+        </div>
+        <div class="client-card" style="padding: var(--space-md); border-bottom: 1px solid var(--color-border);">
+          <h4 class="text-h4">Securities and Exchange Commission (SEC)</h4>
+        </div>
+        <div class="client-card" style="padding: var(--space-md); border-bottom: 1px solid var(--color-border);">
+          <h4 class="text-h4">National Savings Bank</h4>
+        </div>
+        <div class="client-card" style="padding: var(--space-md); border-bottom: 1px solid var(--color-border);">
+          <h4 class="text-h4">Commercial Bank</h4>
+        </div>
+        <div class="client-card" style="padding: var(--space-md); border-bottom: 1px solid var(--color-border);">
+          <h4 class="text-h4">Bank of Ceylon</h4>
+        </div>
+        <div class="client-card" style="padding: var(--space-md); border-bottom: 1px solid var(--color-border);">
+          <h4 class="text-h4">Dialog Axiata</h4>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

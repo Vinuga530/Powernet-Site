@@ -1,0 +1,69 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Contact Us | Powernet (Pvt) Ltd">
+  <section class="section-contact scroll-reveal" style="padding-top: var(--space-3xl); min-height: 80vh;">
+    <div class="container fade-in">
+      <h1 class="text-display-xl">Get in Touch</h1>
+      <p class="text-body-large" style="margin-top: var(--space-md); color: var(--color-muted); max-width: 600px;">
+        Reach out to our specialized departments or visit our facilities for more information.
+      </p>
+
+      <div class="contact-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--space-2xl); margin-top: var(--space-3xl);">
+        
+        <!-- Department Hotlines -->
+        <div class="contact-card" style="background-color: var(--color-surface); padding: var(--space-xl); border: 1px solid var(--color-border);">
+          <h2 class="text-h1" style="margin-bottom: var(--space-lg);">Department Hotlines</h2>
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: var(--space-md); padding: 0;">
+            <li>
+              <span class="text-label" style="display: block; color: var(--color-brand); margin-bottom: 4px;">Network Support</span>
+              <a href="tel:0777788793" class="text-h4">0777 788 793</a>
+            </li>
+            <li>
+              <span class="text-label" style="display: block; color: var(--color-brand); margin-bottom: 4px;">Electrical</span>
+              <a href="tel:0770066844" class="text-h4">0770 066844</a>
+            </li>
+            <li>
+              <span class="text-label" style="display: block; color: var(--color-brand); margin-bottom: 4px;">Fire Protection</span>
+              <a href="tel:0777321393" class="text-h4">0777 321 393</a>
+            </li>
+            <li>
+              <span class="text-label" style="display: block; color: var(--color-brand); margin-bottom: 4px;">Computer Systems</span>
+              <a href="tel:0767464422" class="text-h4">0767 464 422</a>
+            </li>
+            <li>
+              <span class="text-label" style="display: block; color: var(--color-brand); margin-bottom: 4px;">UPS</span>
+              <a href="tel:0703073133" class="text-h4">0703 073 133</a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Facilities -->
+        <div class="facilities-wrapper" style="display: flex; flex-direction: column; gap: var(--space-xl);">
+          <div class="contact-card" style="background-color: var(--color-surface); padding: var(--space-xl); border: 1px solid var(--color-border);">
+            <h2 class="text-h1" style="margin-bottom: var(--space-lg);">Head Office</h2>
+            <p class="text-body-large" style="color: var(--color-muted);">
+              #74, Temple Road<br />
+              Maradana, Colombo 10
+            </p>
+            <div style="margin-top: var(--space-md);">
+              <p>General Tel: 011 4 736 151 / 171</p>
+              <p>Fax: 011 4 795 110</p>
+              <p>Email: <a href="mailto:powernet@powernet.lk" style="color: var(--color-brand);">powernet@powernet.lk</a></p>
+            </div>
+          </div>
+
+          <div class="contact-card" style="background-color: var(--color-surface); padding: var(--space-xl); border: 1px solid var(--color-border);">
+            <h2 class="text-h1" style="margin-bottom: var(--space-lg);">Warehouse Facility</h2>
+            <p class="text-body-large" style="color: var(--color-muted);">
+              Thelengapatha Road<br />
+              Wattala
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+</BaseLayout>
