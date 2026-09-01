@@ -565,6 +565,21 @@ import mapIcon from "../assets/images/icons/map.svg";
       width: 100%;
     }
   }
+
+  /* ========================================
+     SVG STROKE WEIGHT CORRECTIONS
+     ======================================== */
+  
+  /* Thickens the Sri Lanka Map (smaller viewBox) */
+  .stats-icon-1 {
+    stroke-width: 14px !important; 
+  }
+
+  /* Thickens the Handshake (massive 2836px viewBox requires a huge stroke) */
+  .stats-icon-2 path {
+    stroke: #202020 !important;
+    stroke-width: 60px !important; 
+  }
 </style>
 
 <script>
