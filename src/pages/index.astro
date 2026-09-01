@@ -97,8 +97,13 @@ import mapIcon from "../assets/images/icons/map.svg";
           Powernet coordinates complex scopes as a single, integrated project. By unifying multiple critical disciplines under one roof, we eliminate vendor friction and ensure seamless, high-quality delivery for Sri Lanka's critical operations.
         </p>
         <div class="intro-actions">
-          <a href="#" class="btn-primary">Explore Company Profile</a>
-          <a href="#" class="btn-secondary">Explore Quality Process</a>
+          <!-- Added data-text and span wrapper for the text roll animation -->
+          <a href="#" class="btn-primary" data-text="Explore Company Profile">
+            <span>Explore Company Profile</span>
+          </a>
+          <a href="#" class="btn-secondary" data-text="Explore Quality Process">
+            <span>Explore Quality Process</span>
+          </a>
         </div>
       </div>
 
@@ -816,6 +821,57 @@ import mapIcon from "../assets/images/icons/map.svg";
     100% {
       stroke-dashoffset: 0;
     }
+  }
+
+  /* ========================================
+     KINETIC BUTTON TEXT ANIMATION
+     ======================================== */
+  
+  /* 1. Prep buttons to contain the sliding text */
+  .intro-actions .btn-primary,
+  .btn-secondary {
+    overflow: hidden; 
+  }
+
+  /* 2. The visible text inside the span */
+  .intro-actions .btn-primary span,
+  .btn-secondary span {
+    display: inline-block;
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* 3. The hidden clone text waiting below */
+  .intro-actions .btn-primary::before,
+  .btn-secondary::before {
+    content: attr(data-text);
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    transform: translateY(100%); /* Pushed down out of view */
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* Specific alignment for the primary text link */
+  .intro-actions .btn-primary::before {
+    justify-content: flex-start;
+    padding-bottom: 6px; /* Matches the button's base padding */
+  }
+
+  /* Specific alignment for the secondary pill */
+  .btn-secondary::before {
+    justify-content: center;
+  }
+
+  /* 4. The Hover Trigger */
+  .intro-actions .btn-primary:hover span,
+  .btn-secondary:hover span {
+    transform: translateY(-150%);
+  }
+
+  .intro-actions .btn-primary:hover::before,
+  .btn-secondary:hover::before {
+    transform: translateY(0);
   }
 </style>
 
