@@ -235,6 +235,9 @@ import mapIcon from "../assets/images/icons/map.svg";
     z-index: -1;
     background-color: #111;
     will-change: transform;
+    /* Added Hardware Acceleration */
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
   }
 
   .bg-img {
@@ -568,11 +571,9 @@ import mapIcon from "../assets/images/icons/map.svg";
       if (!ticking) {
         window.requestAnimationFrame(() => {
           const scrolled = Math.max(0, window.scrollY);
-          // Animate only while hero section is in view
           if (scrolled < window.innerHeight * 1.5) {
-            const yPos = scrolled * 0.16; // 16% parallax depth
-            // Overscale slightly to prevent edges from showing
-            heroBg.style.transform = `translate3d(0, ${yPos}px, 0) scale(1.05)`;
+            const yPos = scrolled * 0.35; // Increased depth
+            heroBg.style.transform = `translate3d(0, ${yPos}px, 0) scale(1.15)`; // Increased scale
           }
           ticking = false;
         });
