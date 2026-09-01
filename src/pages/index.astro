@@ -580,6 +580,39 @@ import mapIcon from "../assets/images/icons/map.svg";
     stroke: #202020 !important;
     stroke-width: 60px !important; 
   }
+
+  /* ========================================
+     BLUEPRINT DRAWING ANIMATION
+     ======================================== */
+  
+  /* Strip fill colors so only the premium stroke lines are visible */
+  .stats-icon,
+  .stats-icon * {
+    fill: none !important;
+  }
+
+  /* Target all lines within the SVGs */
+  .stats-icon path,
+  .stats-icon line,
+  .stats-icon polyline,
+  .stats-icon polygon,
+  .stats-icon-1,
+  .stats-icon-2 path {
+    /* Massive array handles unknown path lengths without JS math */
+    stroke-dasharray: 15000;
+    stroke-dashoffset: 15000;
+    /* 3.5s smooth drafting effect, holding at the final state */
+    animation: drawBlueprint 3.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  @keyframes drawBlueprint {
+    0% {
+      stroke-dashoffset: 15000;
+    }
+    100% {
+      stroke-dashoffset: 0;
+    }
+  }
 </style>
 
 <script>
