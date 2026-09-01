@@ -518,31 +518,74 @@ import mapIcon from "../assets/images/icons/map.svg";
     margin: 0 0 40px 0;
   }
 
+  /* ========================================
+     PREMIUM BUTTON UI
+     ======================================== */
   .intro-actions {
     display: flex;
-    gap: 16px;
+    gap: 32px;
     flex-wrap: wrap;
+    align-items: center;
   }
 
+  /* Editorial Underline Button */
+  .intro-actions .btn-primary {
+    position: relative;
+    color: #111;
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-decoration: none;
+    padding-bottom: 6px;
+    background: none;
+    border: none;
+    box-shadow: none;
+    letter-spacing: 0.05em;
+  }
+
+  .intro-actions .btn-primary::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0%;
+    height: 2px;
+    background-color: var(--color-brand, #d62828);
+    transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .intro-actions .btn-primary:hover::after {
+    width: 100%;
+  }
+
+  /* Structural Pill Button */
   .btn-secondary {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background-color: #e5e7eb; /* Light gray pill */
-    color: #374151;
-    padding: 12px 28px;
-    font-size: 0.9rem;
-    font-weight: 600;
+    background-color: #f3f4f6; 
+    border: 1px solid #e5e7eb;
+    color: #111;
+    padding: 14px 32px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
     border-radius: 50px;
     text-decoration: none;
-    transition: background 0.3s ease;
+    text-transform: uppercase;
+    transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .btn-secondary:hover {
-    background-color: #d1d5db;
+    background-color: #111;
+    color: #fff;
+    border-color: #111;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   }
 
-  /* The Right Side List */
+  /* ========================================
+     KINETIC LIST INTERACTIONS
+     ======================================== */
   .spec-list {
     list-style: none;
     padding: 0;
@@ -553,17 +596,37 @@ import mapIcon from "../assets/images/icons/map.svg";
   .spec-list li {
     display: flex;
     align-items: center;
-    padding: 24px 0;
+    padding: 24px 16px; /* Added side padding for hover bg */
     border-bottom: 1px solid rgba(0, 0, 0, 0.08);
     font-size: clamp(1.1rem, 1.25vw, 1.25rem);
     color: #222;
+    cursor: pointer;
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), color 0.3s ease, background 0.4s ease;
+    
+    /* Entrance Animation Setup */
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeUpList 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   }
 
   .spec-list li:first-child {
-    border-top: 1px solid rgba(0, 0, 0, 0.08); /* Caps the top */
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
   }
 
-  /* The Soft Glowing Dot */
+  /* Staggered Loading Delays */
+  .spec-list li:nth-child(1) { animation-delay: 0.1s; }
+  .spec-list li:nth-child(2) { animation-delay: 0.2s; }
+  .spec-list li:nth-child(3) { animation-delay: 0.3s; }
+  .spec-list li:nth-child(4) { animation-delay: 0.4s; }
+  .spec-list li:nth-child(5) { animation-delay: 0.5s; }
+
+  /* The Hover State */
+  .spec-list li:hover {
+    transform: translateX(12px) translateY(0); /* Slide right */
+    color: var(--color-brand, #d62828);
+    background: linear-gradient(90deg, rgba(214, 40, 40, 0.03) 0%, transparent 100%);
+  }
+
   .glow-dot {
     display: inline-block;
     width: 10px;
@@ -571,7 +634,23 @@ import mapIcon from "../assets/images/icons/map.svg";
     border-radius: 50%;
     background-color: var(--color-brand, #d62828);
     margin-right: 20px;
-    box-shadow: 0 0 12px rgba(214, 40, 40, 0.6); /* Creates that soft PGP blur */
+    /* Glow removed for a flat, premium matte finish */
+    transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* Dot turns into a technical line on hover */
+  .spec-list li:hover .glow-dot {
+    width: 28px;
+    border-radius: 4px;
+    background-color: var(--color-brand, #d62828);
+    box-shadow: none;
+  }
+
+  @keyframes fadeUpList {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
   @media (max-width: 992px) {
