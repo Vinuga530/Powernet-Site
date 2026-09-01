@@ -97,11 +97,11 @@ import mapIcon from "../assets/images/icons/map.svg";
           Powernet coordinates complex scopes as a single, integrated project. By unifying multiple critical disciplines under one roof, we eliminate vendor friction and ensure seamless, high-quality delivery for Sri Lanka's critical operations.
         </p>
       <div class="intro-actions">
-        <a href="#" class="btn-editorial btn-solid">
-          <span class="text-roller" data-text="Explore Company Profile">Explore Company Profile</span>
+        <a href="#" class="btn-editorial btn-solid hover-stagger">
+          <span class="btn-text-wrapper">Explore Company Profile</span>
         </a>
-        <a href="#" class="btn-editorial btn-outline">
-          <span class="text-roller" data-text="Explore Quality Process">Explore Quality Process</span>
+        <a href="#" class="btn-editorial btn-outline hover-stagger">
+          <span class="btn-text-wrapper">Explore Quality Process</span>
         </a>
       </div>
       </div>
@@ -523,7 +523,7 @@ import mapIcon from "../assets/images/icons/map.svg";
   }
 
   /* ========================================
-     PREMIUM KINETIC BUTTONS
+     PREMIUM STAGGERED BUTTONS
      ======================================== */
   .intro-actions {
     display: flex;
@@ -531,7 +531,7 @@ import mapIcon from "../assets/images/icons/map.svg";
     flex-wrap: wrap;
   }
 
-  /* Base Pill Structure */
+  /* Base Pill */
   .btn-editorial {
     display: inline-flex;
     align-items: center;
@@ -543,59 +543,49 @@ import mapIcon from "../assets/images/icons/map.svg";
     text-transform: uppercase;
     letter-spacing: 0.05em;
     text-decoration: none;
-    overflow: hidden; /* Strictly contains the rolling text */
     transition: background-color 0.3s ease, border-color 0.3s ease;
   }
 
-  /* Solid Red Action (Matches Nav Bar) */
   .btn-solid {
     background-color: var(--color-brand, #d62828);
     color: #ffffff;
     border: 1px solid var(--color-brand, #d62828);
   }
-  
-  .btn-solid:hover {
-    background-color: #b01e1e; /* Deepens on hover */
-    border-color: #b01e1e;
-  }
+  .btn-solid:hover { background-color: #b01e1e; border-color: #b01e1e; }
 
-  /* Sharp Outline Action */
   .btn-outline {
     background-color: transparent;
     color: #111111;
     border: 1px solid #111111;
   }
-  
-  .btn-outline:hover {
-    background-color: #f3f4f6; /* Subtle matte gray fill */
+  .btn-outline:hover { background-color: #f3f4f6; }
+
+  /* The Bleed Fix */
+  .btn-text-wrapper {
+    display: inline-flex;
+    overflow: hidden; /* Clips perfectly to the text height, killing the visual bleed */
+    line-height: 1.1; 
   }
 
-  /* ========================================
-     ISOLATED TEXT ROLL ANIMATION
-     ======================================== */
-  .text-roller {
+  /* Individual Letter Animation */
+  .btn-text-wrapper .char {
     position: relative;
     display: inline-block;
     transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: calc(var(--char-index) * 0.015s); /* Creates the wave */
   }
 
-  /* The cloned text waiting below */
-  .text-roller::before {
-    content: attr(data-text);
+  .btn-text-wrapper .char::before {
+    content: attr(data-char);
     position: absolute;
-    top: 120%; /* Pushed exactly one line down */
+    top: 100%; /* Sits exactly below the visible letter */
     left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     color: inherit;
   }
 
-  /* The Trigger */
-  .btn-editorial:hover .text-roller {
-    transform: translateY(-120%); /* Pulls the hidden text up flawlessly */
+  /* The Wave Trigger */
+  .btn-editorial:hover .char {
+    transform: translateY(-100%);
   }
 
   /* ========================================
@@ -926,5 +916,24 @@ import mapIcon from "../assets/images/icons/map.svg";
         observer.observe(credibilityStrip);
       }
     }
+
+    // Automatically splits button text for the letter-by-letter hover wave
+    document.querySelectorAll('.hover-stagger .btn-text-wrapper').forEach(wrapper => {
+      const text = wrapper.textContent.trim();
+      wrapper.innerHTML = ''; 
+      text.split('').forEach((char, i) => {
+        const span = document.createElement('span');
+        span.className = 'char';
+        if (char === ' ') {
+          span.innerHTML = '&nbsp;';
+          span.dataset.char = '';
+        } else {
+          span.textContent = char;
+          span.dataset.char = char;
+        }
+        span.style.setProperty('--char-index', i);
+        wrapper.appendChild(span);
+      });
+    });
   });
 </script>
