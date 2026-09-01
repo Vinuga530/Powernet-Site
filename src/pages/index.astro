@@ -40,6 +40,10 @@ import mapIcon from "../assets/images/icons/map.svg";
           Integrated engineering and technology solutions for Sri Lanka's
           critical operations.
         </p>
+        <div class="hero-actions fade-in stagger-5">
+          <a href="/contact" class="btn-hero-primary">GET A QUOTE</a>
+          <a href="/projects" class="btn-hero-secondary">EXPLORE PRODUCTS</a>
+        </div>
       </div>
     </div>
   </section>
@@ -243,11 +247,14 @@ import mapIcon from "../assets/images/icons/map.svg";
   .bg-overlay {
     position: absolute;
     inset: 0;
-    background: radial-gradient(
-      ellipse at center,
-      rgba(15, 23, 42, 0.35) 0%,   
+    background: linear-gradient(
+      to bottom,
+      rgba(15, 23, 42, 0.85) 0%,   
+      rgba(15, 23, 42, 0.45) 50%,
       rgba(15, 23, 42, 0.85) 100%
     );
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
     z-index: 1;
   }
 
@@ -282,6 +289,49 @@ import mapIcon from "../assets/images/icons/map.svg";
     margin-right: auto;
     color: rgba(255, 255, 255, 0.95);
     text-shadow: 0 4px 16px rgba(0, 0, 0, 0.95), 0 1px 4px rgba(0, 0, 0, 0.8);
+  }
+
+  .hero-actions {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 32px;
+  }
+
+  .btn-hero-primary {
+    background-color: var(--color-brand);
+    color: #fff;
+    border-radius: 50px;
+    padding: 12px 28px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    text-decoration: none;
+    transition: background-color 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .btn-hero-primary:hover {
+    background-color: #d62828;
+  }
+
+  .btn-hero-secondary {
+    background-color: transparent;
+    border: 1px solid #ffffff;
+    color: #fff;
+    border-radius: 50px;
+    padding: 12px 28px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .btn-hero-secondary:hover {
+    background-color: #ffffff;
+    color: #0f172a;
   }
 
   /* Credibility Strip */
