@@ -83,21 +83,36 @@ import mapIcon from "../assets/images/icons/map.svg";
     </div>
   </section>
 
-  <!-- Company Positioning -->
-  <section class="section-positioning scroll-reveal">
-    <div class="container">
-      <div class="grid-12">
-        <div class="pos-left fade-in stagger-1">
-          <h2 class="text-display">Infrastructure, Built for your needs.</h2>
-        </div>
-        <div class="pos-right fade-in stagger-2">
-          <p class="text-body-large">
-            A client may require networking, electrical, UPS, CCTV, fire
-            protection, air conditioning, interior work, and IT systems.
-            Powernet coordinates these scopes as a single, integrated project.
-          </p>
+  <section class="editorial-intro">
+    <!-- The massive faint background watermark -->
+    <div class="bg-watermark" aria-hidden="true">EXPERTISE</div>
+
+    <div class="editorial-grid">
+      
+      <!-- Left Column: Content & Buttons -->
+      <div class="intro-left">
+        <span class="editorial-eyebrow">Integrated Infrastructure Solutions</span>
+        <h2 class="intro-title">Infrastructure, Built for your needs.</h2>
+        <p class="intro-text">
+          Powernet coordinates complex scopes as a single, integrated project. By unifying multiple critical disciplines under one roof, we eliminate vendor friction and ensure seamless, high-quality delivery for Sri Lanka's critical operations.
+        </p>
+        <div class="intro-actions">
+          <a href="#" class="btn-primary">Explore Company Profile</a>
+          <a href="#" class="btn-secondary">Explore Quality Process</a>
         </div>
       </div>
+
+      <!-- Right Column: The PGP-style Line List -->
+      <div class="intro-right">
+        <ul class="spec-list">
+          <li><span class="glow-dot"></span> Networking & IT Systems</li>
+          <li><span class="glow-dot"></span> Electrical & UPS Solutions</li>
+          <li><span class="glow-dot"></span> CCTV & Security Infrastructure</li>
+          <li><span class="glow-dot"></span> Fire Protection Systems</li>
+          <li><span class="glow-dot"></span> Air Conditioning & Interior Work</li>
+        </ul>
+      </div>
+
     </div>
   </section>
 
@@ -438,18 +453,135 @@ import mapIcon from "../assets/images/icons/map.svg";
     }
   }
 
-  /* Positioning Section */
-  .section-positioning {
-    padding: var(--space-3xl) 0;
-    background-color: var(--color-background);
+  /* ========================================
+     EDITORIAL INTRO BLOCK (PGP STYLE)
+     ======================================== */
+  .editorial-intro {
+    position: relative;
+    width: 100%;
+    padding: 12vh 5%;
+    background-color: #ffffff;
+    overflow: hidden; /* Contains the giant watermark */
+    display: flex;
+    justify-content: center;
   }
-  .pos-left {
-    grid-column: span 7;
+
+  .bg-watermark {
+    position: absolute;
+    top: -2%;
+    left: -2%;
+    font-size: clamp(8rem, 18vw, 22rem);
+    font-family: serif; /* Gives that elegant, legacy feel */
+    color: rgba(0, 0, 0, 0.03); /* Barely visible */
+    z-index: 0;
+    pointer-events: none;
+    user-select: none;
   }
-  .pos-right {
-    grid-column: 9 / -1;
+
+  .editorial-grid {
+    position: relative;
+    z-index: 10;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8vw;
+    width: 100%;
+    max-width: 1400px;
+    align-items: center;
+  }
+
+  .intro-left {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .editorial-eyebrow {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--color-brand, #d62828);
+    margin-bottom: 16px;
+  }
+
+  .intro-title {
+    font-size: clamp(2.5rem, 4vw, 4rem);
+    line-height: 1.1;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: #111;
+    margin: 0 0 24px 0;
+  }
+
+  .intro-text {
+    font-size: clamp(1rem, 1.15vw, 1.15rem);
+    line-height: 1.7;
+    color: #555;
+    max-width: 540px;
+    margin: 0 0 40px 0;
+  }
+
+  .intro-actions {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #e5e7eb; /* Light gray pill */
+    color: #374151;
+    padding: 12px 28px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-radius: 50px;
+    text-decoration: none;
+    transition: background 0.3s ease;
+  }
+
+  .btn-secondary:hover {
+    background-color: #d1d5db;
+  }
+
+  /* The Right Side List */
+  .spec-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+  }
+
+  .spec-list li {
     display: flex;
     align-items: center;
+    padding: 24px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    font-size: clamp(1.1rem, 1.25vw, 1.25rem);
+    color: #222;
+  }
+
+  .spec-list li:first-child {
+    border-top: 1px solid rgba(0, 0, 0, 0.08); /* Caps the top */
+  }
+
+  /* The Soft Glowing Dot */
+  .glow-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: var(--color-brand, #d62828);
+    margin-right: 20px;
+    box-shadow: 0 0 12px rgba(214, 40, 40, 0.6); /* Creates that soft PGP blur */
+  }
+
+  @media (max-width: 992px) {
+    .editorial-grid {
+      grid-template-columns: 1fr;
+      gap: 48px;
+    }
+    .bg-watermark {
+      top: 2%;
+    }
   }
 
   /* Services Overview */
@@ -548,13 +680,6 @@ import mapIcon from "../assets/images/icons/map.svg";
   }
 
   @media (max-width: 1024px) {
-    .pos-left,
-    .pos-right {
-      grid-column: 1 / -1;
-    }
-    .pos-right {
-      margin-top: var(--space-md);
-    }
     .service-row {
       flex-direction: column;
       gap: var(--space-sm);
