@@ -121,7 +121,7 @@ import mapIcon from "../assets/images/icons/map.svg";
   </section>
 
   <!-- Services Overview -->
-  <section class="section-services scroll-reveal">
+  <section class="section-services scroll-reveal reveal-up">
     <div class="container">
       <div class="section-header fade-in">
         <span class="text-label">What Do We Offer?</span>
@@ -169,7 +169,7 @@ import mapIcon from "../assets/images/icons/map.svg";
   </section>
 
   <!-- Featured Projects section to be changed later into a CMS bsed upload of projects -->
-  <section class="section-projects scroll-reveal">
+  <section class="section-projects scroll-reveal reveal-up">
     <div class="container">
       <div class="section-header fade-in">
         <span class="text-label">Our Success Stories</span>
@@ -204,7 +204,7 @@ import mapIcon from "../assets/images/icons/map.svg";
   </section>
 
   <!-- CTA Section -->
-  <section class="section-cta scroll-reveal">
+  <section class="section-cta scroll-reveal reveal-up">
     <div class="container fade-in">
       <h2 class="text-display-xl">LET'S BUILD<br />WHAT'S NEXT.</h2>
       <div class="cta-actions">
@@ -934,54 +934,15 @@ import mapIcon from "../assets/images/icons/map.svg";
 </script>
 
 <script>
-  // 1. Intersection Observer for crisp, structural fade-ups
-  const initReveals = () => {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('is-visible');
-          observer.unobserve(entry.target); // Only animate once
-        }
-      });
-    }, { threshold: 0.15, rootMargin: "0px 0px -50px 0px" });
-
-    document.querySelectorAll('.reveal-up').forEach(el => observer.observe(el));
-  };
-
-  // 2. Extend existing scroll listener for the background watermark
-  const watermark = document.querySelector('.bg-watermark');
-  let lastScrollY = window.scrollY;
-  let ticking = false;
-
-  const handleGlobalScroll = () => {
-    if (!ticking) {
-      window.requestAnimationFrame(() => {
-        const scrolled = window.scrollY;
-        // Subtle reverse-parallax on the giant watermark
-        if (watermark && scrolled > 300) {
-          const offset = (scrolled - 300) * -0.15; 
-          watermark.style.transform = `translateY(${offset}px)`;
-        }
-        ticking = false;
-      });
-      ticking = true;
-    }
-  };
-
-  const initButtonHover = () => {
-    const buttons = document.querySelectorAll('.hover-stagger .btn-text-wrapper');
-    
-    buttons.forEach(wrapper => {
-      // Prevent double-firing if Astro ViewTransitions are used
+  const initInteractions = () => {
+    // 1. Button Hover Stagger
+    document.querySelectorAll('.hover-stagger .btn-text-wrapper').forEach(wrapper => {
       if (wrapper.dataset.initialized) return; 
-      
       const text = wrapper.textContent.trim();
       wrapper.innerHTML = ''; 
-      
       text.split('').forEach((char, i) => {
         const span = document.createElement('span');
         span.className = 'char';
-        
         if (char === ' ') {
           span.innerHTML = '&nbsp;';
           span.dataset.char = '';
@@ -989,31 +950,53 @@ import mapIcon from "../assets/images/icons/map.svg";
           span.textContent = char;
           span.dataset.char = char;
         }
-        
         span.style.setProperty('--char-index', i);
         wrapper.appendChild(span);
       });
-      
       wrapper.dataset.initialized = 'true';
     });
+
+    // 2. Structural Scroll Reveals
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: "0px 0px -50px 0px" });
+
+    document.querySelectorAll('.reveal-up').forEach(el => observer.observe(el));
   };
 
-  // Trigger on DOM ready
+  // 3. Global Parallax (Watermark & Hero)
+  let ticking = false;
+  const handleGlobalScroll = () => {
+    if (!ticking) {
+      window.requestAnimationFrame(() => {
+        const scrolled = window.scrollY;
+        
+        // Watermark Parallax
+        const watermark = document.querySelector('.bg-watermark');
+        if (watermark && scrolled > 300) {
+          const offset = (scrolled - 300) * -0.15; 
+          watermark.style.transform = `translateY(${offset}px)`;
+        }
+        
+        ticking = false;
+      });
+      ticking = true;
+    }
+  };
+
   document.addEventListener('DOMContentLoaded', () => {
-    initReveals();
-    initButtonHover();
+    initInteractions();
     window.addEventListener('scroll', handleGlobalScroll, { passive: true });
   });
   
-  // Trigger for Astro ViewTransitions (if enabled)
-  document.addEventListener('astro:page-load', () => {
-    initReveals();
-    initButtonHover();
-  });
+  document.addEventListener('astro:page-load', initInteractions);
   
-  // Fallback just in case the DOM is already ready when the script parses
   if (document.readyState === 'interactive' || document.readyState === 'complete') {
-    initReveals();
-    initButtonHover();
+    initInteractions();
   }
 </script>
