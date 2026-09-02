@@ -96,7 +96,7 @@ const navItems = [
     </div>
   </div>
 
-  <!-- Mobile Navigation Overlay -->
+  <!-- mobile nav -->
   <div id="mobile-nav-overlay" class="mobile-nav" aria-hidden="true">
     <div class="mobile-nav-content">
       <ul class="mobile-nav-list">
@@ -187,12 +187,10 @@ const navItems = [
 </div>
 
 <style>
-  /* ========================================
-     MAIN HEADER LAYOUT
-     ======================================== */
+  /* header layout */
   .header {
     position: absolute;
-    top: 0; /* Snaps flush to the top edge */
+    top: 0;
     left: 0;
     width: 100%;
     z-index: 100;
@@ -203,31 +201,29 @@ const navItems = [
 
   .header-container {
     display: flex;
-    justify-content: flex-end; /* Pushes nav to the right */
+    justify-content: flex-end;
     align-items: flex-start;
     width: 95%;
     max-width: 1400px;
     margin: 0 auto;
     pointer-events: none;
-    position: relative; /* Anchor for internal elements */
+    position: relative;
   }
 
   .original-nav-container {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: 24px; 
-    margin-top: 28px; /* Forces the nav to float down away from the ceiling */
+    gap: 24px;
+    margin-top: 28px;
     pointer-events: auto;
   }
 
-  /* ========================================
-     LOGO ISLAND (HANGING TAB)
-     ======================================== */
+  /* logo */
   .logo {
-    position: absolute; 
+    position: absolute;
     top: 0;
-    left: 0; /* Locks firmly to the top-left corner of the browser */
+    left: 0;
     z-index: 50;
     pointer-events: auto;
   }
@@ -237,11 +233,11 @@ const navItems = [
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
-    padding: 16px 36px 24px 24px; /* Sleeker padding, reducing bulk */
+    padding: 16px 36px 24px 24px;
     background: rgba(255, 255, 255, 0.98);
-    border-radius: 0 0 42px 0; /* The architectural tab shape */
+    border-radius: 0 0 42px 0;
     text-decoration: none;
-    box-shadow: 4px 8px 24px rgba(0, 0, 0, 0.12); /* Subtle structural shadow */
+    box-shadow: 4px 8px 24px rgba(0, 0, 0, 0.12);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     transition: transform 0.3s ease;
@@ -255,11 +251,9 @@ const navItems = [
     object-fit: contain;
   }
 
-  /* ========================================
-     NAVIGATION ISLAND
-     ======================================== */
+  /* desktop nav */
   .desktop-nav {
-    background: rgba(20, 20, 20, 0.85); /* Dark capsule */
+    background: rgba(20, 20, 20, 0.85);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border-radius: 50px;
@@ -327,12 +321,10 @@ const navItems = [
 
   .nav-link:hover {
     opacity: 1;
-    color: var(--color-brand, #e63946); /* Inherits your brand color on hover */
+    color: var(--color-brand, #e63946);
   }
 
-  /* ========================================
-     CTA ISLAND
-     ======================================== */
+  /* cta */
   .btn-primary {
     display: inline-flex;
     align-items: center;
@@ -340,19 +332,19 @@ const navItems = [
     background-color: var(--color-brand);
     border: 1px solid var(--color-brand);
     color: #fff;
-    padding: 12px 28px 12px 22px; 
+    padding: 12px 28px 12px 22px;
     font-size: 0.85rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    border-radius: 50px; 
+    border-radius: 50px;
     transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
     gap: 12px;
-    box-shadow: none; 
+    box-shadow: none;
   }
 
   .btn-primary:hover {
-    background-color: #d62828; 
+    background-color: #d62828;
     border-color: #d62828;
     transform: translateY(-2px);
   }
@@ -360,13 +352,13 @@ const navItems = [
   .cta-accent {
     display: block;
     width: 12px;
-    height: 2px; 
+    height: 2px;
     background: #fff;
     transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .btn-primary:hover .cta-accent {
-    width: 24px; 
+    width: 24px;
   }
 
   .cta-word {
@@ -399,9 +391,7 @@ const navItems = [
     transform: translateY(-100%);
   }
 
-  /* ========================================
-     FLOATING SCROLL NAV
-     ======================================== */
+  /* floating nav */
   .floating-nav {
     position: fixed;
     top: 24px;
@@ -430,13 +420,13 @@ const navItems = [
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: rgba(20, 20, 20, 0.95); /* Matched to dark capsule */
+    background-color: rgba(20, 20, 20, 0.95);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border-radius: 50px;
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 8px 12px 8px 32px; /* Asymmetric padding to wrap the button cleanly */
+    padding: 8px 12px 8px 32px;
     gap: 32px;
   }
 
@@ -451,9 +441,7 @@ const navItems = [
     gap: 28px;
   }
 
-  /* ========================================
-     MOBILE & RESPONSIVE
-     ======================================== */
+  /* mobile toggle button */
   .mobile-menu-btn {
     display: none;
     flex-direction: column;
@@ -485,13 +473,14 @@ const navItems = [
     transform: translateY(-4px) rotate(-45deg);
   }
 
-  /* ========================================
-     MOBILE NAV OVERLAY
-     ======================================== */
-  .mobile-nav {
-    display: none;
+  /* desktop state */
+  @media (min-width: 1025px) {
+    .mobile-nav {
+      display: none;
+    }
   }
 
+  /* mobile responsive */
   @media (max-width: 1024px) {
     .header {
       top: 16px;
@@ -529,10 +518,10 @@ const navItems = [
       display: none;
     }
 
-    /* 1. The Hidden State (Pushed up and faded out) */
+    /* mobile dropdown hidden state */
     .mobile-nav {
       position: absolute;
-      top: 100%; /* Sits just below the header bar */
+      top: 100%;
       left: 0;
       width: 100%;
       background: rgba(255, 255, 255, 0.98);
@@ -543,22 +532,23 @@ const navItems = [
       display: flex;
       flex-direction: column;
       gap: 24px;
-      
-      /* The kinetic starting position */
-      transform: translateY(-150%);
+      transform: translateY(-100%);
       opacity: 0;
-      pointer-events: none;
       visibility: hidden;
-      transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease, visibility 0.5s;
-      z-index: -1; /* Keeps it behind the main header tab when closed */
+      pointer-events: none;
+      transition:
+        transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.3s ease,
+        visibility 0.4s;
+      z-index: 40;
     }
 
-    /* 2. The Active/Visible State (Slides down smoothly) */
+    /* mobile dropdown active state */
     .mobile-nav.is-active {
       transform: translateY(0);
       opacity: 1;
-      pointer-events: auto;
       visibility: visible;
+      pointer-events: auto;
     }
 
     .mobile-nav-content {
@@ -608,137 +598,83 @@ const navItems = [
       text-align: center;
     }
   }
-
-  @media (max-width: 768px) {
-    /* 1. The Hidden State (Pushed up and faded out) */
-    .mobile-nav {
-      position: absolute;
-      top: 100%; /* Sits just below the header bar */
-      left: 0;
-      width: 100%;
-      background: rgba(255, 255, 255, 0.98);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-      padding: 32px 5%;
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-      
-      /* The kinetic starting position */
-      transform: translateY(-150%);
-      opacity: 0;
-      pointer-events: none;
-      visibility: hidden;
-      transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease, visibility 0.5s;
-      z-index: -1; /* Keeps it behind the main header tab when closed */
-    }
-
-    /* 2. The Active/Visible State (Slides down smoothly) */
-    .mobile-nav.is-active {
-      transform: translateY(0);
-      opacity: 1;
-      pointer-events: auto;
-      visibility: visible;
-    }
-  }
 </style>
 
 <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    // Direction-aware floating nav logic
+  const initHeader = () => {
     const floatingNav = document.getElementById("floating-nav");
-    if (!floatingNav) return;
-
-    let lastScrollY = window.scrollY;
-    let ticking = false;
-
-    // Thresholds
-    const TOP_THRESHOLD = 150;
-    const SCROLL_DELTA_THRESHOLD = 20;
-
-    let scrollAnchor = window.scrollY;
-    let lastDirection = 0; // 1 for down, -1 for up
-
-    const updateNav = () => {
-      const currentScrollY = window.scrollY;
-      const delta = currentScrollY - lastScrollY;
-
-      const currentDirection = delta === 0 ? 0 : Math.sign(delta);
-
-      if (currentDirection !== 0 && currentDirection !== lastDirection) {
-        scrollAnchor = currentScrollY;
-        lastDirection = currentDirection;
-      }
-
-      const distanceFromAnchor = Math.abs(currentScrollY - scrollAnchor);
-
-      if (currentScrollY <= TOP_THRESHOLD) {
-        floatingNav.classList.remove("visible");
-      } else if (
-        currentDirection === -1 &&
-        distanceFromAnchor >= SCROLL_DELTA_THRESHOLD
-      ) {
-        floatingNav.classList.add("visible");
-      } else if (
-        currentDirection === 1 &&
-        distanceFromAnchor >= SCROLL_DELTA_THRESHOLD
-      ) {
-        floatingNav.classList.remove("visible");
-      }
-
-      lastScrollY = currentScrollY;
-      ticking = false;
-    };
-
-    window.addEventListener(
-      "scroll",
-      () => {
-        if (!ticking) {
-          window.requestAnimationFrame(updateNav);
-          ticking = true;
-        }
-      },
-      { passive: true },
-    );
-  });
-</script>
-
-<script>
-  const initMobileNav = () => {
-    // Note to agent: adapt these selectors to match the exact HTML classes in Header.astro
     const menuBtn = document.querySelector('button[aria-label="Menu"], .hamburger, #mobile-menu-toggle');
     const mobileNav = document.querySelector('.mobile-nav, #mobile-nav-overlay, .original-nav-container');
-    
-    if (!menuBtn || !mobileNav) return;
 
-    // Remove old listeners to prevent duplication on Astro page transitions
-    const newMenuBtn = menuBtn.cloneNode(true);
-    menuBtn.parentNode.replaceChild(newMenuBtn, menuBtn);
+    // scroll nav tracking
+    if (floatingNav) {
+      let lastScrollY = window.scrollY;
+      let ticking = false;
+      const topThreshold = 150;
+      const scrollDeltaThreshold = 20;
+      let scrollAnchor = window.scrollY;
+      let lastDirection = 0;
 
-    newMenuBtn.addEventListener('click', () => {
-      const isExpanded = newMenuBtn.getAttribute('aria-expanded') === 'true';
-      newMenuBtn.setAttribute('aria-expanded', !isExpanded);
-      
-      // Toggle active states
-      newMenuBtn.classList.toggle('is-active');
-      mobileNav.classList.toggle('is-active');
-      
-      // Prevent body scroll when menu is open
-      document.body.style.overflow = !isExpanded ? 'hidden' : '';
-    });
+      const updateNav = () => {
+        const currentScrollY = window.scrollY;
+        const delta = currentScrollY - lastScrollY;
+        const currentDirection = delta === 0 ? 0 : Math.sign(delta);
 
-    // Close menu when clicking a link
-    mobileNav.querySelectorAll('a').forEach(link => {
-      link.addEventListener('click', () => {
-        newMenuBtn.setAttribute('aria-expanded', 'false');
-        newMenuBtn.classList.remove('is-active');
-        mobileNav.classList.remove('is-active');
-        document.body.style.overflow = '';
+        if (currentDirection !== 0 && currentDirection !== lastDirection) {
+          scrollAnchor = currentScrollY;
+          lastDirection = currentDirection;
+        }
+
+        const distanceFromAnchor = Math.abs(currentScrollY - scrollAnchor);
+
+        if (currentScrollY <= topThreshold) {
+          floatingNav.classList.remove("visible");
+        } else if (currentDirection === -1 && distanceFromAnchor >= scrollDeltaThreshold) {
+          floatingNav.classList.add("visible");
+        } else if (currentDirection === 1 && distanceFromAnchor >= scrollDeltaThreshold) {
+          floatingNav.classList.remove("visible");
+        }
+
+        lastScrollY = currentScrollY;
+        ticking = false;
+      };
+
+      window.addEventListener(
+        "scroll",
+        () => {
+          if (!ticking) {
+            window.requestAnimationFrame(updateNav);
+            ticking = true;
+          }
+        },
+        { passive: true },
+      );
+    }
+
+    // mobile nav toggle
+    if (menuBtn && mobileNav) {
+      const newMenuBtn = menuBtn.cloneNode(true);
+      menuBtn.parentNode.replaceChild(newMenuBtn, menuBtn);
+
+      newMenuBtn.addEventListener("click", () => {
+        const isExpanded = newMenuBtn.getAttribute("aria-expanded") === "true";
+        newMenuBtn.setAttribute("aria-expanded", String(!isExpanded));
+        newMenuBtn.classList.toggle("is-active");
+        mobileNav.classList.toggle("is-active");
+        document.body.style.overflow = !isExpanded ? "hidden" : "";
       });
-    });
+
+      mobileNav.querySelectorAll("a").forEach((link) => {
+        link.addEventListener("click", () => {
+          newMenuBtn.setAttribute("aria-expanded", "false");
+          newMenuBtn.classList.remove("is-active");
+          mobileNav.classList.remove("is-active");
+          document.body.style.overflow = "";
+        });
+      });
+    }
   };
 
-  document.addEventListener('DOMContentLoaded', initMobileNav);
-  document.addEventListener('astro:page-load', initMobileNav);
+  document.addEventListener("DOMContentLoaded", initHeader);
+  document.addEventListener("astro:page-load", initHeader);
 </script>
