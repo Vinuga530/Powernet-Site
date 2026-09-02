@@ -5,8 +5,8 @@ import logoImg from "../../assets/images/icons/powernet-logo.png";
 const pathname = new URL(Astro.request.url).pathname;
 const isHome = pathname === "/" || pathname === "/index.html";
 const navItems = [
-  { href: "/services", label: "Services" },
-  { href: "/projects", label: "Projects" },
+  { href: "/#services", label: "Services" },
+  { href: "/#projects", label: "Projects" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
 ];
