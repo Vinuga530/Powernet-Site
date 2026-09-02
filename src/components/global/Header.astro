@@ -645,92 +645,10 @@ const navItems = [
   }
 
   @media (max-width: 768px) {
-    /* Force the hamburger button to remain visible on top of everything */
-    .hamburger, 
-    button[aria-label="Menu"], 
-    #mobile-menu-toggle {
-      display: flex !important;
-      opacity: 1 !important;
-      visibility: visible !important;
-      position: relative;
-      z-index: 9999; 
-      pointer-events: auto !important;
-    }
-
-    /* The Liquid Glass Container */
     .mobile-nav,
     .nav-links-wrapper {
-      position: absolute;
-      top: 90px; /* Drops it just below the header logo */
-      left: 16px;
-      right: 16px; /* Creates the floating bubble effect */
-      width: auto;
-      padding: 32px 24px;
-      
-      /* Premium Frosted Glass Physics */
-      background: rgba(255, 255, 255, 0.45); 
-      backdrop-filter: saturate(180%) blur(24px);
-      -webkit-backdrop-filter: saturate(180%) blur(24px);
-      border: 1px solid rgba(255, 255, 255, 0.5);
-      box-shadow: 
-        0 24px 48px rgba(0, 0, 0, 0.2), 
-        inset 0 1px 0 rgba(255, 255, 255, 0.6); /* Creates the sharp top glass edge */
-      
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      
-      /* Kinetic Bubble Entrance */
-      transform: translateY(-20px) scale(0.98);
-      opacity: 0;
-      pointer-events: none;
-      visibility: hidden;
-      transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-      z-index: 999;
-    }
-
-    /* Active State */
-    .mobile-nav.is-active,
-    .nav-links-wrapper.is-active {
-      transform: translateY(0) scale(1);
-      opacity: 1;
-      pointer-events: auto;
-      visibility: visible;
-    }
-
-    /* Premium Typography Formatting */
-    .mobile-nav a:not(.btn-primary),
-    .nav-links-wrapper a:not(.btn-primary) {
-      font-size: 1.05rem;
-      font-weight: 600;
-      letter-spacing: 0.1em;
-      color: #111111;
-      text-decoration: none;
-      padding: 16px 8px;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-      transition: color 0.3s ease;
-    }
-
-    .mobile-nav a:hover,
-    .nav-links-wrapper a:hover {
-      color: var(--color-brand, #d62828);
-    }
-
-    /* The Let's Talk Button */
-    .mobile-nav .btn-primary,
-    .nav-links-wrapper .btn-primary,
-    .mobile-nav .let-talk-btn,
-    .mobile-nav .mobile-cta {
-      margin-top: 16px;
-      text-align: center;
-      padding: 16px;
-      border-radius: 12px;
-      background-color: var(--color-brand, #d62828);
-      color: #fff;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      box-shadow: 0 8px 16px rgba(214, 40, 40, 0.2);
+      top: 80px;
+      padding: 24px 20px;
     }
   }
 </style>
@@ -812,4 +730,8 @@ const navItems = [
 
   document.addEventListener("DOMContentLoaded", initHeader);
   document.addEventListener("astro:page-load", initHeader);
+
+  if (document.readyState === "interactive" || document.readyState === "complete") {
+    initHeader();
+  }
 </script>

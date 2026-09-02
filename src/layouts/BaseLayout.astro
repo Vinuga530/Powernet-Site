@@ -88,13 +88,29 @@ const { title, description = "Powernet (Pvt) Ltd — Sri Lanka's trusted one-sto
 </html>
 
 <style is:global>
-  /* Page transition styles if needed */
+  /* page transitions */
   .transition-fade {
     transition: opacity 0.4s;
     opacity: 1;
   }
   html.is-animating .transition-fade {
     opacity: 0;
+  }
+
+  /* root stacking context: header sits strictly above main content */
+  header#main-header,
+  header.header,
+  .site-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 9999;
+  }
+
+  main#swup {
+    position: relative;
+    z-index: 1;
   }
 
   /* Loader Styles */
