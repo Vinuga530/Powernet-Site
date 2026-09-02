@@ -59,7 +59,8 @@ const navItems = [
         </ul>
       </nav>
       <button
-        class="mobile-menu-btn"
+        id="mobile-menu-toggle"
+        class="mobile-menu-btn hamburger"
         aria-label="Toggle menu"
         aria-expanded="false"
       >
@@ -127,9 +128,10 @@ const navItems = [
       </ul>
     </nav>
     <button
-      class="mobile-menu-btn"
+      class="mobile-menu-btn hamburger"
       aria-label="Toggle menu"
       aria-expanded="false"
+      onclick="document.getElementById('mobile-menu-toggle')?.click()"
     >
       <span class="hamburger-line"></span>
       <span class="hamburger-line"></span>
@@ -157,6 +159,28 @@ const navItems = [
             }
           </span>
         </span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Mobile Navigation Overlay -->
+<div id="mobile-nav-overlay" class="mobile-nav" aria-hidden="true">
+  <div class="mobile-nav-content">
+    <ul class="mobile-nav-list">
+      {
+        navItems.map((item) => (
+          <li>
+            <a href={item.href} class="mobile-nav-link">
+              {item.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+    <div class="mobile-nav-actions">
+      <a href="/contact" class="btn-primary mobile-cta">
+        <span>LET'S TALK</span>
       </a>
     </div>
   </div>
@@ -453,6 +477,21 @@ const navItems = [
       opacity 0.3s ease;
   }
 
+  .mobile-menu-btn.is-active .hamburger-line:first-child {
+    transform: translateY(4px) rotate(45deg);
+  }
+
+  .mobile-menu-btn.is-active .hamburger-line:last-child {
+    transform: translateY(-4px) rotate(-45deg);
+  }
+
+  /* ========================================
+     MOBILE NAV OVERLAY
+     ======================================== */
+  .mobile-nav {
+    display: none;
+  }
+
   @media (max-width: 1024px) {
     .header {
       top: 16px;
@@ -489,20 +528,92 @@ const navItems = [
     .floating-nav-inner .header-actions {
       display: none;
     }
+
+    .mobile-nav {
+      display: flex;
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      background: rgba(15, 15, 15, 0.96);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      z-index: 99;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition:
+        opacity 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+        visibility 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .mobile-nav.is-active {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    .mobile-nav-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 36px;
+      text-align: center;
+      padding: 24px;
+      width: 100%;
+      max-width: 360px;
+    }
+
+    .mobile-nav-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      width: 100%;
+    }
+
+    .mobile-nav-link {
+      font-family: inherit;
+      font-size: 1.6rem;
+      font-weight: 600;
+      color: #ffffff;
+      text-decoration: none;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      transition: color 0.2s ease, transform 0.2s ease;
+      display: inline-block;
+    }
+
+    .mobile-nav-link:hover,
+    .mobile-nav-link:active {
+      color: var(--color-accent, #e2e8f0);
+      transform: translateY(-2px);
+    }
+
+    .mobile-nav-actions {
+      margin-top: 12px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+
+    .mobile-nav-actions .btn-primary {
+      width: 100%;
+      max-width: 260px;
+      justify-content: center;
+      text-align: center;
+    }
   }
 </style>
 
 <script>
   document.addEventListener("DOMContentLoaded", () => {
-    // Mobile menu toggle
-    const btns = document.querySelectorAll(".mobile-menu-btn");
-    btns.forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const expanded = btn.getAttribute("aria-expanded") === "true";
-        btns.forEach((b) => b.setAttribute("aria-expanded", !expanded));
-      });
-    });
-
     // Direction-aware floating nav logic
     const floatingNav = document.getElementById("floating-nav");
     if (!floatingNav) return;
@@ -559,4 +670,43 @@ const navItems = [
       { passive: true },
     );
   });
+</script>
+
+<script>
+  const initMobileNav = () => {
+    // Note to agent: adapt these selectors to match the exact HTML classes in Header.astro
+    const menuBtn = document.querySelector('button[aria-label="Menu"], .hamburger, #mobile-menu-toggle');
+    const mobileNav = document.querySelector('.mobile-nav, #mobile-nav-overlay, .original-nav-container');
+    
+    if (!menuBtn || !mobileNav) return;
+
+    // Remove old listeners to prevent duplication on Astro page transitions
+    const newMenuBtn = menuBtn.cloneNode(true);
+    menuBtn.parentNode.replaceChild(newMenuBtn, menuBtn);
+
+    newMenuBtn.addEventListener('click', () => {
+      const isExpanded = newMenuBtn.getAttribute('aria-expanded') === 'true';
+      newMenuBtn.setAttribute('aria-expanded', !isExpanded);
+      
+      // Toggle active states
+      newMenuBtn.classList.toggle('is-active');
+      mobileNav.classList.toggle('is-active');
+      
+      // Prevent body scroll when menu is open
+      document.body.style.overflow = !isExpanded ? 'hidden' : '';
+    });
+
+    // Close menu when clicking a link
+    mobileNav.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        newMenuBtn.setAttribute('aria-expanded', 'false');
+        newMenuBtn.classList.remove('is-active');
+        mobileNav.classList.remove('is-active');
+        document.body.style.overflow = '';
+      });
+    });
+  };
+
+  document.addEventListener('DOMContentLoaded', initMobileNav);
+  document.addEventListener('astro:page-load', initMobileNav);
 </script>

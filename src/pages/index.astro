@@ -838,6 +838,21 @@ import mapIcon from "../assets/images/icons/map.svg";
     transform: translateY(0);
   }
 
+  @media (max-width: 768px) {
+    .hero-title {
+      /* Scales down drastically for mobile to prevent viewport overflow */
+      font-size: clamp(2rem, 10vw, 3rem) !important;
+      word-wrap: break-word;
+      hyphens: auto;
+      padding: 0 16px;
+      line-height: 1.1;
+    }
+    .hero-subtitle {
+      padding: 0 16px;
+      font-size: 1rem;
+    }
+  }
+
 </style>
 
 <script>
