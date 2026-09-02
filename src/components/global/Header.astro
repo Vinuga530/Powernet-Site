@@ -187,13 +187,15 @@ const navItems = [
 </div>
 
 <style>
-  /* header layout */
+  /* global header stacking fix */
+  header, 
+  .site-header,
   .header {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
-    z-index: 100;
+    z-index: 9999 !important; /* Forces the entire header system above the hero section */
     padding-top: 0;
     background-color: transparent;
     pointer-events: none;
@@ -492,8 +494,11 @@ const navItems = [
 
   /* mobile responsive */
   @media (max-width: 1024px) {
+    header,
+    .site-header,
     .header {
       top: 16px;
+      z-index: 9999 !important;
     }
 
     .logo-link {
