@@ -96,8 +96,8 @@ const navItems = [
     </div>
   </div>
 
-  <!-- mobile nav -->
-  <div id="mobile-nav-overlay" class="mobile-nav" aria-hidden="true">
+  <!-- mobile nav container (sibling to header-container holding toggle button) -->
+  <div id="mobile-nav-overlay" class="mobile-nav nav-links-wrapper" aria-hidden="true">
     <div class="mobile-nav-content">
       <ul class="mobile-nav-list">
         {
@@ -465,6 +465,15 @@ const navItems = [
       opacity 0.3s ease;
   }
 
+  .mobile-menu-btn.is-active {
+    background: rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 0, 0, 0.15);
+  }
+
+  .mobile-menu-btn.is-active .hamburger-line {
+    background-color: #111111;
+  }
+
   .mobile-menu-btn.is-active .hamburger-line:first-child {
     transform: translateY(4px) rotate(45deg);
   }
@@ -475,7 +484,8 @@ const navItems = [
 
   /* desktop state */
   @media (min-width: 1025px) {
-    .mobile-nav {
+    .mobile-nav,
+    .nav-links-wrapper {
       display: none;
     }
   }
@@ -500,8 +510,16 @@ const navItems = [
       display: none;
     }
 
-    .mobile-menu-btn {
-      display: flex;
+    /* Force the hamburger button to remain visible on top of everything */
+    .hamburger, 
+    button[aria-label="Menu"], 
+    #mobile-menu-toggle {
+      display: flex !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      position: relative;
+      z-index: 9999; 
+      pointer-events: auto !important;
     }
 
     .floating-nav {
@@ -519,7 +537,8 @@ const navItems = [
     }
 
     /* mobile dropdown hidden state */
-    .mobile-nav {
+    .mobile-nav,
+    .nav-links-wrapper {
       position: absolute;
       top: 100%;
       left: 0;
@@ -544,7 +563,8 @@ const navItems = [
     }
 
     /* mobile dropdown active state */
-    .mobile-nav.is-active {
+    .mobile-nav.is-active,
+    .nav-links-wrapper.is-active {
       transform: translateY(0);
       opacity: 1;
       visibility: visible;
@@ -582,7 +602,7 @@ const navItems = [
 
     .mobile-nav-link:hover,
     .mobile-nav-link:active {
-      color: var(--color-accent, #2563eb);
+      color: var(--color-brand, #2563eb);
       transform: translateX(4px);
     }
 
@@ -598,13 +618,27 @@ const navItems = [
       text-align: center;
     }
   }
+
+  @media (max-width: 768px) {
+    /* Force the hamburger button to remain visible on top of everything */
+    .hamburger, 
+    button[aria-label="Menu"], 
+    #mobile-menu-toggle {
+      display: flex !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      position: relative;
+      z-index: 9999; 
+      pointer-events: auto !important;
+    }
+  }
 </style>
 
 <script>
   const initHeader = () => {
     const floatingNav = document.getElementById("floating-nav");
     const menuBtn = document.querySelector('button[aria-label="Menu"], .hamburger, #mobile-menu-toggle');
-    const mobileNav = document.querySelector('.mobile-nav, #mobile-nav-overlay, .original-nav-container');
+    const mobileNav = document.querySelector('#mobile-nav-overlay, .mobile-nav, .nav-links-wrapper');
 
     // scroll nav tracking
     if (floatingNav) {
