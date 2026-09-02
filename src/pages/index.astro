@@ -48,7 +48,7 @@ import mapIcon from "../assets/images/icons/map.svg";
     </div>
   </section>
 
-  <section class="credibility-strip scroll-reveal">
+  <section class="credibility-strip scroll-reveal reveal-up">
     <div class="container">
       <div class="strip-grid">
         <div class="strip-item fade-in stagger-1">
@@ -87,7 +87,7 @@ import mapIcon from "../assets/images/icons/map.svg";
     <!-- The massive faint background watermark -->
     <div class="bg-watermark" aria-hidden="true">EXPERTISE</div>
 
-    <div class="editorial-grid">
+    <div class="editorial-grid reveal-up">
       
       <!-- Left Column: Content & Buttons -->
       <div class="intro-left">
@@ -568,14 +568,14 @@ import mapIcon from "../assets/images/icons/map.svg";
   }
 
   /* Individual Letter Animation */
-  .btn-text-wrapper .char {
+  .btn-text-wrapper :global(.char) {
     position: relative;
     display: inline-block;
     transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
     transition-delay: calc(var(--char-index) * 0.015s); /* Creates the wave */
   }
 
-  .btn-text-wrapper .char::before {
+  .btn-text-wrapper :global(.char)::before {
     content: attr(data-char);
     position: absolute;
     top: 100%; /* Sits exactly below the visible letter */
@@ -584,7 +584,7 @@ import mapIcon from "../assets/images/icons/map.svg";
   }
 
   /* The Wave Trigger */
-  .btn-editorial:hover .char {
+  .btn-editorial:hover :global(.char) {
     transform: translateY(-100%);
   }
 
@@ -823,6 +823,19 @@ import mapIcon from "../assets/images/icons/map.svg";
     }
   }
 
+  /* ========================================
+     STRUCTURAL SCROLL REVEALS
+     ======================================== */
+  .reveal-up {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform, opacity;
+  }
+  .reveal-up.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
 
 </style>
 
@@ -921,6 +934,40 @@ import mapIcon from "../assets/images/icons/map.svg";
 </script>
 
 <script>
+  // 1. Intersection Observer for crisp, structural fade-ups
+  const initReveals = () => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target); // Only animate once
+        }
+      });
+    }, { threshold: 0.15, rootMargin: "0px 0px -50px 0px" });
+
+    document.querySelectorAll('.reveal-up').forEach(el => observer.observe(el));
+  };
+
+  // 2. Extend existing scroll listener for the background watermark
+  const watermark = document.querySelector('.bg-watermark');
+  let lastScrollY = window.scrollY;
+  let ticking = false;
+
+  const handleGlobalScroll = () => {
+    if (!ticking) {
+      window.requestAnimationFrame(() => {
+        const scrolled = window.scrollY;
+        // Subtle reverse-parallax on the giant watermark
+        if (watermark && scrolled > 300) {
+          const offset = (scrolled - 300) * -0.15; 
+          watermark.style.transform = `translateY(${offset}px)`;
+        }
+        ticking = false;
+      });
+      ticking = true;
+    }
+  };
+
   const initButtonHover = () => {
     const buttons = document.querySelectorAll('.hover-stagger .btn-text-wrapper');
     
@@ -951,14 +998,22 @@ import mapIcon from "../assets/images/icons/map.svg";
     });
   };
 
-  // Trigger for standard page loads
-  document.addEventListener('DOMContentLoaded', initButtonHover);
+  // Trigger on DOM ready
+  document.addEventListener('DOMContentLoaded', () => {
+    initReveals();
+    initButtonHover();
+    window.addEventListener('scroll', handleGlobalScroll, { passive: true });
+  });
   
   // Trigger for Astro ViewTransitions (if enabled)
-  document.addEventListener('astro:page-load', initButtonHover);
+  document.addEventListener('astro:page-load', () => {
+    initReveals();
+    initButtonHover();
+  });
   
   // Fallback just in case the DOM is already ready when the script parses
   if (document.readyState === 'interactive' || document.readyState === 'complete') {
+    initReveals();
     initButtonHover();
   }
 </script>
