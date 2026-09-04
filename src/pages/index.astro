@@ -24,6 +24,14 @@ import mapIcon from "../assets/images/icons/map.svg";
       <div class="bg-overlay"></div>
     </div>
 
+    <!-- spatial hero assets -->
+    <div class="spatial-layer layer-left" aria-hidden="true">
+      <img src="/images/photos/screw.webp" alt="" class="spatial-img" />
+    </div>
+    <div class="spatial-layer layer-right" aria-hidden="true">
+      <img src="/images/photos/meter.jpg" alt="" class="spatial-img" />
+    </div>
+
     <div class="container hero-content">
       <div class="hero-text-wrapper">
         <h1 class="hero-title text-display-xl">
@@ -328,13 +336,75 @@ import mapIcon from "../assets/images/icons/map.svg";
 
   .hero-content {
     position: relative;
-    z-index: 2;
+    z-index: 10;
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
     padding: 0 5%;
     margin-top: 10vh;
+  }
+
+  /* spatial hero stage */
+  .spatial-layer {
+    position: absolute;
+    pointer-events: none;
+    z-index: 2; /* sits above overlay, behind hero-content (z-index: 10) */
+    will-change: transform;
+  }
+
+  .spatial-layer.layer-left {
+    top: 15%;
+    left: 4%;
+  }
+
+  .spatial-layer.layer-right {
+    bottom: 12%;
+    right: 4%;
+  }
+
+  .spatial-img {
+    display: block;
+    width: clamp(200px, 22vw, 360px);
+    height: auto;
+    opacity: 0;
+    filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.35));
+  }
+
+  /* entrance transitions */
+  .layer-left .spatial-img {
+    animation: entrySlideUp 1.1s cubic-bezier(0.16, 1, 0.3, 1) 0.15s forwards;
+  }
+
+  .layer-right .spatial-img {
+    animation: entrySlideUp 1.1s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
+  }
+
+  @keyframes entrySlideUp {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 90px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  /* mobile scaling */
+  @media (max-width: 768px) {
+    .spatial-img {
+      width: 140px;
+      opacity: 0.25; /* prevent contrast clash with hero typography */
+    }
+    .layer-left {
+      top: 10%;
+      left: -20px;
+    }
+    .layer-right {
+      bottom: 6%;
+      right: -20px;
+    }
   }
 
   .hero-text-wrapper {
@@ -1136,5 +1206,48 @@ import mapIcon from "../assets/images/icons/map.svg";
 
   if (document.readyState === "interactive" || document.readyState === "complete") {
     initPage();
+  }
+
+  // spatial parallax controller
+  let spatialScrollHandler = null;
+
+  const initSpatialParallax = () => {
+    if (spatialScrollHandler) {
+      window.removeEventListener("scroll", spatialScrollHandler);
+      spatialScrollHandler = null;
+    }
+
+    const leftLayer = document.querySelector<HTMLElement>(".layer-left");
+    const rightLayer = document.querySelector<HTMLElement>(".layer-right");
+    if (!leftLayer && !rightLayer) return;
+
+    let ticking = false;
+
+    const updateParallax = () => {
+      const y = window.scrollY;
+      if (y < 1200) {
+        // multi-speed vertical displacement
+        if (leftLayer) leftLayer.style.transform = `translate3d(0, ${y * -0.22}px, 0)`;
+        if (rightLayer) rightLayer.style.transform = `translate3d(0, ${y * -0.1}px, 0)`;
+      }
+      ticking = false;
+    };
+
+    const onScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(updateParallax);
+        ticking = true;
+      }
+    };
+
+    spatialScrollHandler = onScroll;
+    window.addEventListener("scroll", onScroll, { passive: true });
+    updateParallax();
+  };
+
+  document.addEventListener("DOMContentLoaded", initSpatialParallax);
+  document.addEventListener("astro:page-load", initSpatialParallax);
+  if (document.readyState === "interactive" || document.readyState === "complete") {
+    initSpatialParallax();
   }
 </script>
