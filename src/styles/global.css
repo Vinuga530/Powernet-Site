@@ -4,6 +4,11 @@
 @import './typography.css';
 @import './animations.css';
 
+html,
+body {
+  overflow-x: clip; /* prevents horizontal scroll while allowing vertical escape */
+}
+
 body {
   background-color: var(--color-background);
   color: var(--color-foreground);

@@ -277,14 +277,21 @@ import screwImg from "../assets/images/photos/screw.png";
     width: 100%;
     height: 100%;
   }
+  html,
+  body {
+    overflow-x: clip; /* prevents horizontal scroll while allowing vertical escape */
+  }
+
+  .hero,
+  #hero,
   .hero-section {
     position: relative;
-    z-index: 1;
+    z-index: 20;
     min-height: 100svh;
     display: flex;
     align-items: center;
     color: var(--color-dark-foreground);
-    overflow: hidden;
+    overflow: visible !important; /* lets assets travel down past the hero boundary */
   }
 
   .hero-section::before {
@@ -347,65 +354,76 @@ import screwImg from "../assets/images/photos/screw.png";
     margin-top: 10vh;
   }
 
-  /* spatial hero stage */
+  /* spatial layer setup */
   .spatial-layer {
     position: absolute;
     pointer-events: none;
-    z-index: 2; /* sits above overlay, behind hero-content (z-index: 10) */
+    z-index: 20; /* above section backgrounds, behind modals */
     will-change: transform;
   }
 
-  .spatial-layer.layer-left {
-    top: 15%;
-    left: 4%;
+  .layer-left {
+    top: 16%;
+    left: 6%;
   }
 
-  .spatial-layer.layer-right {
-    bottom: 12%;
-    right: 4%;
+  .layer-right {
+    top: 55%;
+    right: 6%;
   }
 
   .spatial-img {
     display: block;
-    width: clamp(200px, 22vw, 360px);
+    width: clamp(180px, 20vw, 320px);
     height: auto;
-    opacity: 0;
-    filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.35));
+    filter: drop-shadow(0 25px 50px rgba(0, 0, 0, 0.4));
+    will-change: transform, opacity;
   }
 
-  /* entrance transitions */
+  /* off-screen entrance animations */
   .layer-left .spatial-img {
-    animation: entrySlideUp 1.1s cubic-bezier(0.16, 1, 0.3, 1) 0.15s forwards;
+    animation: flyInFromLeft 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
   }
 
   .layer-right .spatial-img {
-    animation: entrySlideUp 1.1s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
+    animation: flyInFromRight 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.25s forwards;
   }
 
-  @keyframes entrySlideUp {
-    from {
+  @keyframes flyInFromLeft {
+    0% {
       opacity: 0;
-      transform: translate3d(0, 90px, 0);
+      transform: translate3d(-120vw, 0, 0);
     }
-    to {
+    100% {
       opacity: 1;
       transform: translate3d(0, 0, 0);
     }
   }
 
-  /* mobile scaling */
+  @keyframes flyInFromRight {
+    0% {
+      opacity: 0;
+      transform: translate3d(120vw, 0, 0);
+    }
+    100% {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  /* mobile tuning */
   @media (max-width: 768px) {
     .spatial-img {
-      width: 140px;
-      opacity: 0.25; /* prevent contrast clash with hero typography */
+      width: 130px;
+      opacity: 0.3;
     }
     .layer-left {
-      top: 10%;
-      left: -20px;
+      top: 12%;
+      left: -10px;
     }
     .layer-right {
-      bottom: 6%;
-      right: -20px;
+      top: 60%;
+      right: -10px;
     }
   }
 
@@ -1226,12 +1244,17 @@ import screwImg from "../assets/images/photos/screw.png";
     let ticking = false;
 
     const updateParallax = () => {
-      const y = window.scrollY;
-      if (y < 1200) {
-        // multi-speed vertical displacement
-        if (leftLayer) leftLayer.style.transform = `translate3d(0, ${y * -0.22}px, 0)`;
-        if (rightLayer) rightLayer.style.transform = `translate3d(0, ${y * -0.1}px, 0)`;
+      const scrolled = window.scrollY;
+
+      // translate downward as user scrolls (floating travel effect)
+      // using subtle differential ratios for natural optical depth
+      if (leftLayer) {
+        leftLayer.style.transform = `translate3d(0, ${scrolled * 0.35}px, 0)`;
       }
+      if (rightLayer) {
+        rightLayer.style.transform = `translate3d(0, ${scrolled * 0.2}px, 0)`;
+      }
+
       ticking = false;
     };
 
