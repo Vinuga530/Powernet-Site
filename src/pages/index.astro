@@ -10,6 +10,16 @@ import screwImg from "../assets/images/photos/screw.png";
 ---
 
 <BaseLayout title="Powernet (Pvt) Ltd | Power and Infrastructure Solutions">
+  <!-- global spatial viewport stage -->
+  <aside class="spatial-viewport" aria-hidden="true">
+    <div class="spatial-item tool-left">
+      <img src={meterImg.src} alt="" class="tool-img" />
+    </div>
+    <div class="spatial-item tool-right">
+      <img src={screwImg.src} alt="" class="tool-img" />
+    </div>
+  </aside>
+
   <section class="hero-section hero-dark-overlay">
     <div class="hero-bg image-reveal-wrapper is-revealed">
       <Picture
@@ -24,14 +34,6 @@ import screwImg from "../assets/images/photos/screw.png";
         fetchpriority="high"
       />
       <div class="bg-overlay"></div>
-    </div>
-
-    <!-- spatial hero assets -->
-    <div class="spatial-layer layer-left" aria-hidden="true">
-      <img src={meterImg.src} alt="" class="spatial-img" />
-    </div>
-    <div class="spatial-layer layer-right" aria-hidden="true">
-      <img src={screwImg.src} alt="" class="spatial-img" />
     </div>
 
     <div class="container hero-content">
@@ -354,76 +356,77 @@ import screwImg from "../assets/images/photos/screw.png";
     margin-top: 10vh;
   }
 
-  /* spatial layer setup */
-  .spatial-layer {
-    position: absolute;
+  /* fixed global viewport stage */
+  .spatial-viewport {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
     pointer-events: none;
-    z-index: 20; /* above section backgrounds, behind modals */
-    will-change: transform;
+    z-index: 25; /* above hero & content sections, below header (9999) */
+    overflow: hidden;
+    transition: opacity 0.4s ease;
   }
 
-  .layer-left {
-    top: 16%;
+  .spatial-item {
+    position: absolute;
+    will-change: transform, opacity;
+    transition: opacity 0.4s ease;
+  }
+
+  /* initial resting coordinates */
+  .tool-left {
+    top: 22%;
     left: 6%;
   }
 
-  .layer-right {
-    top: 55%;
+  .tool-right {
+    top: 60%;
     right: 6%;
   }
 
-  .spatial-img {
+  .tool-img {
     display: block;
-    width: clamp(180px, 20vw, 320px);
+    width: clamp(160px, 18vw, 290px);
     height: auto;
-    filter: drop-shadow(0 25px 50px rgba(0, 0, 0, 0.4));
-    will-change: transform, opacity;
+    filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.28));
   }
 
   /* off-screen entrance animations */
-  .layer-left .spatial-img {
-    animation: flyInFromLeft 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
+  .tool-left .tool-img {
+    animation: enterFromLeft 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
   }
 
-  .layer-right .spatial-img {
-    animation: flyInFromRight 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.25s forwards;
+  .tool-right .tool-img {
+    animation: enterFromRight 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.25s forwards;
   }
 
-  @keyframes flyInFromLeft {
-    0% {
+  @keyframes enterFromLeft {
+    from {
       opacity: 0;
-      transform: translate3d(-120vw, 0, 0);
+      transform: translate3d(-100vw, 0, 0);
     }
-    100% {
+    to {
       opacity: 1;
       transform: translate3d(0, 0, 0);
     }
   }
 
-  @keyframes flyInFromRight {
-    0% {
+  @keyframes enterFromRight {
+    from {
       opacity: 0;
-      transform: translate3d(120vw, 0, 0);
+      transform: translate3d(100vw, 0, 0);
     }
-    100% {
+    to {
       opacity: 1;
       transform: translate3d(0, 0, 0);
     }
   }
 
-  /* mobile tuning */
+  /* mobile constraints */
   @media (max-width: 768px) {
-    .spatial-img {
-      width: 130px;
-      opacity: 0.3;
-    }
-    .layer-left {
-      top: 12%;
-      left: -10px;
-    }
-    .layer-right {
-      top: 60%;
-      right: -10px;
+    .spatial-viewport {
+      display: none; /* keep clean on mobile viewports */
     }
   }
 
@@ -1228,51 +1231,52 @@ import screwImg from "../assets/images/photos/screw.png";
     initPage();
   }
 
-  // spatial parallax controller
-  let spatialScrollHandler = null;
+  // persistent spatial scroll engine
+  let persistentScrollHandler = null;
 
-  const initSpatialParallax = () => {
-    if (spatialScrollHandler) {
-      window.removeEventListener("scroll", spatialScrollHandler);
-      spatialScrollHandler = null;
+  const initPersistentSpatial = () => {
+    if (persistentScrollHandler) {
+      window.removeEventListener("scroll", persistentScrollHandler);
+      persistentScrollHandler = null;
     }
 
-    const leftLayer = document.querySelector<HTMLElement>(".layer-left");
-    const rightLayer = document.querySelector<HTMLElement>(".layer-right");
-    if (!leftLayer && !rightLayer) return;
+    const toolLeft = document.querySelector<HTMLElement>(".tool-left");
+    const toolRight = document.querySelector<HTMLElement>(".tool-right");
+    const stage = document.querySelector<HTMLElement>(".spatial-viewport");
+    if (!toolLeft || !toolRight || !stage) return;
 
     let ticking = false;
 
-    const updateParallax = () => {
-      const scrolled = window.scrollY;
-
-      // translate downward as user scrolls (floating travel effect)
-      // using subtle differential ratios for natural optical depth
-      if (leftLayer) {
-        leftLayer.style.transform = `translate3d(0, ${scrolled * 0.35}px, 0)`;
-      }
-      if (rightLayer) {
-        rightLayer.style.transform = `translate3d(0, ${scrolled * 0.2}px, 0)`;
-      }
-
-      ticking = false;
-    };
-
     const onScroll = () => {
       if (!ticking) {
-        window.requestAnimationFrame(updateParallax);
+        window.requestAnimationFrame(() => {
+          const y = window.scrollY;
+
+          // continuous vertical drift across the white content sections
+          toolLeft.style.transform = `translate3d(0, ${y * -0.35}px, 0)`;
+          toolRight.style.transform = `translate3d(0, ${y * -0.55}px, 0)`;
+
+          // fade out cleanly after the services section
+          if (y > 1700) {
+            stage.style.opacity = "0";
+          } else {
+            stage.style.opacity = "1";
+          }
+
+          ticking = false;
+        });
         ticking = true;
       }
     };
 
-    spatialScrollHandler = onScroll;
+    persistentScrollHandler = onScroll;
     window.addEventListener("scroll", onScroll, { passive: true });
-    updateParallax();
+    onScroll();
   };
 
-  document.addEventListener("DOMContentLoaded", initSpatialParallax);
-  document.addEventListener("astro:page-load", initSpatialParallax);
+  document.addEventListener("DOMContentLoaded", initPersistentSpatial);
+  document.addEventListener("astro:page-load", initPersistentSpatial);
   if (document.readyState === "interactive" || document.readyState === "complete") {
-    initSpatialParallax();
+    initPersistentSpatial();
   }
 </script>
