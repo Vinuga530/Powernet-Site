@@ -34,6 +34,7 @@ const { title, description = "Powernet (Pvt) Ltd — Sri Lanka's trusted one-sto
         <div class="dot dot-3"></div>
       </div>
     </div>
+    <slot name="spatial" />
     <Header />
     <main id="swup" class="transition-fade">
       <slot />
@@ -41,7 +42,7 @@ const { title, description = "Powernet (Pvt) Ltd — Sri Lanka's trusted one-sto
     <Footer />
     
     <script>
-      // Hide loader logic
+      // loader dismissal
       const hideLoader = () => {
         const loader = document.getElementById('initial-loader');
         if (loader && !loader.classList.contains('is-hidden')) {
@@ -52,18 +53,18 @@ const { title, description = "Powernet (Pvt) Ltd — Sri Lanka's trusted one-sto
         }
       };
 
-      // Check if hero image exists and wait for it
+      // hero image load check
       const heroImg = document.querySelector('.bg-img');
       if (heroImg && !heroImg.complete) {
         heroImg.addEventListener('load', hideLoader);
-        setTimeout(hideLoader, 500); // safety fallback reduced to 500ms
+        setTimeout(hideLoader, 500); // safety fallback
       } else {
-        // Run immediately if no image or already loaded
+        // immediate fallback
         hideLoader();
       }
 
       document.addEventListener('DOMContentLoaded', () => {
-        // Scroll Observer
+        // scroll reveal observer
         const observerOptions = {
           root: null,
           rootMargin: '0px 0px -10% 0px',
@@ -88,7 +89,7 @@ const { title, description = "Powernet (Pvt) Ltd — Sri Lanka's trusted one-sto
 </html>
 
 <style is:global>
-  /* page transitions */
+  /* swup transition */
   .transition-fade {
     transition: opacity 0.4s;
     opacity: 1;
@@ -97,15 +98,15 @@ const { title, description = "Powernet (Pvt) Ltd — Sri Lanka's trusted one-sto
     opacity: 0;
   }
 
-  /* root stacking context: header sits strictly above main content */
+  /* root header stacking */
   header#main-header,
   header.header,
   .site-header {
-    position: absolute;
+    position: fixed !important;
     top: 0;
     left: 0;
     width: 100%;
-    z-index: 9999;
+    z-index: 9999 !important;
   }
 
   main#swup {
@@ -113,7 +114,7 @@ const { title, description = "Powernet (Pvt) Ltd — Sri Lanka's trusted one-sto
     z-index: 1;
   }
 
-  /* Loader Styles */
+  /* initial loader */
   .loader-overlay {
     position: fixed;
     inset: 0;

@@ -1,4 +1,4 @@
-/* Global Styles */
+/* global styles */
 @import './reset.css';
 @import './variables.css';
 @import './typography.css';
@@ -6,7 +6,7 @@
 
 html,
 body {
-  overflow-x: clip; /* prevents horizontal scroll while allowing vertical escape */
+  overflow-x: clip; /* horizontal clip */
 }
 
 body {
@@ -27,7 +27,7 @@ a {
   padding-inline: var(--page-padding);
 }
 
-/* Grid Layout */
+/* grid layout */
 .grid-12 {
   display: grid;
   grid-template-columns: repeat(12, 1fr);

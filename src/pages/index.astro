@@ -10,8 +10,8 @@ import screwImg from "../assets/images/photos/screw.png";
 ---
 
 <BaseLayout title="Powernet (Pvt) Ltd | Power and Infrastructure Solutions">
-  <!-- global spatial viewport stage -->
-  <aside class="spatial-viewport" aria-hidden="true">
+  <!-- spatial viewport stage -->
+  <aside class="spatial-viewport" slot="spatial" aria-hidden="true">
     <div class="spatial-item tool-left">
       <img src={meterImg.src} alt="" class="tool-img" />
     </div>
@@ -95,13 +95,14 @@ import screwImg from "../assets/images/photos/screw.png";
     </div>
   </section>
 
-  <section class="editorial-intro">
-    <!-- The massive faint background watermark -->
+  <!-- about section -->
+  <section id="about" class="editorial-intro">
+    <!-- watermark -->
     <div class="bg-watermark" aria-hidden="true">EXPERTISE</div>
 
     <div class="editorial-grid reveal-up">
       
-      <!-- Left Column: Content & Buttons -->
+      <!-- editorial content -->
       <div class="intro-left">
         <span class="editorial-eyebrow">Integrated Infrastructure Solutions</span>
         <h2 class="intro-title">Infrastructure, Built for your needs.</h2>
@@ -109,16 +110,16 @@ import screwImg from "../assets/images/photos/screw.png";
           Powernet coordinates complex scopes as a single, integrated project. By unifying multiple critical disciplines under one roof, we eliminate vendor friction and ensure seamless, high-quality delivery for Sri Lanka's critical operations.
         </p>
       <div class="intro-actions">
-        <a href="#" class="btn-editorial btn-solid hover-stagger">
+        <a href="/#about" class="btn-editorial btn-solid hover-stagger">
           <span class="btn-text-wrapper">Explore Company Profile</span>
         </a>
-        <a href="#" class="btn-editorial btn-outline hover-stagger">
+        <a href="/#about" class="btn-editorial btn-outline hover-stagger">
           <span class="btn-text-wrapper">Explore Quality Process</span>
         </a>
       </div>
       </div>
 
-      <!-- Right Column: The PGP-style Line List -->
+      <!-- capabilities list -->
       <div class="intro-right">
         <ul class="spec-list">
           <li><span class="glow-dot"></span> Networking & IT Systems</li>
@@ -225,7 +226,7 @@ import screwImg from "../assets/images/photos/screw.png";
     </div>
   </section>
 
-  <!-- Featured Projects section to be changed later into a CMS bsed upload of projects -->
+  <!-- featured projects -->
   <section id="projects" class="section-projects scroll-reveal reveal-up">
     <div class="container">
       <div class="section-header fade-in">
@@ -260,8 +261,8 @@ import screwImg from "../assets/images/photos/screw.png";
     </div>
   </section>
 
-  <!-- CTA Section -->
-  <section class="section-cta scroll-reveal reveal-up">
+  <!-- contact section -->
+  <section id="contact" class="section-cta scroll-reveal reveal-up">
     <div class="container fade-in">
       <h2 class="text-display-xl">LET'S BUILD<br />WHAT'S NEXT.</h2>
       <div class="cta-actions">
@@ -319,7 +320,7 @@ import screwImg from "../assets/images/photos/screw.png";
     z-index: -1;
     background-color: #111;
     will-change: transform;
-    /* hardware acceleration */
+    /* composite layer */
     transform-style: preserve-3d;
     backface-visibility: hidden;
   }
@@ -334,7 +335,7 @@ import screwImg from "../assets/images/photos/screw.png";
   .bg-overlay {
     position: absolute;
     inset: 0;
-    /* background gradient */
+    /* hero scrim */
     background: linear-gradient(
       to bottom,
       rgba(15, 23, 42, 0.15) 0%,   
@@ -356,15 +357,15 @@ import screwImg from "../assets/images/photos/screw.png";
     margin-top: 10vh;
   }
 
-  /* fixed global viewport stage */
+  /* spatial viewport stage */
   .spatial-viewport {
     position: fixed;
     inset: 0;
     width: 100vw;
     height: 100vh;
     pointer-events: none;
-    z-index: 25; /* above hero & content sections, below header (9999) */
-    overflow: hidden;
+    z-index: 25;
+    overflow: visible;
     transition: opacity 0.4s ease;
   }
 
@@ -374,7 +375,7 @@ import screwImg from "../assets/images/photos/screw.png";
     transition: opacity 0.4s ease;
   }
 
-  /* initial resting coordinates */
+  /* tool coordinates */
   .tool-left {
     top: 22%;
     left: 6%;
@@ -392,7 +393,7 @@ import screwImg from "../assets/images/photos/screw.png";
     filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.28));
   }
 
-  /* off-screen entrance animations */
+  /* entrance keyframes */
   .tool-left .tool-img {
     animation: enterFromLeft 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
   }
@@ -423,11 +424,12 @@ import screwImg from "../assets/images/photos/screw.png";
     }
   }
 
-  /* mobile constraints */
-  @media (max-width: 768px) {
-    .spatial-viewport {
-      display: none; /* keep clean on mobile viewports */
-    }
+  /* section anchor offsets */
+  #services,
+  #projects,
+  #about,
+  #contact {
+    scroll-margin-top: 100px;
   }
 
   .hero-text-wrapper {
@@ -440,7 +442,7 @@ import screwImg from "../assets/images/photos/screw.png";
   .hero-title {
     margin-bottom: var(--space-md);
     --text-display-xl: clamp(3.2rem, 5.2vw, 5.64rem);
-    /* text shadow */
+    /* title shadow */
     text-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.6);
   }
 
@@ -499,7 +501,7 @@ import screwImg from "../assets/images/photos/screw.png";
     color: #0f172a;
   }
 
-  /* credibility strip */
+  /* metrics strip */
   .credibility-strip {
     background-color: var(--color-background);
     padding: 100px 0 var(--space-3xl);
@@ -555,7 +557,7 @@ import screwImg from "../assets/images/photos/screw.png";
     line-height: 1.4;
   }
 
-  /* stats icons */
+  /* metric icons */
   .stats-icon {
     position: absolute;
     right: -10%;
@@ -567,7 +569,7 @@ import screwImg from "../assets/images/photos/screw.png";
     z-index: 0;
   }
 
-  /* editorial intro */
+  /* editorial section */
   .editorial-intro {
     position: relative;
     width: 100%;
@@ -630,7 +632,7 @@ import screwImg from "../assets/images/photos/screw.png";
     margin: 0 0 40px 0;
   }
 
-  /* buttons */
+  /* editorial actions */
   .intro-actions {
     display: flex;
     gap: 16px;
@@ -671,7 +673,7 @@ import screwImg from "../assets/images/photos/screw.png";
     line-height: 1.1; 
   }
 
-  /* letter animation */
+  /* character split */
   .btn-text-wrapper :global(.char) {
     position: relative;
     display: inline-block;
@@ -687,12 +689,12 @@ import screwImg from "../assets/images/photos/screw.png";
     color: inherit;
   }
 
-  /* hover trigger */
+  /* hover effect */
   .btn-editorial:hover :global(.char) {
     transform: translateY(-100%);
   }
 
-  /* kinetic list */
+  /* spec list */
   .spec-list {
     list-style: none;
     padding: 0;
@@ -718,14 +720,14 @@ import screwImg from "../assets/images/photos/screw.png";
     border-top: 1px solid rgba(0, 0, 0, 0.08);
   }
 
-  /* stagger delays */
+  /* spec delays */
   .spec-list li:nth-child(1) { animation-delay: 0.1s; }
   .spec-list li:nth-child(2) { animation-delay: 0.2s; }
   .spec-list li:nth-child(3) { animation-delay: 0.3s; }
   .spec-list li:nth-child(4) { animation-delay: 0.4s; }
   .spec-list li:nth-child(5) { animation-delay: 0.5s; }
 
-  /* hover state */
+  /* spec hover */
   .spec-list li:hover {
     transform: translateX(12px) translateY(0);
     color: var(--color-brand, #d62828);
@@ -742,7 +744,7 @@ import screwImg from "../assets/images/photos/screw.png";
     transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  /* hover indicator */
+  /* glow dot hover */
   .spec-list li:hover .glow-dot {
     width: 28px;
     border-radius: 4px;
@@ -757,17 +759,7 @@ import screwImg from "../assets/images/photos/screw.png";
     }
   }
 
-  @media (max-width: 992px) {
-    .editorial-grid {
-      grid-template-columns: 1fr;
-      gap: 48px;
-    }
-    .bg-watermark {
-      top: 2%;
-    }
-  }
-
-  /* services */
+  /* services section */
   .section-services {
     padding: var(--space-3xl) 0;
     background-color: var(--color-background);
@@ -834,7 +826,7 @@ import screwImg from "../assets/images/photos/screw.png";
     will-change: transform;
   }
 
-  /* card numbering */
+  /* card index */
   .service-card .card-num {
     font-size: 0.85rem;
     font-weight: 600;
@@ -908,7 +900,7 @@ import screwImg from "../assets/images/photos/screw.png";
     transform: translateX(6px);
   }
 
-  /* section-header base */
+  /* section header */
   .section-header {
     margin-bottom: var(--space-2xl);
     border-bottom: 1px solid var(--color-border);
@@ -929,7 +921,7 @@ import screwImg from "../assets/images/photos/screw.png";
     color: var(--color-brand);
   }
 
-  /* projects */
+  /* projects section */
   .section-projects {
     padding: var(--space-3xl) 0;
     background-color: var(--color-surface);
@@ -957,7 +949,7 @@ import screwImg from "../assets/images/photos/screw.png";
     align-self: flex-start;
   }
 
-  /* cta */
+  /* cta section */
   .section-cta {
     padding: var(--space-3xl) 0;
     background-color: var(--color-brand);
@@ -975,13 +967,7 @@ import screwImg from "../assets/images/photos/screw.png";
     background-color: var(--color-surface);
   }
 
-  @media (max-width: 1024px) {
-    .services-grid {
-      gap: 20px;
-    }
-  }
-
-  /* svg stroke adjustments */
+  /* icon stroke overrides */
   .stats-icon-1 {
     stroke-width: 14px !important; 
   }
@@ -991,7 +977,7 @@ import screwImg from "../assets/images/photos/screw.png";
     stroke-width: 60px !important; 
   }
 
-  /* blueprint drawing */
+  /* blueprint animation */
   .stats-icon,
   .stats-icon * {
     fill: none !important;
@@ -1017,7 +1003,7 @@ import screwImg from "../assets/images/photos/screw.png";
     }
   }
 
-  /* scroll reveals */
+  /* reveal transitions */
   .reveal-up {
     opacity: 0;
     transform: translateY(40px);
@@ -1029,8 +1015,28 @@ import screwImg from "../assets/images/photos/screw.png";
     transform: translateY(0);
   }
 
-  /* mobile layout */
+  /* responsive breakpoints */
+  @media (max-width: 1024px) {
+    .services-grid {
+      gap: 20px;
+    }
+  }
+
+  @media (max-width: 992px) {
+    .editorial-grid {
+      grid-template-columns: 1fr;
+      gap: 48px;
+    }
+    .bg-watermark {
+      top: 2%;
+    }
+  }
+
   @media (max-width: 768px) {
+    .spatial-viewport {
+      display: none;
+    }
+
     .hero-title {
       font-size: clamp(2rem, 10vw, 3rem) !important;
       word-wrap: break-word;
@@ -1085,13 +1091,21 @@ import screwImg from "../assets/images/photos/screw.png";
 </style>
 
 <script>
+  let pageScrollHandler: (() => void) | null = null;
+
   const initPage = () => {
+    // scroll handler teardown
+    if (pageScrollHandler) {
+      window.removeEventListener("scroll", pageScrollHandler);
+      pageScrollHandler = null;
+    }
+
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    // button hover character split
+    // button character split
     document.querySelectorAll(".hover-stagger .btn-text-wrapper").forEach((wrapper) => {
-      if (wrapper.dataset.initialized) return;
-      const text = wrapper.textContent.trim();
+      if (wrapper.getAttribute("data-initialized")) return;
+      const text = wrapper.textContent?.trim() || "";
       wrapper.innerHTML = "";
       text.split("").forEach((char, i) => {
         const span = document.createElement("span");
@@ -1103,13 +1117,13 @@ import screwImg from "../assets/images/photos/screw.png";
           span.textContent = char;
           span.dataset.char = char;
         }
-        span.style.setProperty("--char-index", i);
+        span.style.setProperty("--char-index", String(i));
         wrapper.appendChild(span);
       });
-      wrapper.dataset.initialized = "true";
+      wrapper.setAttribute("data-initialized", "true");
     });
 
-    // scroll reveals
+    // intersection reveal
     const revealObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -1124,29 +1138,33 @@ import screwImg from "../assets/images/photos/screw.png";
 
     document.querySelectorAll(".reveal-up").forEach((el) => revealObserver.observe(el));
 
-    // stats icon draw animation
+    // svg icon draw
     const credibilityStrip = document.querySelector(".credibility-strip");
     const svgIcons = document.querySelectorAll(".stats-icon");
 
     if (credibilityStrip && svgIcons.length > 0) {
       if (prefersReducedMotion) {
         svgIcons.forEach((svg) => {
-          const accent = svg.querySelector(".draw-accent");
+          const accent = svg.querySelector<HTMLElement>(".draw-accent");
           if (accent) accent.style.opacity = "1";
         });
       } else {
-        const svgAnimations = [];
+        const svgAnimations: Array<{
+          svg: Element;
+          paths: Array<{ el: SVGGeometryElement; length: number }>;
+          accent: HTMLElement | null;
+        }> = [];
 
         svgIcons.forEach((svg) => {
-          const paths = svg.querySelectorAll(".draw-path");
-          const accent = svg.querySelector(".draw-accent");
+          const paths = svg.querySelectorAll<SVGGeometryElement>(".draw-path");
+          const accent = svg.querySelector<HTMLElement>(".draw-accent");
 
           if (accent) accent.style.opacity = "0";
 
           const pathData = Array.from(paths).map((path) => {
             const length = path.getTotalLength();
-            path.style.strokeDasharray = length;
-            path.style.strokeDashoffset = length;
+            path.style.strokeDasharray = String(length);
+            path.style.strokeDashoffset = String(length);
             path.getBoundingClientRect();
             return { el: path, length };
           });
@@ -1154,7 +1172,10 @@ import screwImg from "../assets/images/photos/screw.png";
           svgAnimations.push({ svg, paths: pathData, accent });
         });
 
-        const animateIcon = (iconData) => {
+        const animateIcon = (iconData: {
+          paths: Array<{ el: SVGGeometryElement; length: number }>;
+          accent: HTMLElement | null;
+        }) => {
           let currentDelay = 0;
           const totalLength = iconData.paths.reduce((sum, p) => sum + p.length, 0);
           const totalDuration = 1400;
@@ -1192,35 +1213,52 @@ import screwImg from "../assets/images/photos/screw.png";
       }
     }
 
-    // scroll parallax for hero & watermark
+    // unified scroll engine
     if (!prefersReducedMotion && window.innerWidth >= 768) {
-      const heroBg = document.querySelector(".hero-bg");
-      const watermark = document.querySelector(".bg-watermark");
+      const heroBg = document.querySelector<HTMLElement>(".hero-bg");
+      const watermark = document.querySelector<HTMLElement>(".bg-watermark");
+      const toolLeft = document.querySelector<HTMLElement>(".tool-left");
+      const toolRight = document.querySelector<HTMLElement>(".tool-right");
+      const stage = document.querySelector<HTMLElement>(".spatial-viewport");
+
       let ticking = false;
 
-      const onScroll = () => {
+      const updateScroll = () => {
+        const scrolled = window.scrollY;
+
+        if (heroBg && scrolled < window.innerHeight * 1.5) {
+          const yPos = scrolled * 0.35;
+          heroBg.style.transform = `translate3d(0, ${yPos}px, 0) scale(1.15)`;
+        }
+
+        if (watermark && scrolled > 300) {
+          const offset = (scrolled - 300) * -0.15;
+          watermark.style.transform = `translateY(${offset}px)`;
+        }
+
+        if (toolLeft && toolRight && stage) {
+          toolLeft.style.transform = `translate3d(0, ${scrolled * -0.35}px, 0)`;
+          toolRight.style.transform = `translate3d(0, ${scrolled * -0.55}px, 0)`;
+
+          if (scrolled > 1700) {
+            stage.style.opacity = "0";
+          } else {
+            stage.style.opacity = "1";
+          }
+        }
+
+        ticking = false;
+      };
+
+      pageScrollHandler = () => {
         if (!ticking) {
-          window.requestAnimationFrame(() => {
-            const scrolled = window.scrollY;
-
-            if (heroBg instanceof HTMLElement && scrolled < window.innerHeight * 1.5) {
-              const yPos = scrolled * 0.35;
-              heroBg.style.transform = `translate3d(0, ${yPos}px, 0) scale(1.15)`;
-            }
-
-            if (watermark instanceof HTMLElement && scrolled > 300) {
-              const offset = (scrolled - 300) * -0.15;
-              watermark.style.transform = `translateY(${offset}px)`;
-            }
-
-            ticking = false;
-          });
+          window.requestAnimationFrame(updateScroll);
           ticking = true;
         }
       };
 
-      window.addEventListener("scroll", onScroll, { passive: true });
-      onScroll();
+      window.addEventListener("scroll", pageScrollHandler, { passive: true });
+      updateScroll();
     }
   };
 
@@ -1229,54 +1267,5 @@ import screwImg from "../assets/images/photos/screw.png";
 
   if (document.readyState === "interactive" || document.readyState === "complete") {
     initPage();
-  }
-
-  // persistent spatial scroll engine
-  let persistentScrollHandler = null;
-
-  const initPersistentSpatial = () => {
-    if (persistentScrollHandler) {
-      window.removeEventListener("scroll", persistentScrollHandler);
-      persistentScrollHandler = null;
-    }
-
-    const toolLeft = document.querySelector<HTMLElement>(".tool-left");
-    const toolRight = document.querySelector<HTMLElement>(".tool-right");
-    const stage = document.querySelector<HTMLElement>(".spatial-viewport");
-    if (!toolLeft || !toolRight || !stage) return;
-
-    let ticking = false;
-
-    const onScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          const y = window.scrollY;
-
-          // continuous vertical drift across the white content sections
-          toolLeft.style.transform = `translate3d(0, ${y * -0.35}px, 0)`;
-          toolRight.style.transform = `translate3d(0, ${y * -0.55}px, 0)`;
-
-          // fade out cleanly after the services section
-          if (y > 1700) {
-            stage.style.opacity = "0";
-          } else {
-            stage.style.opacity = "1";
-          }
-
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-
-    persistentScrollHandler = onScroll;
-    window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
-  };
-
-  document.addEventListener("DOMContentLoaded", initPersistentSpatial);
-  document.addEventListener("astro:page-load", initPersistentSpatial);
-  if (document.readyState === "interactive" || document.readyState === "complete") {
-    initPersistentSpatial();
   }
 </script>

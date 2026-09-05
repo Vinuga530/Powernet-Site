@@ -1,6 +1,6 @@
-/* Animation Helpers */
+/* animation helpers */
 
-/* Hide text before reveal */
+/* text mask */
 .text-reveal-wrapper {
   overflow: hidden;
   display: inline-block;
@@ -18,7 +18,7 @@
   transform: translateY(0);
 }
 
-/* Image reveal mask */
+/* image reveal mask */
 .image-reveal-wrapper {
   overflow: hidden;
   position: relative;
@@ -36,7 +36,7 @@
   transform: scale(1);
 }
 
-/* Subtle fade in for sections */
+/* section fade */
 .fade-in {
   opacity: 0;
   transform: translateY(15px);
@@ -49,15 +49,13 @@
   transform: translateY(0);
 }
 
-
-
-/* Stagger Utilities */
+/* stagger utilities */
 .stagger-1 { transition-delay: 0.1s; }
 .stagger-2 { transition-delay: 0.2s; }
 .stagger-3 { transition-delay: 0.3s; }
 .stagger-4 { transition-delay: 0.4s; }
 
-/* Reduced Motion */
+/* reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .text-reveal-inner,
   .image-reveal-inner,

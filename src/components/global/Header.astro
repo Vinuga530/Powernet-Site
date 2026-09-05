@@ -7,8 +7,8 @@ const isHome = pathname === "/" || pathname === "/index.html";
 const navItems = [
   { href: "/#services", label: "Services" },
   { href: "/#projects", label: "Projects" },
-  { href: "/about", label: "About" },
-  { href: "/contact", label: "Contact" },
+  { href: "/#about", label: "About" },
+  { href: "/#contact", label: "Contact" },
 ];
 ---
 
@@ -69,7 +69,7 @@ const navItems = [
       </button>
 
       <div class="header-actions">
-        <a href="/contact" class="btn-primary">
+        <a href="/#contact" class="btn-primary">
           <span class="cta-accent" aria-hidden="true"></span>
           <span class="cta-word">
             <span class="cta-layer cta-layer-top">
@@ -96,7 +96,7 @@ const navItems = [
     </div>
   </div>
 
-  <!-- mobile nav container (sibling to header-container holding toggle button) -->
+  <!-- mobile drawer container -->
   <div id="mobile-nav-overlay" class="mobile-nav nav-links-wrapper" aria-hidden="true">
     <div class="mobile-nav-content">
       <ul class="mobile-nav-list">
@@ -111,7 +111,7 @@ const navItems = [
         }
       </ul>
       <div class="mobile-nav-actions">
-        <a href="/contact" class="btn-primary mobile-cta">
+        <a href="/#contact" class="btn-primary mobile-cta">
           <span>LET'S TALK</span>
         </a>
       </div>
@@ -159,7 +159,7 @@ const navItems = [
       <span class="hamburger-line"></span>
     </button>
     <div class="header-actions">
-      <a href="/contact" class="btn-primary">
+      <a href="/#contact" class="btn-primary">
         <span class="cta-accent" aria-hidden="true"></span>
         <span class="cta-word">
           <span class="cta-layer cta-layer-top">
@@ -187,15 +187,15 @@ const navItems = [
 </div>
 
 <style>
-  /* global header stacking fix */
+  /* root header stacking */
   header, 
   .site-header,
   .header {
-    position: absolute;
+    position: fixed !important;
     top: 0;
     left: 0;
     width: 100%;
-    z-index: 9999 !important; /* Forces the entire header system above the hero section */
+    z-index: 9999 !important;
     padding-top: 0;
     background-color: transparent;
     pointer-events: none;
@@ -221,7 +221,7 @@ const navItems = [
     pointer-events: auto;
   }
 
-  /* logo */
+  /* logo anchor */
   .logo {
     position: absolute;
     top: 0;
@@ -253,7 +253,7 @@ const navItems = [
     object-fit: contain;
   }
 
-  /* desktop nav */
+  /* desktop navigation */
   .desktop-nav {
     background: rgba(20, 20, 20, 0.85);
     backdrop-filter: blur(12px);
@@ -326,7 +326,7 @@ const navItems = [
     color: var(--color-brand, #e63946);
   }
 
-  /* cta */
+  /* primary action button */
   .btn-primary {
     display: inline-flex;
     align-items: center;
@@ -393,7 +393,7 @@ const navItems = [
     transform: translateY(-100%);
   }
 
-  /* floating nav */
+  /* floating scroll nav */
   .floating-nav {
     position: fixed;
     top: 24px;
@@ -443,7 +443,7 @@ const navItems = [
     gap: 28px;
   }
 
-  /* mobile toggle button */
+  /* mobile menu toggle */
   .mobile-menu-btn {
     display: none;
     flex-direction: column;
@@ -454,8 +454,9 @@ const navItems = [
     border-radius: 50px;
     cursor: pointer;
     padding: 12px 16px;
-    z-index: 101;
+    z-index: 10000;
     backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
   }
 
   .hamburger-line {
@@ -468,12 +469,12 @@ const navItems = [
   }
 
   .mobile-menu-btn.is-active {
-    background: rgba(0, 0, 0, 0.05);
-    border-color: rgba(0, 0, 0, 0.15);
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
   }
 
   .mobile-menu-btn.is-active .hamburger-line {
-    background-color: #111111;
+    background-color: #ffffff;
   }
 
   .mobile-menu-btn.is-active .hamburger-line:first-child {
@@ -484,7 +485,7 @@ const navItems = [
     transform: translateY(-4px) rotate(-45deg);
   }
 
-  /* desktop state */
+  /* consolidated media queries */
   @media (min-width: 1025px) {
     .mobile-nav,
     .nav-links-wrapper {
@@ -492,7 +493,6 @@ const navItems = [
     }
   }
 
-  /* mobile responsive */
   @media (max-width: 1024px) {
     header,
     .site-header,
@@ -515,15 +515,14 @@ const navItems = [
       display: none;
     }
 
-    /* Force the hamburger button to remain visible on top of everything */
     .hamburger, 
-    button[aria-label="Menu"], 
+    button[aria-label="Toggle menu"], 
     #mobile-menu-toggle {
       display: flex !important;
       opacity: 1 !important;
       visibility: visible !important;
       position: relative;
-      z-index: 9999; 
+      z-index: 10000; 
       pointer-events: auto !important;
     }
 
@@ -541,7 +540,7 @@ const navItems = [
       display: none;
     }
 
-    /* Liquid Glass Container */
+    /* mobile drawer */
     .mobile-nav,
     .nav-links-wrapper {
       position: absolute;
@@ -550,15 +549,14 @@ const navItems = [
       right: 16px;
       width: auto;
       padding: 32px 24px;
-      /* Premium Frosted Glass Physics */
-      background: rgba(255, 255, 255, 0.45); 
+      background: rgba(18, 18, 20, 0.96); 
       backdrop-filter: saturate(180%) blur(24px);
       -webkit-backdrop-filter: saturate(180%) blur(24px);
-      border: 1px solid rgba(255, 255, 255, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 24px;
       box-shadow: 
-        0 24px 48px rgba(0, 0, 0, 0.2), 
-        inset 0 1px 0 rgba(255, 255, 255, 0.6); /* Creates the sharp top glass edge */
+        0 24px 48px rgba(0, 0, 0, 0.5), 
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
       display: flex;
       flex-direction: column;
       gap: 16px;
@@ -570,7 +568,6 @@ const navItems = [
       z-index: 999;
     }
 
-    /* active state */
     .mobile-nav.is-active,
     .nav-links-wrapper.is-active {
       transform: translateY(0) scale(1);
@@ -595,17 +592,16 @@ const navItems = [
       width: 100%;
     }
 
-    /* typography */
     .mobile-nav a:not(.btn-primary),
     .nav-links-wrapper a:not(.btn-primary),
     .mobile-nav-link {
       font-size: 1.05rem;
       font-weight: 600;
       letter-spacing: 0.1em;
-      color: #111111;
+      color: #ffffff;
       text-decoration: none;
       padding: 16px 8px;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
       transition: color 0.3s ease;
       display: block;
       text-transform: uppercase;
@@ -621,7 +617,6 @@ const navItems = [
       width: 100%;
     }
 
-    /* let's talk button */
     .mobile-nav .btn-primary,
     .nav-links-wrapper .btn-primary,
     .mobile-nav .let-talk-btn,
@@ -654,9 +649,16 @@ const navItems = [
 </style>
 
 <script>
+  let headerScrollHandler: (() => void) | null = null;
+
   const initHeader = () => {
+    if (headerScrollHandler) {
+      window.removeEventListener("scroll", headerScrollHandler);
+      headerScrollHandler = null;
+    }
+
     const floatingNav = document.getElementById("floating-nav");
-    const menuBtn = document.querySelector('button[aria-label="Menu"], .hamburger, #mobile-menu-toggle');
+    const menuBtn = document.querySelector('button[aria-label="Toggle menu"], .hamburger, #mobile-menu-toggle');
     const mobileNav = document.querySelector('#mobile-nav-overlay, .mobile-nav, .nav-links-wrapper');
 
     // scroll nav tracking
@@ -692,22 +694,20 @@ const navItems = [
         ticking = false;
       };
 
-      window.addEventListener(
-        "scroll",
-        () => {
-          if (!ticking) {
-            window.requestAnimationFrame(updateNav);
-            ticking = true;
-          }
-        },
-        { passive: true },
-      );
+      headerScrollHandler = () => {
+        if (!ticking) {
+          window.requestAnimationFrame(updateNav);
+          ticking = true;
+        }
+      };
+
+      window.addEventListener("scroll", headerScrollHandler, { passive: true });
     }
 
     // mobile nav toggle
     if (menuBtn && mobileNav) {
       const newMenuBtn = menuBtn.cloneNode(true);
-      menuBtn.parentNode.replaceChild(newMenuBtn, menuBtn);
+      menuBtn.parentNode?.replaceChild(newMenuBtn, menuBtn);
 
       newMenuBtn.addEventListener("click", () => {
         const isExpanded = newMenuBtn.getAttribute("aria-expanded") === "true";
