@@ -10,16 +10,6 @@ import screwImg from "../assets/images/photos/screw.png";
 ---
 
 <BaseLayout title="Powernet (Pvt) Ltd | Power and Infrastructure Solutions">
-  <!-- spatial viewport stage -->
-  <aside class="spatial-viewport" slot="spatial" aria-hidden="true">
-    <div class="spatial-item tool-left">
-      <img src={meterImg.src} alt="" class="tool-img" />
-    </div>
-    <div class="spatial-item tool-right">
-      <img src={screwImg.src} alt="" class="tool-img" />
-    </div>
-  </aside>
-
   <section class="hero-section hero-dark-overlay">
     <div class="hero-bg image-reveal-wrapper is-revealed">
       <Picture
@@ -143,7 +133,7 @@ import screwImg from "../assets/images/photos/screw.png";
       </div>
 
       <div class="services-grid">
-        <a href="/contact" class="service-card reveal-up">
+        <a href="/contact" class="service-card reveal-up has-contextual-asset">
           <span class="card-num">01</span>
           <h3>Data &amp; Voice</h3>
           <p>Structured CAT5/CAT6, fiber optic, LAN/WAN and wireless network implementations for enterprise environments.</p>
@@ -151,15 +141,21 @@ import screwImg from "../assets/images/photos/screw.png";
             <span>Learn More</span>
             <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
           </div>
+          <div class="contextual-asset-wrap" aria-hidden="true">
+            <img src={screwImg.src} alt="" class="contextual-asset asset-tool" loading="lazy" />
+          </div>
         </a>
 
-        <a href="/contact" class="service-card reveal-up">
+        <a href="/contact" class="service-card reveal-up has-contextual-asset">
           <span class="card-num">02</span>
           <h3>Power &amp; UPS</h3>
           <p>Electrical design, installation and reliable backup power infrastructure for mission-critical facilities.</p>
           <div class="card-action">
             <span>Learn More</span>
             <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+          </div>
+          <div class="contextual-asset-wrap" aria-hidden="true">
+            <img src={meterImg.src} alt="" class="contextual-asset asset-multimeter" loading="lazy" />
           </div>
         </a>
 
@@ -357,71 +353,43 @@ import screwImg from "../assets/images/photos/screw.png";
     margin-top: 10vh;
   }
 
-  /* spatial viewport stage */
-  .spatial-viewport {
-    position: fixed;
-    inset: 0;
-    width: 100vw;
-    height: 100vh;
-    pointer-events: none;
-    z-index: 25;
-    overflow: visible;
-    transition: opacity 0.4s ease;
-  }
-
-  .spatial-item {
+  /* contextual asset containers */
+  .contextual-asset-wrap {
     position: absolute;
-    will-change: transform, opacity;
-    transition: opacity 0.4s ease;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 1;
   }
 
-  /* tool coordinates */
-  .tool-left {
-    top: 22%;
-    left: 6%;
-  }
-
-  .tool-right {
-    top: 60%;
-    right: 6%;
-  }
-
-  .tool-img {
-    display: block;
-    width: clamp(160px, 18vw, 290px);
+  .contextual-asset {
+    position: absolute;
+    max-width: 220px;
+    width: clamp(140px, 16vw, 200px);
     height: auto;
-    filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.28));
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.12));
+    will-change: transform, opacity;
   }
 
-  /* entrance keyframes */
-  .tool-left .tool-img {
-    animation: enterFromLeft 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
+  /* revealed only when section enters viewport */
+  .is-visible .contextual-asset,
+  .is-revealed .contextual-asset {
+    opacity: 1;
+    transform: translateY(0);
   }
 
-  .tool-right .tool-img {
-    animation: enterFromRight 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.25s forwards;
+  /* placement within parent section */
+  .asset-multimeter {
+    right: -20px;
+    top: 15%;
   }
 
-  @keyframes enterFromLeft {
-    from {
-      opacity: 0;
-      transform: translate3d(-100vw, 0, 0);
-    }
-    to {
-      opacity: 1;
-      transform: translate3d(0, 0, 0);
-    }
-  }
-
-  @keyframes enterFromRight {
-    from {
-      opacity: 0;
-      transform: translate3d(100vw, 0, 0);
-    }
-    to {
-      opacity: 1;
-      transform: translate3d(0, 0, 0);
-    }
+  .asset-tool {
+    right: -20px;
+    top: 15%;
   }
 
   /* section anchor offsets */
@@ -826,6 +794,14 @@ import screwImg from "../assets/images/photos/screw.png";
     will-change: transform;
   }
 
+  .service-card .card-num,
+  .service-card h3,
+  .service-card p,
+  .service-card .card-action {
+    position: relative;
+    z-index: 2;
+  }
+
   /* card index */
   .service-card .card-num {
     font-size: 0.85rem;
@@ -1017,6 +993,10 @@ import screwImg from "../assets/images/photos/screw.png";
 
   /* responsive breakpoints */
   @media (max-width: 1024px) {
+    .contextual-asset-wrap,
+    .contextual-asset {
+      display: none;
+    }
     .services-grid {
       gap: 20px;
     }
@@ -1033,9 +1013,6 @@ import screwImg from "../assets/images/photos/screw.png";
   }
 
   @media (max-width: 768px) {
-    .spatial-viewport {
-      display: none;
-    }
 
     .hero-title {
       font-size: clamp(2rem, 10vw, 3rem) !important;
@@ -1217,9 +1194,7 @@ import screwImg from "../assets/images/photos/screw.png";
     if (!prefersReducedMotion && window.innerWidth >= 768) {
       const heroBg = document.querySelector<HTMLElement>(".hero-bg");
       const watermark = document.querySelector<HTMLElement>(".bg-watermark");
-      const toolLeft = document.querySelector<HTMLElement>(".tool-left");
-      const toolRight = document.querySelector<HTMLElement>(".tool-right");
-      const stage = document.querySelector<HTMLElement>(".spatial-viewport");
+      const contextualSections = document.querySelectorAll<HTMLElement>(".has-contextual-asset");
 
       let ticking = false;
 
@@ -1236,16 +1211,18 @@ import screwImg from "../assets/images/photos/screw.png";
           watermark.style.transform = `translateY(${offset}px)`;
         }
 
-        if (toolLeft && toolRight && stage) {
-          toolLeft.style.transform = `translate3d(0, ${scrolled * -0.35}px, 0)`;
-          toolRight.style.transform = `translate3d(0, ${scrolled * -0.55}px, 0)`;
-
-          if (scrolled > 1700) {
-            stage.style.opacity = "0";
-          } else {
-            stage.style.opacity = "1";
+        // local contextual parallax
+        contextualSections.forEach((section) => {
+          const rect = section.getBoundingClientRect();
+          if (rect.top < window.innerHeight && rect.bottom > 0) {
+            const progress = (window.innerHeight - rect.top) / (window.innerHeight + rect.height);
+            const asset = section.querySelector<HTMLElement>(".contextual-asset");
+            if (asset) {
+              const offset = (progress - 0.5) * -60; // subtle 30px shift
+              asset.style.transform = `translate3d(0, ${offset}px, 0)`;
+            }
           }
-        }
+        });
 
         ticking = false;
       };
