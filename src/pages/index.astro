@@ -285,12 +285,12 @@ import screwImg from "../assets/images/photos/screw.png";
   #hero,
   .hero-section {
     position: relative;
-    z-index: 20;
+    z-index: 1;
     min-height: 100svh;
     display: flex;
     align-items: center;
     color: var(--color-dark-foreground);
-    overflow: visible !important; /* lets assets travel down past the hero boundary */
+    overflow: hidden;
   }
 
   .hero-section::before {
@@ -467,6 +467,20 @@ import screwImg from "../assets/images/photos/screw.png";
   .btn-hero-secondary:hover {
     background-color: #ffffff;
     color: #0f172a;
+  }
+
+  /* force natural document flow on content sections */
+  .credibility-strip,
+  .section-logos,
+  .editorial-intro,
+  .editorial-grid {
+    position: relative !important;
+    transform: none !important; /* wipe any rogue inline scroll transforms */
+    z-index: 5;
+    background-color: #ffffff; /* ensure clean contrast against dark hero */
+    opacity: 1 !important; /* failsafe against stalled observers */
+    visibility: visible !important;
+    overflow: visible;
   }
 
   /* metrics strip */
@@ -982,10 +996,11 @@ import screwImg from "../assets/images/photos/screw.png";
   /* reveal transitions */
   .reveal-up {
     opacity: 0;
-    transform: translateY(40px);
-    transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    transform: translateY(24px);
+    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     will-change: transform, opacity;
   }
+
   .reveal-up.is-visible {
     opacity: 1;
     transform: translateY(0);
@@ -1070,6 +1085,33 @@ import screwImg from "../assets/images/photos/screw.png";
 <script>
   let pageScrollHandler: (() => void) | null = null;
 
+  const initSafeReveals = () => {
+    const reveals = document.querySelectorAll('.reveal-up');
+    if (!reveals.length) return;
+
+    // Fallback: If IntersectionObserver fails or elements are already near the fold, reveal immediately
+    reveals.forEach(el => {
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight) {
+        el.classList.add('is-visible');
+      }
+    });
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { 
+      threshold: 0.05, /* trigger as soon as 5% is on screen */
+      rootMargin: '50px 0px' /* trigger slightly before entering viewport */
+    });
+
+    reveals.forEach(el => observer.observe(el));
+  };
+
   const initPage = () => {
     // scroll handler teardown
     if (pageScrollHandler) {
@@ -1100,20 +1142,8 @@ import screwImg from "../assets/images/photos/screw.png";
       wrapper.setAttribute("data-initialized", "true");
     });
 
-    // intersection reveal
-    const revealObserver = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("is-visible");
-            revealObserver.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.15, rootMargin: "0px 0px -50px 0px" },
-    );
-
-    document.querySelectorAll(".reveal-up").forEach((el) => revealObserver.observe(el));
+    // failsafe scroll reveal
+    initSafeReveals();
 
     // svg icon draw
     const credibilityStrip = document.querySelector(".credibility-strip");
@@ -1241,8 +1271,11 @@ import screwImg from "../assets/images/photos/screw.png";
 
   document.addEventListener("DOMContentLoaded", initPage);
   document.addEventListener("astro:page-load", initPage);
+  document.addEventListener("DOMContentLoaded", initSafeReveals);
+  document.addEventListener("astro:page-load", initSafeReveals);
 
   if (document.readyState === "interactive" || document.readyState === "complete") {
     initPage();
+    initSafeReveals();
   }
 </script>
