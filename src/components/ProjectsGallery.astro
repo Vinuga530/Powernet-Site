@@ -1,0 +1,1109 @@
+---
+// static data import
+import projects from '../data/projects.json';
+---
+
+<div class="projects-gallery" id="projects-gallery" data-active-index="0">
+  <!-- architectural telemetry hud -->
+  <div class="gallery-hud">
+    <div class="hud-meta">
+      <span class="hud-label">TELEMETRY // FEED</span>
+      <span class="hud-title">MISSION-CRITICAL INFRASTRUCTURE SHOWCASE</span>
+    </div>
+    <div class="hud-nav">
+      <button type="button" class="hud-btn btn-prev" aria-label="Previous project">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="m15 18-6-6 6-6"/>
+        </svg>
+      </button>
+      <div class="hud-counter">
+        <span class="counter-current">01</span>
+        <span class="counter-sep">/</span>
+        <span class="counter-total">{String(projects.length).padStart(2, '0')}</span>
+      </div>
+      <button type="button" class="hud-btn btn-next" aria-label="Next project">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="m9 18 6-6-6-6"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- 3-panel stage -->
+  <div class="gallery-stage" id="gallery-stage">
+    {projects.map((project, idx) => (
+      <article
+        class={`project-card ${idx === 0 ? 'is-center' : idx === projects.length - 1 ? 'is-prev' : 'is-next'}`}
+        data-index={idx}
+        role="button"
+        tabindex="0"
+        aria-label={`Project ${project.id}: ${project.title}`}
+      >
+        <div class="card-visual">
+          <img
+            src={project.image}
+            alt={project.title}
+            class="card-img"
+            loading={idx === 0 ? 'eager' : 'lazy'}
+          />
+          <div class="card-scrim"></div>
+          <div class="card-frame-grid" aria-hidden="true"></div>
+        </div>
+
+        <div class="card-body">
+          <div class="card-meta">
+            <span class="meta-tag">{project.id} // {project.year}</span>
+            <span class="category-badge">{project.category}</span>
+          </div>
+
+          <div class="card-info">
+            <div class="client-name">{project.client}</div>
+            <h3 class="card-title">{project.title}</h3>
+          </div>
+
+          <div class="card-action-bar">
+            <span class="action-text">INSPECT TECHNICAL DOSSIER</span>
+            <span class="action-icon" aria-hidden="true">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+              </svg>
+            </span>
+          </div>
+        </div>
+      </article>
+    ))}
+
+    <!-- technical slide dossier overlay -->
+    <div class="detail-dossier" id="detail-dossier" aria-hidden="true">
+      {projects.map((project, idx) => (
+        <div
+          class={`dossier-panel ${idx === 0 ? 'is-active' : ''}`}
+          data-index={idx}
+        >
+          <div class="dossier-header">
+            <div class="dossier-tags">
+              <span class="dossier-meta">{project.id} // {project.year}</span>
+              <span class="dossier-badge">{project.category}</span>
+            </div>
+            <button type="button" class="dossier-close" aria-label="Close dossier">
+              <span class="close-label">ESC // CLOSE</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+              </svg>
+            </button>
+          </div>
+
+          <div class="dossier-content">
+            <div class="dossier-client">{project.client}</div>
+            <h2 class="dossier-title">{project.title}</h2>
+            <p class="dossier-summary">{project.summary}</p>
+
+            <div class="dossier-block">
+              <div class="dossier-block-header">
+                <span class="block-bar"></span>
+                <span>TECHNICAL SPECIFICATIONS</span>
+              </div>
+              <ul class="dossier-specs-list">
+                {project.specs.map((spec, sIdx) => (
+                  <li>
+                    <span class="spec-index">[{String(sIdx + 1).padStart(2, '0')}]</span>
+                    <span class="spec-detail">{spec}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div class="dossier-block">
+              <div class="dossier-block-header">
+                <span class="block-bar"></span>
+                <span>ENGINEERING SCOPE</span>
+              </div>
+              <div class="dossier-scope-pills">
+                {project.scope.split(',').map((tag) => (
+                  <span class="scope-pill">{tag.trim()}</span>
+                ))}
+              </div>
+            </div>
+
+            <div class="dossier-footer">
+              <div class="sla-indicator">
+                <span class="sla-pulse"></span>
+                <span>SPECIFICATION COMPLIANT // TIER III READY</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <!-- stage pagination tabs -->
+  <div class="gallery-pagination">
+    {projects.map((project, idx) => (
+      <button
+        type="button"
+        class={`pagination-tab ${idx === 0 ? 'is-active' : ''}`}
+        data-index={idx}
+        aria-label={`Jump to project ${project.id}`}
+      >
+        <span class="tab-index">{project.id}</span>
+        <span class="tab-bar"></span>
+      </button>
+    ))}
+  </div>
+</div>
+
+<style>
+  /* design tokens */
+  .projects-gallery {
+    --gallery-bg: #0d0e12;
+    --gallery-border: 1px solid rgba(255, 255, 255, 0.08);
+    --gallery-radius: 20px;
+    --brand-red: #d62828;
+    position: relative;
+    width: 100%;
+    margin-top: var(--space-md, 24px);
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  /* architectural telemetry hud */
+  .gallery-hud {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding: 0 4px;
+    gap: 16px;
+  }
+
+  .hud-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .hud-label {
+    font-family: monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    color: var(--brand-red);
+    text-transform: uppercase;
+  }
+
+  .hud-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--color-foreground, #111111);
+  }
+
+  .hud-nav {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #0d0e12;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 50px;
+    padding: 6px 14px;
+  }
+
+  .hud-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: #ffffff;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 50%;
+    transition: color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
+  }
+
+  .hud-btn:hover {
+    color: var(--brand-red);
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  .hud-btn:active {
+    transform: scale(0.92);
+  }
+
+  .hud-counter {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: monospace;
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    color: #ffffff;
+  }
+
+  .counter-sep {
+    color: rgba(255, 255, 255, 0.35);
+  }
+
+  .counter-total {
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  /* 3-panel stage container */
+  .gallery-stage {
+    position: relative;
+    width: 100%;
+    min-height: 560px;
+    height: clamp(520px, 60vh, 660px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    perspective: 1000px;
+    perspective-origin: center center;
+    overflow: hidden;
+    border-radius: var(--gallery-radius);
+    background: #060709;
+  }
+
+  /* slide card elevation */
+  .project-card {
+    position: absolute;
+    width: clamp(340px, 52%, 620px);
+    height: calc(100% - 40px);
+    background: var(--gallery-bg);
+    border: var(--gallery-border);
+    border-radius: var(--gallery-radius);
+    overflow: hidden;
+    will-change: transform, opacity;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s ease;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    touch-action: pan-y;
+  }
+
+  /* stage card positions */
+  .project-card.is-center {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 1;
+    z-index: 5;
+    cursor: pointer;
+  }
+
+  .project-card.is-prev {
+    transform: translate3d(-64%, 0, 0) scale(0.85);
+    opacity: 0.35;
+    z-index: 2;
+    cursor: pointer;
+  }
+
+  .project-card.is-next {
+    transform: translate3d(64%, 0, 0) scale(0.85);
+    opacity: 0.35;
+    z-index: 2;
+    cursor: pointer;
+  }
+
+  .project-card.is-hidden {
+    transform: translate3d(0, 0, -200px) scale(0.7);
+    opacity: 0;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  /* card visual container */
+  .card-visual {
+    position: relative;
+    width: 100%;
+    height: 58%;
+    overflow: hidden;
+    background: #111218;
+  }
+
+  .card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    transform: scale(1.02);
+    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .project-card:hover .card-img {
+    transform: scale(1.08);
+  }
+
+  .card-scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(13, 14, 18, 0.1) 0%,
+      rgba(13, 14, 18, 0.4) 50%,
+      #0d0e12 100%
+    );
+    pointer-events: none;
+  }
+
+  .card-frame-grid {
+    position: absolute;
+    inset: 0;
+    background-image: linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    background-size: 32px 32px;
+    opacity: 0.4;
+    pointer-events: none;
+  }
+
+  /* card body details */
+  .card-body {
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 24px 28px 24px;
+    background: var(--gallery-bg);
+  }
+
+  .card-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .meta-tag {
+    font-family: monospace;
+    letter-spacing: 0.08em;
+    color: var(--brand-red);
+    font-size: 0.82rem;
+    font-weight: 500;
+  }
+
+  .category-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 50px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .card-info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 10px 0;
+  }
+
+  .client-name {
+    font-family: monospace;
+    font-size: 0.8rem;
+    letter-spacing: 0.06em;
+    color: rgba(255, 255, 255, 0.55);
+    text-transform: uppercase;
+  }
+
+  .card-title {
+    font-size: clamp(1.2rem, 1.8vw, 1.45rem);
+    line-height: 1.25;
+    font-weight: 600;
+    color: #ffffff;
+    letter-spacing: -0.015em;
+    margin: 0;
+  }
+
+  .card-action-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 14px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .action-text {
+    font-family: monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    color: rgba(255, 255, 255, 0.7);
+    transition: color 0.3s ease;
+  }
+
+  .action-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.06);
+    color: #ffffff;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+  }
+
+  .project-card:hover .action-text {
+    color: var(--brand-red);
+  }
+
+  .project-card:hover .action-icon {
+    background: var(--brand-red);
+    transform: translateX(4px);
+  }
+
+  /* technical slide dossier overlay: operates at z-index: 50, beneath header (z-index: 9999) */
+  .detail-dossier {
+    position: absolute;
+    inset: 0;
+    z-index: 50;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.5s;
+  }
+
+  .dossier-panel {
+    grid-column: 2;
+    display: none;
+    flex-direction: column;
+    background: var(--gallery-bg);
+    border: var(--gallery-border);
+    border-radius: var(--gallery-radius);
+    margin: 20px 20px 20px 10px;
+    padding: 32px 36px;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+    overflow: hidden;
+    transform: translate3d(30px, 0, 0);
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .dossier-panel.is-active {
+    display: flex;
+  }
+
+  .dossier-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .dossier-tags {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .dossier-meta {
+    font-family: monospace;
+    letter-spacing: 0.08em;
+    color: var(--brand-red);
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+
+  .dossier-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 50px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .dossier-close {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 50px;
+    padding: 6px 14px;
+    color: rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+    font-family: monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    transition: all 0.2s ease;
+  }
+
+  .dossier-close:hover {
+    background: var(--brand-red);
+    border-color: var(--brand-red);
+    color: #ffffff;
+  }
+
+  .dossier-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    padding-top: 20px;
+    padding-right: 8px;
+  }
+
+  .dossier-client {
+    font-family: monospace;
+    font-size: 0.82rem;
+    letter-spacing: 0.08em;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .dossier-title {
+    font-size: clamp(1.3rem, 2vw, 1.7rem);
+    line-height: 1.25;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: -0.015em;
+    margin: 0 0 16px 0;
+  }
+
+  .dossier-summary {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.75);
+    margin: 0 0 24px 0;
+  }
+
+  .dossier-block {
+    margin-bottom: 22px;
+  }
+
+  .dossier-block-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .block-bar {
+    display: inline-block;
+    width: 14px;
+    height: 2px;
+    background: var(--brand-red);
+  }
+
+  .dossier-specs-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .dossier-specs-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 0.88rem;
+    line-height: 1.45;
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  .spec-index {
+    font-family: monospace;
+    color: var(--brand-red);
+    font-size: 0.8rem;
+    flex-shrink: 0;
+  }
+
+  .dossier-scope-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .scope-pill {
+    display: inline-block;
+    padding: 5px 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-family: monospace;
+    letter-spacing: 0.04em;
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  .dossier-footer {
+    margin-top: auto;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .sla-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .sla-pulse {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #10b981;
+    box-shadow: 0 0 8px #10b981;
+  }
+
+  /* dossier expansion states */
+  .projects-gallery.is-dossier-open .project-card.is-prev {
+    transform: translate3d(-120%, 0, 0) scale(0.85);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .projects-gallery.is-dossier-open .project-card.is-next {
+    transform: translate3d(120%, 0, 0) scale(0.85);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  @media (min-width: 992px) {
+    .projects-gallery.is-dossier-open .project-card.is-center {
+      transform: translate3d(-50%, 0, 0) scale(0.96);
+      cursor: default;
+    }
+  }
+
+  .projects-gallery.is-dossier-open .detail-dossier {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .projects-gallery.is-dossier-open .dossier-panel.is-active {
+    transform: translate3d(0, 0, 0);
+  }
+
+  /* stage pagination tabs */
+  .gallery-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    margin-top: 24px;
+  }
+
+  .pagination-tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 6px 12px;
+  }
+
+  .tab-index {
+    font-family: monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    color: rgba(0, 0, 0, 0.4);
+    transition: color 0.3s ease;
+  }
+
+  .tab-bar {
+    width: 32px;
+    height: 2px;
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 2px;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .pagination-tab.is-active .tab-index {
+    color: var(--brand-red);
+    font-weight: 700;
+  }
+
+  .pagination-tab.is-active .tab-bar {
+    width: 56px;
+    background: var(--brand-red);
+  }
+
+  /* responsive adjustments */
+  @media (max-width: 991px) {
+    .gallery-stage {
+      height: 600px;
+    }
+
+    .project-card {
+      width: clamp(300px, 80%, 480px);
+    }
+
+    .project-card.is-prev {
+      transform: translate3d(-75%, 0, 0) scale(0.85);
+    }
+
+    .project-card.is-next {
+      transform: translate3d(75%, 0, 0) scale(0.85);
+    }
+
+    .detail-dossier {
+      grid-template-columns: 1fr;
+      background: rgba(6, 7, 9, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .dossier-panel {
+      grid-column: 1;
+      margin: 16px;
+      padding: 24px;
+    }
+
+    .projects-gallery.is-dossier-open .project-card.is-center {
+      opacity: 0;
+      pointer-events: none;
+      transform: translate3d(0, -30px, 0) scale(0.9);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .gallery-hud {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .hud-nav {
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .gallery-stage {
+      height: 520px;
+    }
+
+    .project-card {
+      width: 88%;
+      height: calc(100% - 24px);
+    }
+
+    .card-body {
+      padding: 18px 20px;
+    }
+
+    .card-title {
+      font-size: 1.15rem;
+    }
+
+    .dossier-panel {
+      margin: 10px;
+      padding: 20px 16px;
+    }
+  }
+</style>
+
+<script>
+  // active gallery state tracking
+  let activeIndex = 0;
+  let isDossierOpen = false;
+  let isFinePointer = false;
+  let tiltRafId: number | null = null;
+  let boundKeyDown: ((e: KeyboardEvent) => void) | null = null;
+  let boundTouchStart: ((e: TouchEvent) => void) | null = null;
+  let boundTouchEnd: ((e: TouchEvent) => void) | null = null;
+
+  // teardown active listeners and animations
+  const teardownProjectsGallery = () => {
+    if (tiltRafId !== null) {
+      cancelAnimationFrame(tiltRafId);
+      tiltRafId = null;
+    }
+
+    if (boundKeyDown) {
+      window.removeEventListener('keydown', boundKeyDown);
+      boundKeyDown = null;
+    }
+
+    const stage = document.getElementById('gallery-stage');
+    if (stage) {
+      if (boundTouchStart) {
+        stage.removeEventListener('touchstart', boundTouchStart);
+        boundTouchStart = null;
+      }
+      if (boundTouchEnd) {
+        stage.removeEventListener('touchend', boundTouchEnd);
+        boundTouchEnd = null;
+      }
+    }
+  };
+
+  // gallery mounting and event binding
+  const initProjectsGallery = () => {
+    teardownProjectsGallery();
+
+    const root = document.getElementById('projects-gallery');
+    const stage = document.getElementById('gallery-stage');
+    if (!root || !stage) return;
+
+    const cards = Array.from(root.querySelectorAll('.project-card')) as HTMLElement[];
+    const panels = Array.from(root.querySelectorAll('.dossier-panel')) as HTMLElement[];
+    const tabs = Array.from(root.querySelectorAll('.pagination-tab')) as HTMLElement[];
+    const btnPrev = root.querySelector('.btn-prev');
+    const btnNext = root.querySelector('.btn-next');
+    const counterCurrent = root.querySelector('.counter-current');
+    const closeButtons = Array.from(root.querySelectorAll('.dossier-close'));
+    const total = cards.length;
+
+    if (total === 0) return;
+
+    isFinePointer = window.matchMedia('(pointer: fine)').matches;
+
+    // cycle position classes and attributes
+    const updateGalleryState = () => {
+      root.setAttribute('data-active-index', String(activeIndex));
+
+      cards.forEach((card, idx) => {
+        card.classList.remove('is-center', 'is-prev', 'is-next', 'is-hidden');
+
+        if (idx === activeIndex) {
+          card.classList.add('is-center');
+        } else if (idx === (activeIndex - 1 + total) % total) {
+          card.classList.add('is-prev');
+        } else if (idx === (activeIndex + 1) % total) {
+          card.classList.add('is-next');
+        } else {
+          card.classList.add('is-hidden');
+        }
+
+        // reset custom inline tilt transform on position switch
+        card.style.transform = '';
+      });
+
+      panels.forEach((panel, idx) => {
+        if (idx === activeIndex) {
+          panel.classList.add('is-active');
+        } else {
+          panel.classList.remove('is-active');
+        }
+      });
+
+      tabs.forEach((tab, idx) => {
+        if (idx === activeIndex) {
+          tab.classList.add('is-active');
+        } else {
+          tab.classList.remove('is-active');
+        }
+      });
+
+      if (counterCurrent) {
+        counterCurrent.textContent = String(activeIndex + 1).padStart(2, '0');
+      }
+
+      bindCenterCardTilt();
+    };
+
+    // open detail dossier modal
+    const openDossier = () => {
+      isDossierOpen = true;
+      root.classList.add('is-dossier-open');
+      const dossierEl = document.getElementById('detail-dossier');
+      if (dossierEl) dossierEl.setAttribute('aria-hidden', 'false');
+
+      // reset active tilt transform for clean dock alignment
+      const centerCard = root.querySelector('.project-card.is-center') as HTMLElement | null;
+      if (centerCard) centerCard.style.transform = '';
+    };
+
+    // close detail dossier modal
+    const closeDossier = () => {
+      isDossierOpen = false;
+      root.classList.remove('is-dossier-open');
+      const dossierEl = document.getElementById('detail-dossier');
+      if (dossierEl) dossierEl.setAttribute('aria-hidden', 'true');
+
+      const centerCard = root.querySelector('.project-card.is-center') as HTMLElement | null;
+      if (centerCard) centerCard.style.transform = '';
+    };
+
+    // navigate to next project
+    const navigateNext = () => {
+      if (isDossierOpen) closeDossier();
+      activeIndex = (activeIndex + 1) % total;
+      updateGalleryState();
+    };
+
+    // navigate to previous project
+    const navigatePrev = () => {
+      if (isDossierOpen) closeDossier();
+      activeIndex = (activeIndex - 1 + total) % total;
+      updateGalleryState();
+    };
+
+    // 3d cursor tilt tracking for desktop
+    const bindCenterCardTilt = () => {
+      if (!isFinePointer) return;
+
+      const centerCard = root.querySelector('.project-card.is-center') as HTMLElement | null;
+      if (!centerCard) return;
+
+      let targetX = 0;
+      let targetY = 0;
+      let currentX = 0;
+      let currentY = 0;
+
+      const renderTilt = () => {
+        if (isDossierOpen) {
+          centerCard.style.transform = '';
+          tiltRafId = null;
+          return;
+        }
+
+        currentX += (targetX - currentX) * 0.15;
+        currentY += (targetY - currentY) * 0.15;
+
+        centerCard.style.transform = `perspective(1000px) rotateX(${currentY.toFixed(2)}deg) rotateY(${currentX.toFixed(2)}deg) scale(1)`;
+
+        if (Math.abs(targetX - currentX) > 0.05 || Math.abs(targetY - currentY) > 0.05) {
+          tiltRafId = requestAnimationFrame(renderTilt);
+        } else {
+          tiltRafId = null;
+        }
+      };
+
+      centerCard.onmousemove = (e: MouseEvent) => {
+        if (isDossierOpen) return;
+        const rect = centerCard.getBoundingClientRect();
+        const normX = (e.clientX - rect.left) / rect.width - 0.5;
+        const normY = (e.clientY - rect.top) / rect.height - 0.5;
+        targetX = normX * 10;
+        targetY = -normY * 10;
+
+        if (tiltRafId === null) {
+          tiltRafId = requestAnimationFrame(renderTilt);
+        }
+      };
+
+      centerCard.onmouseleave = () => {
+        targetX = 0;
+        targetY = 0;
+        if (tiltRafId === null) {
+          tiltRafId = requestAnimationFrame(renderTilt);
+        }
+        setTimeout(() => {
+          if (!isDossierOpen && centerCard.classList.contains('is-center')) {
+            centerCard.style.transform = '';
+          }
+        }, 250);
+      };
+    };
+
+    // card click routing
+    cards.forEach((card) => {
+      card.addEventListener('click', () => {
+        const index = Number(card.getAttribute('data-index'));
+        if (card.classList.contains('is-center')) {
+          if (!isDossierOpen) {
+            openDossier();
+          }
+        } else if (card.classList.contains('is-prev')) {
+          navigatePrev();
+        } else if (card.classList.contains('is-next')) {
+          navigateNext();
+        } else {
+          activeIndex = index;
+          updateGalleryState();
+        }
+      });
+    });
+
+    // button navigation controls
+    if (btnPrev) btnPrev.addEventListener('click', navigatePrev);
+    if (btnNext) btnNext.addEventListener('click', navigateNext);
+
+    // tab pagination clicks
+    tabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        const targetIndex = Number(tab.getAttribute('data-index'));
+        if (targetIndex !== activeIndex) {
+          if (isDossierOpen) closeDossier();
+          activeIndex = targetIndex;
+          updateGalleryState();
+        }
+      });
+    });
+
+    // dossier close control bindings
+    closeButtons.forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        closeDossier();
+      });
+    });
+
+    // keyboard arrows and escape handling
+    boundKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isDossierOpen) {
+        closeDossier();
+      } else if (e.key === 'ArrowLeft') {
+        navigatePrev();
+      } else if (e.key === 'ArrowRight') {
+        navigateNext();
+      }
+    };
+    window.addEventListener('keydown', boundKeyDown);
+
+    // touch gesture detection
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+    boundTouchStart = (e: TouchEvent) => {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    };
+
+    boundTouchEnd = (e: TouchEvent) => {
+      const touchEndX = e.changedTouches[0].clientX;
+      const touchEndY = e.changedTouches[0].clientY;
+      const deltaX = touchEndX - touchStartX;
+      const deltaY = touchEndY - touchStartY;
+
+      if (Math.abs(deltaX) > 40 && Math.abs(deltaX) > Math.abs(deltaY) * 1.4) {
+        if (deltaX < 0) {
+          navigateNext();
+        } else {
+          navigatePrev();
+        }
+      }
+    };
+
+    stage.addEventListener('touchstart', boundTouchStart, { passive: true });
+    stage.addEventListener('touchend', boundTouchEnd, { passive: true });
+
+    // initial state synchronization
+    updateGalleryState();
+  };
+
+  // lifecycle hooks
+  document.addEventListener('DOMContentLoaded', initProjectsGallery);
+  document.addEventListener('astro:page-load', initProjectsGallery);
+  document.addEventListener('astro:before-swap', teardownProjectsGallery);
+
+  if (document.readyState === 'interactive' || document.readyState === 'complete') {
+    initProjectsGallery();
+  }
+</script>

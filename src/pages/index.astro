@@ -2,7 +2,7 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { Image, Picture } from "astro:assets";
 import heroImg from "../assets/images/photos/compress bg.webp";
-import projectImg from "../assets/images/photos/a guy fixing a server pc.jpg";
+import ProjectsGallery from "../components/ProjectsGallery.astro";
 import contractIcon from "../assets/images/icons/contract.svg";
 import mapIcon from "../assets/images/icons/map.svg";
 import meterImg from "../assets/images/photos/meter.png";
@@ -222,38 +222,14 @@ import screwImg from "../assets/images/photos/screw.png";
     </div>
   </section>
 
-  <!-- featured projects -->
+  <!-- featured projects showcase -->
   <section id="projects" class="section-projects scroll-reveal reveal-up">
     <div class="container">
       <div class="section-header fade-in">
         <span class="text-label">Our Success Stories</span>
       </div>
 
-      <div class="grid-12">
-        <div class="project-left fade-in stagger-1">
-          <h2 class="text-display">WORLD BANK<br />SRI LANKA</h2>
-          <p class="text-technical-meta project-meta">
-            Total electrical works • MV cabling • Earthing • Lightning automation
-          </p>
-          <a href="/projects" class="btn-secondary mt-md"
-            >View Case Study &rarr;</a
-          >
-        </div>
-        <div class="project-right">
-          <div class="image-reveal-wrapper project-image">
-            <Picture
-              src={projectImg}
-              alt="World Bank Project"
-              class="image-reveal-inner"
-              formats={["avif", "webp"]}
-              quality={75}
-              widths={[400, 800, 1200]}
-              sizes="(max-width: 1024px) 100vw, 50vw"
-              loading="lazy"
-            />
-          </div>
-        </div>
-      </div>
+      <ProjectsGallery />
     </div>
   </section>
 
