@@ -17,7 +17,7 @@ const navItems = [
   class={`header ${isHome ? "header-transparent-dark" : ""}`}
 >
   <div class="container header-container">
-    <div class="logo fade-in stagger-1">
+    <div class="logo">
       <a href="/" class="logo-link">
         <Image
           src={logoImg}
@@ -29,7 +29,7 @@ const navItems = [
       </a>
     </div>
 
-    <div class="original-nav-container fade-in stagger-2">
+    <div class="original-nav-container">
       <nav class="desktop-nav">
         <ul class="nav-list">
           {
@@ -58,6 +58,7 @@ const navItems = [
           }
         </ul>
       </nav>
+
       <button
         id="mobile-menu-toggle"
         class="mobile-menu-btn hamburger"
@@ -119,78 +120,12 @@ const navItems = [
   </div>
 </header>
 
-<div id="floating-nav" class="floating-nav" aria-hidden="true">
-  <div class="floating-nav-inner">
-    <nav class="desktop-nav">
-      <ul class="nav-list">
-        {
-          navItems.map((item) => (
-            <li>
-              <a href={item.href} class="nav-link">
-                <span class="nav-word">
-                  <span class="nav-layer nav-layer-top">
-                    {Array.from(item.label).map((letter, index) => (
-                      <span class="nav-char" style={`--i:${index}`}>
-                        {letter}
-                      </span>
-                    ))}
-                  </span>
-                  <span class="nav-layer nav-layer-bottom" aria-hidden="true">
-                    {Array.from(item.label).map((letter, index) => (
-                      <span class="nav-char" style={`--i:${index}`}>
-                        {letter}
-                      </span>
-                    ))}
-                  </span>
-                </span>
-              </a>
-            </li>
-          ))
-        }
-      </ul>
-    </nav>
-    <button
-      class="mobile-menu-btn hamburger"
-      aria-label="Toggle menu"
-      aria-expanded="false"
-      onclick="document.getElementById('mobile-menu-toggle')?.click()"
-    >
-      <span class="hamburger-line"></span>
-      <span class="hamburger-line"></span>
-    </button>
-    <div class="header-actions">
-      <a href="/#contact" class="btn-primary">
-        <span class="cta-accent" aria-hidden="true"></span>
-        <span class="cta-word">
-          <span class="cta-layer cta-layer-top">
-            {
-              Array.from("LET'S TALK").map((letter, index) => (
-                <span class="cta-char" style={`--i:${index}`}>
-                  {letter === " " ? "\u00A0" : letter}
-                </span>
-              ))
-            }
-          </span>
-          <span class="cta-layer cta-layer-bottom" aria-hidden="true">
-            {
-              Array.from("LET'S TALK").map((letter, index) => (
-                <span class="cta-char" style={`--i:${index}`}>
-                  {letter === " " ? "\u00A0" : letter}
-                </span>
-              ))
-            }
-          </span>
-        </span>
-      </a>
-    </div>
-  </div>
-</div>
-
 <style>
   /* root header stacking */
   header, 
   .site-header,
-  .header {
+  .header,
+  #main-header {
     position: fixed !important;
     top: 0;
     left: 0;
@@ -198,18 +133,50 @@ const navItems = [
     z-index: 9999 !important;
     padding-top: 0;
     background-color: transparent;
+    border-bottom: 1px solid transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    transform: translateY(0);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+      background-color 0.3s ease,
+      border-color 0.3s ease,
+      backdrop-filter 0.3s ease,
+      -webkit-backdrop-filter 0.3s ease;
     pointer-events: none;
+  }
+
+  /* directional scroll states */
+  #main-header.is-hidden {
+    transform: translateY(-100%);
+  }
+
+  #main-header.is-scrolled {
+    transform: translateY(0);
+    background-color: rgba(13, 14, 18, 0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  #main-header.is-top {
+    transform: translateY(0);
+    background-color: transparent;
+    border-bottom: 1px solid transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
   }
 
   .header-container {
     display: flex;
     justify-content: flex-end;
-    align-items: flex-start;
+    align-items: center;
     width: 95%;
     max-width: 1400px;
     margin: 0 auto;
+    min-height: 80px;
     pointer-events: none;
     position: relative;
+    transition: min-height 0.3s ease;
   }
 
   .original-nav-container {
@@ -217,8 +184,15 @@ const navItems = [
     align-items: center;
     justify-content: flex-end;
     gap: 24px;
-    margin-top: 28px;
+    margin-top: 20px;
+    margin-bottom: 20px;
     pointer-events: auto;
+    transition: margin 0.3s ease;
+  }
+
+  #main-header.is-scrolled .original-nav-container {
+    margin-top: 12px;
+    margin-bottom: 12px;
   }
 
   /* logo anchor */
@@ -242,7 +216,12 @@ const navItems = [
     box-shadow: 4px 8px 24px rgba(0, 0, 0, 0.12);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease, padding 0.3s ease, border-radius 0.3s ease;
+  }
+
+  #main-header.is-scrolled .logo-link {
+    padding: 12px 28px 18px 20px;
+    border-radius: 0 0 28px 0;
   }
 
   .logo-img {
@@ -331,8 +310,8 @@ const navItems = [
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background-color: var(--color-brand);
-    border: 1px solid var(--color-brand);
+    background-color: var(--color-brand, #d62828);
+    border: 1px solid var(--color-brand, #d62828);
     color: #fff;
     padding: 12px 28px 12px 22px;
     font-size: 0.85rem;
@@ -346,8 +325,8 @@ const navItems = [
   }
 
   .btn-primary:hover {
-    background-color: #d62828;
-    border-color: #d62828;
+    background-color: #b01e1e;
+    border-color: #b01e1e;
     transform: translateY(-2px);
   }
 
@@ -393,56 +372,6 @@ const navItems = [
     transform: translateY(-100%);
   }
 
-  /* floating scroll nav */
-  .floating-nav {
-    position: fixed;
-    top: 24px;
-    left: 50%;
-    transform: translate(-50%, -150%);
-    z-index: 1000;
-    opacity: 0;
-    visibility: hidden;
-    transition:
-      transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
-      opacity 0.3s ease,
-      visibility 0.3s;
-    width: max-content;
-    max-width: calc(100vw - 32px);
-    pointer-events: none;
-  }
-
-  .floating-nav.visible {
-    transform: translate(-50%, 0);
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
-  }
-
-  .floating-nav-inner {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: rgba(20, 20, 20, 0.95);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border-radius: 50px;
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 8px 12px 8px 32px;
-    gap: 32px;
-  }
-
-  .floating-nav-inner .desktop-nav {
-    background: transparent;
-    box-shadow: none;
-    border: none;
-    padding: 0;
-  }
-
-  .floating-nav .nav-list {
-    gap: 28px;
-  }
-
   /* mobile menu toggle */
   .mobile-menu-btn {
     display: none;
@@ -485,7 +414,7 @@ const navItems = [
     transform: translateY(-4px) rotate(-45deg);
   }
 
-  /* consolidated media queries */
+  /* responsive queries */
   @media (min-width: 1025px) {
     .mobile-nav,
     .nav-links-wrapper {
@@ -494,20 +423,21 @@ const navItems = [
   }
 
   @media (max-width: 1024px) {
-    header,
-    .site-header,
-    .header {
-      top: 16px;
-      z-index: 9999 !important;
+    #main-header {
+      top: 0;
+    }
+
+    .header-container {
+      min-height: 70px;
     }
 
     .logo-link {
-      padding: 16px 24px 24px 24px;
-      border-radius: 0 0 32px 32px;
+      padding: 12px 20px 16px 20px;
+      border-radius: 0 0 24px 24px;
     }
 
     .logo-img {
-      width: 130px;
+      width: 120px;
     }
 
     .desktop-nav,
@@ -515,57 +445,50 @@ const navItems = [
       display: none;
     }
 
+    .original-nav-container {
+      margin-top: 14px;
+      margin-bottom: 14px;
+    }
+
+    /* explicit mobile menu toggle */
+    .mobile-menu-btn,
     .hamburger, 
-    button[aria-label="Toggle menu"], 
     #mobile-menu-toggle {
       display: flex !important;
       opacity: 1 !important;
       visibility: visible !important;
       position: relative;
-      z-index: 10000; 
+      z-index: 10000 !important; 
       pointer-events: auto !important;
-    }
-
-    .floating-nav {
-      top: 16px;
-    }
-
-    .floating-nav-inner {
-      padding: 8px 24px;
-      gap: 0;
-    }
-
-    .floating-nav-inner .desktop-nav,
-    .floating-nav-inner .header-actions {
-      display: none;
+      cursor: pointer;
     }
 
     /* mobile drawer */
     .mobile-nav,
     .nav-links-wrapper {
-      position: absolute;
-      top: 90px;
+      position: fixed;
+      top: 76px;
       left: 16px;
       right: 16px;
       width: auto;
-      padding: 32px 24px;
-      background: rgba(18, 18, 20, 0.96); 
-      backdrop-filter: saturate(180%) blur(24px);
-      -webkit-backdrop-filter: saturate(180%) blur(24px);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 24px;
-      box-shadow: 
-        0 24px 48px rgba(0, 0, 0, 0.5), 
-        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      padding: 28px 24px;
+      background: rgba(16, 17, 22, 0.98);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      box-shadow: 0 24px 48px rgba(0, 0, 0, 0.6);
       display: flex;
       flex-direction: column;
       gap: 16px;
-      transform: translateY(-20px) scale(0.98);
+      transform: translateY(-16px) scale(0.98);
       opacity: 0;
       pointer-events: none;
       visibility: hidden;
-      transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-      z-index: 999;
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+        opacity 0.3s ease,
+        visibility 0.3s ease;
+      z-index: 9998;
     }
 
     .mobile-nav.is-active,
@@ -592,63 +515,66 @@ const navItems = [
       width: 100%;
     }
 
-    .mobile-nav a:not(.btn-primary),
-    .nav-links-wrapper a:not(.btn-primary),
     .mobile-nav-link {
-      font-size: 1.05rem;
+      font-size: 1rem;
       font-weight: 600;
-      letter-spacing: 0.1em;
-      color: #ffffff;
+      letter-spacing: 0.08em;
+      color: #ffffff !important;
       text-decoration: none;
-      padding: 16px 8px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      transition: color 0.3s ease;
+      padding: 14px 4px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      transition: color 0.2s ease;
       display: block;
       text-transform: uppercase;
     }
 
-    .mobile-nav a:hover,
-    .nav-links-wrapper a:hover,
     .mobile-nav-link:hover {
-      color: var(--color-brand, #d62828);
+      color: var(--color-brand, #d62828) !important;
     }
 
     .mobile-nav-actions {
       width: 100%;
+      margin-top: 8px;
     }
 
-    .mobile-nav .btn-primary,
-    .nav-links-wrapper .btn-primary,
-    .mobile-nav .let-talk-btn,
-    .mobile-nav .mobile-cta {
-      margin-top: 16px;
-      text-align: center;
-      padding: 16px;
-      border-radius: 12px;
-      background-color: var(--color-brand, #d62828);
-      color: #fff;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      box-shadow: 0 8px 16px rgba(214, 40, 40, 0.2);
-      width: 100%;
-      box-sizing: border-box;
+    .mobile-cta {
       display: flex;
       justify-content: center;
       align-items: center;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 14px 20px;
+      border-radius: 9999px;
+      background-color: var(--color-brand, #d62828);
+      color: #ffffff;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      border: none;
     }
   }
 
   @media (max-width: 768px) {
+    .header-container {
+      min-height: 64px;
+    }
+
+    .original-nav-container {
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
+
     .mobile-nav,
     .nav-links-wrapper {
-      top: 80px;
-      padding: 24px 20px;
+      top: 68px;
+      padding: 24px 18px;
     }
   }
 </style>
 
 <script>
+  /* directional scroll */
   let headerScrollHandler: (() => void) | null = null;
 
   const initHeader = () => {
@@ -657,73 +583,98 @@ const navItems = [
       headerScrollHandler = null;
     }
 
-    const floatingNav = document.getElementById("floating-nav");
-    const menuBtn = document.querySelector('button[aria-label="Toggle menu"], .hamburger, #mobile-menu-toggle');
-    const mobileNav = document.querySelector('#mobile-nav-overlay, .mobile-nav, .nav-links-wrapper');
+    const header = document.getElementById("main-header");
+    const menuBtn = document.getElementById("mobile-menu-toggle");
+    const mobileNav = document.getElementById("mobile-nav-overlay");
 
-    // scroll nav tracking
-    if (floatingNav) {
-      let lastScrollY = window.scrollY;
-      let ticking = false;
-      const topThreshold = 150;
-      const scrollDeltaThreshold = 20;
-      let scrollAnchor = window.scrollY;
-      let lastDirection = 0;
+    if (!header) return;
 
-      const updateNav = () => {
-        const currentScrollY = window.scrollY;
-        const delta = currentScrollY - lastScrollY;
-        const currentDirection = delta === 0 ? 0 : Math.sign(delta);
+    let lastScrollY = window.scrollY;
+    let ticking = false;
+    let isMenuOpen = false;
 
-        if (currentDirection !== 0 && currentDirection !== lastDirection) {
-          scrollAnchor = currentScrollY;
-          lastDirection = currentDirection;
-        }
+    const updateHeaderState = () => {
+      const currentScrollY = window.scrollY;
+      const delta = currentScrollY - lastScrollY;
 
-        const distanceFromAnchor = Math.abs(currentScrollY - scrollAnchor);
-
-        if (currentScrollY <= topThreshold) {
-          floatingNav.classList.remove("visible");
-        } else if (currentDirection === -1 && distanceFromAnchor >= scrollDeltaThreshold) {
-          floatingNav.classList.add("visible");
-        } else if (currentDirection === 1 && distanceFromAnchor >= scrollDeltaThreshold) {
-          floatingNav.classList.remove("visible");
-        }
-
+      // drawer open lock
+      if (isMenuOpen) {
         lastScrollY = currentScrollY;
         ticking = false;
-      };
+        return;
+      }
 
-      headerScrollHandler = () => {
-        if (!ticking) {
-          window.requestAnimationFrame(updateNav);
-          ticking = true;
+      if (currentScrollY < 20) {
+        // page top
+        header.classList.remove("is-hidden");
+        header.classList.remove("is-scrolled");
+        header.classList.add("is-top");
+      } else {
+        header.classList.remove("is-top");
+        if (delta > 0 && currentScrollY > 80) {
+          // scroll down past 80px
+          header.classList.add("is-hidden");
+          header.classList.remove("is-scrolled");
+        } else if (delta < 0) {
+          // scroll up
+          header.classList.remove("is-hidden");
+          header.classList.add("is-scrolled");
+        }
+      }
+
+      lastScrollY = currentScrollY;
+      ticking = false;
+    };
+
+    // initial state on load
+    if (window.scrollY < 20) {
+      header.classList.add("is-top");
+      header.classList.remove("is-scrolled", "is-hidden");
+    } else {
+      header.classList.add("is-scrolled");
+      header.classList.remove("is-top", "is-hidden");
+    }
+
+    headerScrollHandler = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(updateHeaderState);
+        ticking = true;
+      }
+    };
+
+    window.addEventListener("scroll", headerScrollHandler, { passive: true });
+
+    // mobile drawer toggle
+    if (menuBtn && mobileNav) {
+      const toggleMenu = (open?: boolean) => {
+        const willOpen = typeof open === "boolean" ? open : !isMenuOpen;
+        isMenuOpen = willOpen;
+        menuBtn.setAttribute("aria-expanded", String(willOpen));
+        menuBtn.classList.toggle("is-active", willOpen);
+        mobileNav.classList.toggle("is-active", willOpen);
+        mobileNav.setAttribute("aria-hidden", String(!willOpen));
+        if (willOpen) {
+          header.classList.remove("is-hidden");
+          header.classList.add("is-scrolled");
         }
       };
 
-      window.addEventListener("scroll", headerScrollHandler, { passive: true });
-    }
-
-    // mobile nav toggle
-    if (menuBtn && mobileNav) {
-      const newMenuBtn = menuBtn.cloneNode(true);
-      menuBtn.parentNode?.replaceChild(newMenuBtn, menuBtn);
-
-      newMenuBtn.addEventListener("click", () => {
-        const isExpanded = newMenuBtn.getAttribute("aria-expanded") === "true";
-        newMenuBtn.setAttribute("aria-expanded", String(!isExpanded));
-        newMenuBtn.classList.toggle("is-active");
-        mobileNav.classList.toggle("is-active");
-        document.body.style.overflow = !isExpanded ? "hidden" : "";
-      });
+      menuBtn.onclick = (e) => {
+        e.stopPropagation();
+        toggleMenu();
+      };
 
       mobileNav.querySelectorAll("a").forEach((link) => {
-        link.addEventListener("click", () => {
-          newMenuBtn.setAttribute("aria-expanded", "false");
-          newMenuBtn.classList.remove("is-active");
-          mobileNav.classList.remove("is-active");
-          document.body.style.overflow = "";
-        });
+        link.onclick = () => {
+          toggleMenu(false);
+        };
+      });
+
+      // backdrop click close
+      document.addEventListener("click", (e) => {
+        if (isMenuOpen && !mobileNav.contains(e.target as Node) && !menuBtn.contains(e.target as Node)) {
+          toggleMenu(false);
+        }
       });
     }
   };

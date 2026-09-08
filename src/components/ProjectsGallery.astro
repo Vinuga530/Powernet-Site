@@ -29,7 +29,7 @@ import projects from '../data/projects.json';
     </div>
   </div>
 
-  <!-- 3-panel stage -->
+  <!-- stage container -->
   <div class="gallery-stage" id="gallery-stage">
     {projects.map((project, idx) => (
       <article
@@ -72,9 +72,12 @@ import projects from '../data/projects.json';
         </div>
       </article>
     ))}
+  </div>
 
-    <!-- technical slide dossier overlay -->
-    <div class="detail-dossier" id="detail-dossier" aria-hidden="true">
+  <!-- technical dossier overlay -->
+  <div class="detail-dossier" id="detail-dossier" aria-hidden="true">
+    <div class="dossier-backdrop" id="dossier-backdrop" aria-hidden="true"></div>
+    <div class="dossier-container">
       {projects.map((project, idx) => (
         <div
           class={`dossier-panel ${idx === 0 ? 'is-active' : ''}`}
@@ -85,7 +88,7 @@ import projects from '../data/projects.json';
               <span class="dossier-meta">{project.id} // {project.year}</span>
               <span class="dossier-badge">{project.category}</span>
             </div>
-            <button type="button" class="dossier-close" aria-label="Close dossier">
+            <button type="button" class="dossier-close content__close" aria-label="Close dossier">
               <span class="close-label">ESC // CLOSE</span>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
@@ -154,7 +157,7 @@ import projects from '../data/projects.json';
 </div>
 
 <style>
-  /* design tokens */
+  /* gallery tokens */
   .projects-gallery {
     --gallery-bg: #0d0e12;
     --gallery-border: 1px solid rgba(255, 255, 255, 0.08);
@@ -248,7 +251,7 @@ import projects from '../data/projects.json';
     color: rgba(255, 255, 255, 0.5);
   }
 
-  /* 3-panel stage container */
+  /* desktop stage container */
   .gallery-stage {
     position: relative;
     width: 100%;
@@ -310,7 +313,7 @@ import projects from '../data/projects.json';
     pointer-events: none;
   }
 
-  /* card visual container */
+  /* card visual */
   .card-visual {
     position: relative;
     width: 100%;
@@ -354,14 +357,14 @@ import projects from '../data/projects.json';
     pointer-events: none;
   }
 
-  /* card body details */
+  /* card body */
   .card-body {
     position: relative;
     flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: 24px 28px 24px;
+    padding: 24px 28px;
     background: var(--gallery-bg);
   }
 
@@ -454,36 +457,68 @@ import projects from '../data/projects.json';
     transform: translateX(4px);
   }
 
-  /* technical slide dossier overlay: operates at z-index: 50, beneath header (z-index: 9999) */
+  /* dossier overlay: z-index 9000 (beneath header 9999) */
   .detail-dossier {
-    position: absolute;
+    position: fixed;
     inset: 0;
-    z-index: 50;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    pointer-events: none;
+    z-index: 9000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.5s;
+    pointer-events: none;
+    transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+      visibility 0.35s;
+  }
+
+  .projects-gallery.is-dossier-open .detail-dossier {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .dossier-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(8, 9, 12, 0.88);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    cursor: pointer;
+  }
+
+  .dossier-container {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 680px;
+    max-height: calc(100vh - 80px);
+    max-height: calc(100dvh - 80px);
+    display: flex;
+    padding: 0 20px;
+    box-sizing: border-box;
   }
 
   .dossier-panel {
-    grid-column: 2;
     display: none;
     flex-direction: column;
-    background: var(--gallery-bg);
-    border: var(--gallery-border);
-    border-radius: var(--gallery-radius);
-    margin: 20px 20px 20px 10px;
-    padding: 32px 36px;
-    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+    width: 100%;
+    background: #0d0e12;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 32px;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8);
     overflow: hidden;
-    transform: translate3d(30px, 0, 0);
-    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: translateY(20px) scale(0.98);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .dossier-panel.is-active {
     display: flex;
+  }
+
+  .projects-gallery.is-dossier-open .dossier-panel.is-active {
+    transform: translateY(0) scale(1);
   }
 
   .dossier-header {
@@ -545,11 +580,11 @@ import projects from '../data/projects.json';
 
   .dossier-content {
     flex: 1;
-    display: flex;
-    flex-direction: column;
     overflow-y: auto;
     padding-top: 20px;
     padding-right: 8px;
+    max-height: calc(80vh - 120px);
+    max-height: calc(80dvh - 120px);
   }
 
   .dossier-client {
@@ -664,40 +699,9 @@ import projects from '../data/projects.json';
     height: 7px;
     border-radius: 50%;
     background: #10b981;
-    box-shadow: 0 0 8px #10b981;
   }
 
-  /* dossier expansion states */
-  .projects-gallery.is-dossier-open .project-card.is-prev {
-    transform: translate3d(-120%, 0, 0) scale(0.85);
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  .projects-gallery.is-dossier-open .project-card.is-next {
-    transform: translate3d(120%, 0, 0) scale(0.85);
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  @media (min-width: 992px) {
-    .projects-gallery.is-dossier-open .project-card.is-center {
-      transform: translate3d(-50%, 0, 0) scale(0.96);
-      cursor: default;
-    }
-  }
-
-  .projects-gallery.is-dossier-open .detail-dossier {
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
-  }
-
-  .projects-gallery.is-dossier-open .dossier-panel.is-active {
-    transform: translate3d(0, 0, 0);
-  }
-
-  /* stage pagination tabs */
+  /* pagination tabs */
   .gallery-pagination {
     display: flex;
     justify-content: center;
@@ -743,41 +747,76 @@ import projects from '../data/projects.json';
     background: var(--brand-red);
   }
 
-  /* responsive adjustments */
-  @media (max-width: 991px) {
+  /* mobile responsiveness */
+  @media (max-width: 1024px) {
     .gallery-stage {
-      height: 600px;
+      position: relative;
+      width: 100%;
+      height: auto;
+      min-height: 0;
+      perspective: none;
+      overflow-x: auto;
+      overflow-y: hidden;
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
+      justify-content: flex-start;
+      gap: 16px;
+      padding: 16px;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scroll-behavior: smooth;
+      scrollbar-width: none;
+    }
+
+    .gallery-stage::-webkit-scrollbar {
+      display: none;
     }
 
     .project-card {
-      width: clamp(300px, 80%, 480px);
-    }
-
-    .project-card.is-prev {
-      transform: translate3d(-75%, 0, 0) scale(0.85);
-    }
-
-    .project-card.is-next {
-      transform: translate3d(75%, 0, 0) scale(0.85);
+      position: relative !important;
+      top: auto !important;
+      left: auto !important;
+      right: auto !important;
+      bottom: auto !important;
+      flex: 0 0 calc(100% - 32px) !important;
+      width: calc(100% - 32px) !important;
+      min-width: calc(100% - 32px) !important;
+      max-width: calc(100% - 32px) !important;
+      height: 520px;
+      scroll-snap-align: center;
+      scroll-snap-stop: always;
+      transform: none !important;
+      opacity: 1 !important;
+      z-index: 1 !important;
+      pointer-events: auto !important;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
     }
 
     .detail-dossier {
-      grid-template-columns: 1fr;
-      background: rgba(6, 7, 9, 0.85);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      align-items: flex-start;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: calc(env(safe-area-inset-top, 24px) + 24px) 16px calc(env(safe-area-inset-bottom, 24px) + 32px);
+      box-sizing: border-box;
+    }
+
+    .dossier-container {
+      max-width: 100%;
+      max-height: none;
+      padding: 0;
+      margin: auto 0;
     }
 
     .dossier-panel {
-      grid-column: 1;
-      margin: 16px;
-      padding: 24px;
+      padding: 24px 20px;
+      margin: 0;
+      max-height: none;
     }
 
-    .projects-gallery.is-dossier-open .project-card.is-center {
-      opacity: 0;
-      pointer-events: none;
-      transform: translate3d(0, -30px, 0) scale(0.9);
+    .dossier-content {
+      max-height: none;
+      overflow-y: visible;
     }
   }
 
@@ -793,13 +832,8 @@ import projects from '../data/projects.json';
       justify-content: space-between;
     }
 
-    .gallery-stage {
-      height: 520px;
-    }
-
     .project-card {
-      width: 88%;
-      height: calc(100% - 24px);
+      height: 480px;
     }
 
     .card-body {
@@ -811,7 +845,6 @@ import projects from '../data/projects.json';
     }
 
     .dossier-panel {
-      margin: 10px;
       padding: 20px 16px;
     }
   }
@@ -824,8 +857,7 @@ import projects from '../data/projects.json';
   let isFinePointer = false;
   let tiltRafId: number | null = null;
   let boundKeyDown: ((e: KeyboardEvent) => void) | null = null;
-  let boundTouchStart: ((e: TouchEvent) => void) | null = null;
-  let boundTouchEnd: ((e: TouchEvent) => void) | null = null;
+  let stageScrollHandler: (() => void) | null = null;
 
   // teardown active listeners and animations
   const teardownProjectsGallery = () => {
@@ -840,15 +872,9 @@ import projects from '../data/projects.json';
     }
 
     const stage = document.getElementById('gallery-stage');
-    if (stage) {
-      if (boundTouchStart) {
-        stage.removeEventListener('touchstart', boundTouchStart);
-        boundTouchStart = null;
-      }
-      if (boundTouchEnd) {
-        stage.removeEventListener('touchend', boundTouchEnd);
-        boundTouchEnd = null;
-      }
+    if (stage && stageScrollHandler) {
+      stage.removeEventListener('scroll', stageScrollHandler);
+      stageScrollHandler = null;
     }
   };
 
@@ -866,7 +892,8 @@ import projects from '../data/projects.json';
     const btnPrev = root.querySelector('.btn-prev');
     const btnNext = root.querySelector('.btn-next');
     const counterCurrent = root.querySelector('.counter-current');
-    const closeButtons = Array.from(root.querySelectorAll('.dossier-close'));
+    const closeButtons = Array.from(root.querySelectorAll('.content__close, .dossier-close'));
+    const backdrop = document.getElementById('dossier-backdrop');
     const total = cards.length;
 
     if (total === 0) return;
@@ -874,25 +901,29 @@ import projects from '../data/projects.json';
     isFinePointer = window.matchMedia('(pointer: fine)').matches;
 
     // cycle position classes and attributes
-    const updateGalleryState = () => {
+    const updateActiveState = (scrollMobile = true) => {
       root.setAttribute('data-active-index', String(activeIndex));
 
-      cards.forEach((card, idx) => {
-        card.classList.remove('is-center', 'is-prev', 'is-next', 'is-hidden');
+      // desktop 3-panel position classes
+      if (window.innerWidth > 1024) {
+        cards.forEach((card, idx) => {
+          card.classList.remove('is-center', 'is-prev', 'is-next', 'is-hidden');
 
-        if (idx === activeIndex) {
-          card.classList.add('is-center');
-        } else if (idx === (activeIndex - 1 + total) % total) {
-          card.classList.add('is-prev');
-        } else if (idx === (activeIndex + 1) % total) {
-          card.classList.add('is-next');
-        } else {
-          card.classList.add('is-hidden');
-        }
+          if (idx === activeIndex) {
+            card.classList.add('is-center');
+          } else if (idx === (activeIndex - 1 + total) % total) {
+            card.classList.add('is-prev');
+          } else if (idx === (activeIndex + 1) % total) {
+            card.classList.add('is-next');
+          } else {
+            card.classList.add('is-hidden');
+          }
 
-        // reset custom inline tilt transform on position switch
-        card.style.transform = '';
-      });
+          card.style.transform = '';
+        });
+      } else if (scrollMobile && cards[activeIndex]) {
+        cards[activeIndex].scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      }
 
       panels.forEach((panel, idx) => {
         if (idx === activeIndex) {
@@ -914,49 +945,57 @@ import projects from '../data/projects.json';
         counterCurrent.textContent = String(activeIndex + 1).padStart(2, '0');
       }
 
-      bindCenterCardTilt();
+      if (window.innerWidth > 1024) {
+        bindCenterCardTilt();
+      }
     };
 
-    // open detail dossier modal
-    const openDossier = () => {
+    // open dossier modal
+    const showContent = (index: number) => {
+      activeIndex = index;
+      updateActiveState(false);
       isDossierOpen = true;
       root.classList.add('is-dossier-open');
       const dossierEl = document.getElementById('detail-dossier');
       if (dossierEl) dossierEl.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
 
-      // reset active tilt transform for clean dock alignment
-      const centerCard = root.querySelector('.project-card.is-center') as HTMLElement | null;
-      if (centerCard) centerCard.style.transform = '';
+      if (isFinePointer) {
+        const centerCard = root.querySelector('.project-card.is-center') as HTMLElement | null;
+        if (centerCard) centerCard.style.transform = '';
+      }
     };
 
-    // close detail dossier modal
-    const closeDossier = () => {
+    // close dossier modal
+    const hideContent = () => {
       isDossierOpen = false;
       root.classList.remove('is-dossier-open');
       const dossierEl = document.getElementById('detail-dossier');
       if (dossierEl) dossierEl.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
 
-      const centerCard = root.querySelector('.project-card.is-center') as HTMLElement | null;
-      if (centerCard) centerCard.style.transform = '';
+      if (isFinePointer) {
+        const centerCard = root.querySelector('.project-card.is-center') as HTMLElement | null;
+        if (centerCard) centerCard.style.transform = '';
+      }
     };
 
-    // navigate to next project
+    // navigation steps
     const navigateNext = () => {
-      if (isDossierOpen) closeDossier();
+      if (isDossierOpen) hideContent();
       activeIndex = (activeIndex + 1) % total;
-      updateGalleryState();
+      updateActiveState(true);
     };
 
-    // navigate to previous project
     const navigatePrev = () => {
-      if (isDossierOpen) closeDossier();
+      if (isDossierOpen) hideContent();
       activeIndex = (activeIndex - 1 + total) % total;
-      updateGalleryState();
+      updateActiveState(true);
     };
 
-    // 3d cursor tilt tracking for desktop
+    // 3d cursor tilt tracking for desktop with fine pointer
     const bindCenterCardTilt = () => {
-      if (!isFinePointer) return;
+      if (!isFinePointer || window.innerWidth <= 1024) return;
 
       const centerCard = root.querySelector('.project-card.is-center') as HTMLElement | null;
       if (!centerCard) return;
@@ -1012,13 +1051,19 @@ import projects from '../data/projects.json';
       };
     };
 
-    // card click routing
+    // card interactions
     cards.forEach((card) => {
       card.addEventListener('click', () => {
         const index = Number(card.getAttribute('data-index'));
+
+        if (window.innerWidth <= 1024) {
+          showContent(index);
+          return;
+        }
+
         if (card.classList.contains('is-center')) {
           if (!isDossierOpen) {
-            openDossier();
+            showContent(index);
           }
         } else if (card.classList.contains('is-prev')) {
           navigatePrev();
@@ -1026,39 +1071,45 @@ import projects from '../data/projects.json';
           navigateNext();
         } else {
           activeIndex = index;
-          updateGalleryState();
+          updateActiveState(true);
         }
       });
     });
 
-    // button navigation controls
+    // button controls
     if (btnPrev) btnPrev.addEventListener('click', navigatePrev);
     if (btnNext) btnNext.addEventListener('click', navigateNext);
 
-    // tab pagination clicks
+    // pagination tabs
     tabs.forEach((tab) => {
       tab.addEventListener('click', () => {
         const targetIndex = Number(tab.getAttribute('data-index'));
         if (targetIndex !== activeIndex) {
-          if (isDossierOpen) closeDossier();
+          if (isDossierOpen) hideContent();
           activeIndex = targetIndex;
-          updateGalleryState();
+          updateActiveState(true);
         }
       });
     });
 
-    // dossier close control bindings
+    // dossier close handlers
     closeButtons.forEach((btn) => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
-        closeDossier();
+        hideContent();
       });
     });
 
-    // keyboard arrows and escape handling
+    if (backdrop) {
+      backdrop.addEventListener('click', () => {
+        hideContent();
+      });
+    }
+
+    // keyboard escape and arrow keys
     boundKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isDossierOpen) {
-        closeDossier();
+      if (e.key === 'Escape') {
+        hideContent();
       } else if (e.key === 'ArrowLeft') {
         navigatePrev();
       } else if (e.key === 'ArrowRight') {
@@ -1067,35 +1118,27 @@ import projects from '../data/projects.json';
     };
     window.addEventListener('keydown', boundKeyDown);
 
-    // touch gesture detection
-    let touchStartX = 0;
-    let touchStartY = 0;
-
-    boundTouchStart = (e: TouchEvent) => {
-      touchStartX = e.touches[0].clientX;
-      touchStartY = e.touches[0].clientY;
-    };
-
-    boundTouchEnd = (e: TouchEvent) => {
-      const touchEndX = e.changedTouches[0].clientX;
-      const touchEndY = e.changedTouches[0].clientY;
-      const deltaX = touchEndX - touchStartX;
-      const deltaY = touchEndY - touchStartY;
-
-      if (Math.abs(deltaX) > 40 && Math.abs(deltaX) > Math.abs(deltaY) * 1.4) {
-        if (deltaX < 0) {
-          navigateNext();
-        } else {
-          navigatePrev();
+    // mobile native scroll snap sync
+    let scrollDebounce: number | null = null;
+    stageScrollHandler = () => {
+      if (window.innerWidth > 1024) return;
+      if (scrollDebounce) clearTimeout(scrollDebounce);
+      scrollDebounce = window.setTimeout(() => {
+        const slideWidth = cards[0]?.offsetWidth || 1;
+        const gap = 16;
+        const scrollLeft = stage.scrollLeft;
+        const detectedIndex = Math.min(total - 1, Math.max(0, Math.round(scrollLeft / (slideWidth + gap))));
+        if (detectedIndex !== activeIndex) {
+          activeIndex = detectedIndex;
+          updateActiveState(false);
         }
-      }
+      }, 50);
     };
 
-    stage.addEventListener('touchstart', boundTouchStart, { passive: true });
-    stage.addEventListener('touchend', boundTouchEnd, { passive: true });
+    stage.addEventListener('scroll', stageScrollHandler, { passive: true });
 
-    // initial state synchronization
-    updateGalleryState();
+    // initial synchronization
+    updateActiveState(false);
   };
 
   // lifecycle hooks

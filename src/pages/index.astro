@@ -42,9 +42,21 @@ import screwImg from "../assets/images/photos/screw.png";
           Integrated engineering and technology solutions for Sri Lanka's
           critical operations.
         </p>
+
+        <!-- kinetic dual-layer hero cta buttons -->
         <div class="hero-actions fade-in stagger-5">
-          <a href="/contact" class="btn-hero-primary">GET A QUOTE</a>
-          <a href="/projects" class="btn-hero-secondary">EXPLORE PRODUCTS</a>
+          <a href="/contact" class="btn-quote">
+            <span class="btn-roll-wrapper">
+              <span class="btn-roll-primary">GET A QUOTE</span>
+              <span class="btn-roll-secondary" aria-hidden="true">GET A QUOTE</span>
+            </span>
+          </a>
+          <a href="/projects" class="btn-explore">
+            <span class="btn-roll-wrapper">
+              <span class="btn-roll-primary">EXPLORE PRODUCTS</span>
+              <span class="btn-roll-secondary" aria-hidden="true">EXPLORE PRODUCTS</span>
+            </span>
+          </a>
         </div>
       </div>
     </div>
@@ -85,140 +97,103 @@ import screwImg from "../assets/images/photos/screw.png";
     </div>
   </section>
 
-  <!-- about section -->
+  <!-- editorial intro -->
   <section id="about" class="editorial-intro">
-    <!-- watermark -->
     <div class="bg-watermark" aria-hidden="true">EXPERTISE</div>
 
     <div class="editorial-grid reveal-up">
-      
-      <!-- editorial content -->
       <div class="intro-left">
         <span class="editorial-eyebrow">Integrated Infrastructure Solutions</span>
         <h2 class="intro-title">Infrastructure, Built for your needs.</h2>
         <p class="intro-text">
           Powernet coordinates complex scopes as a single, integrated project. By unifying multiple critical disciplines under one roof, we eliminate vendor friction and ensure seamless, high-quality delivery for Sri Lanka's critical operations.
         </p>
-      <div class="intro-actions">
-        <a href="/#about" class="btn-editorial btn-solid hover-stagger">
-          <span class="btn-text-wrapper">Explore Company Profile</span>
-        </a>
-        <a href="/#about" class="btn-editorial btn-outline hover-stagger">
-          <span class="btn-text-wrapper">Explore Quality Process</span>
-        </a>
-      </div>
+        <div class="intro-actions">
+          <a href="/#about" class="btn-editorial btn-solid hover-stagger">
+            <span class="btn-text-wrapper">Explore Company Profile</span>
+          </a>
+          <a href="/#about" class="btn-editorial btn-outline hover-stagger">
+            <span class="btn-text-wrapper">Explore Quality Process</span>
+          </a>
+        </div>
       </div>
 
-      <!-- capabilities list -->
       <div class="intro-right">
         <ul class="spec-list">
-          <li><span class="glow-dot"></span> Networking & IT Systems</li>
-          <li><span class="glow-dot"></span> Electrical & UPS Solutions</li>
-          <li><span class="glow-dot"></span> CCTV & Security Infrastructure</li>
-          <li><span class="glow-dot"></span> Fire Protection Systems</li>
-          <li><span class="glow-dot"></span> Air Conditioning & Interior Work</li>
+          <li><span class="spec-dot"></span> Networking &amp; IT Systems</li>
+          <li><span class="spec-dot"></span> Electrical &amp; UPS Solutions</li>
+          <li><span class="spec-dot"></span> CCTV &amp; Security Infrastructure</li>
+          <li><span class="spec-dot"></span> Fire Protection Systems</li>
+          <li><span class="spec-dot"></span> Air Conditioning &amp; Interior Work</li>
         </ul>
       </div>
-
     </div>
   </section>
 
-  <!-- services -->
-  <section id="services" class="section-services">
-    <div class="container">
-      <div class="section-header reveal-up">
-        <span class="services-eyebrow">Our Services</span>
-        <h2 class="services-heading">Integrated infrastructure services for modern organizations.</h2>
-        <p class="services-subheading">One trusted partner for Data &amp; Voice, Power &amp; UPS, Fire Protection, Security Systems, Interior &amp; Civil, Air Conditioning, IT Compute and IT Infrastructure.</p>
-      </div>
+  <!-- asymmetric blueprint matrix -->
+  <section id="services" class="services-matrix scroll-reveal reveal-up">
+    <div class="matrix-header">
+      <span class="matrix-tag">02 // CAPABILITIES</span>
+      <h2 class="matrix-title">Engineered for Zero Downtime.</h2>
+    </div>
 
-      <div class="services-grid">
-        <a href="/contact" class="service-card reveal-up has-contextual-asset">
-          <span class="card-num">01</span>
-          <h3>Data &amp; Voice</h3>
-          <p>Structured CAT5/CAT6, fiber optic, LAN/WAN and wireless network implementations for enterprise environments.</p>
-          <div class="card-action">
-            <span>Learn More</span>
-            <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
-          </div>
-          <div class="contextual-asset-wrap" aria-hidden="true">
-            <img src={screwImg.src} alt="" class="contextual-asset asset-tool" loading="lazy" />
-          </div>
-        </a>
+    <div class="matrix-grid">
+      <!-- 01 Flagship Power (Span 7) -->
+      <article class="matrix-card card-flagship">
+        <div class="corner-mark top-left">+</div>
+        <div class="corner-mark bottom-right">+</div>
+        <div class="card-meta">
+          <span class="card-index">01</span>
+          <span class="card-badge">TIER III COMPLIANT</span>
+        </div>
+        <div class="card-content">
+          <h3>Critical Power &amp; UPS Infrastructure</h3>
+          <p>Dual-bus distribution paths, automated switchgear, and transient surge suppression for continuous industrial loads.</p>
+        </div>
+        <img src={meterImg.src} alt="" class="docked-tool tool-meter" loading="lazy" />
+      </article>
 
-        <a href="/contact" class="service-card reveal-up has-contextual-asset">
-          <span class="card-num">02</span>
-          <h3>Power &amp; UPS</h3>
-          <p>Electrical design, installation and reliable backup power infrastructure for mission-critical facilities.</p>
-          <div class="card-action">
-            <span>Learn More</span>
-            <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
-          </div>
-          <div class="contextual-asset-wrap" aria-hidden="true">
-            <img src={meterImg.src} alt="" class="contextual-asset asset-multimeter" loading="lazy" />
-          </div>
-        </a>
+      <!-- 02 Network Backbone (Span 5) -->
+      <article class="matrix-card card-network">
+        <div class="corner-mark top-left">+</div>
+        <div class="corner-mark bottom-right">+</div>
+        <div class="card-meta">
+          <span class="card-index">02</span>
+          <span class="card-badge">SINGLE-MODE FIBER</span>
+        </div>
+        <div class="card-content">
+          <h3>High-Density Cabling &amp; Telecom</h3>
+          <p>Structured optical backbones, server containment zones, and certified low-voltage distribution grids.</p>
+        </div>
+        <img src={screwImg.src} alt="" class="docked-tool tool-driver" loading="lazy" />
+      </article>
 
-        <a href="/contact" class="service-card reveal-up">
-          <span class="card-num">03</span>
-          <h3>Fire Protection</h3>
-          <p>Detection, alarm, hydrant and suppression systems designed for commercial and industrial safety requirements.</p>
-          <div class="card-action">
-            <span>Learn More</span>
-            <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
-          </div>
-        </a>
+      <!-- 03 SCADA & Automation (Span 4) -->
+      <article class="matrix-card card-compact">
+        <div class="card-meta"><span class="card-index">03</span></div>
+        <div class="card-content">
+          <h3>Substation Automation &amp; SCADA</h3>
+          <p>Real-time phase telemetry, automated load management, and hardened PLC integration.</p>
+        </div>
+      </article>
 
-        <a href="/contact" class="service-card reveal-up">
-          <span class="card-num">04</span>
-          <h3>Security Systems</h3>
-          <p>Integrated CCTV, PA and access control solutions for safer, smarter operations.</p>
-          <div class="card-action">
-            <span>Learn More</span>
-            <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
-          </div>
-        </a>
+      <!-- 04 Fire Suppression (Span 4) -->
+      <article class="matrix-card card-compact">
+        <div class="card-meta"><span class="card-index">04</span></div>
+        <div class="card-content">
+          <h3>Clean-Agent Fire Suppression</h3>
+          <p>Zero-residue gaseous suppression systems integrated with early aspirating smoke telemetry.</p>
+        </div>
+      </article>
 
-        <a href="/contact" class="service-card reveal-up">
-          <span class="card-num">05</span>
-          <h3>Interior &amp; Civil</h3>
-          <p>Corporate interior planning, furniture manufacturing and fit-out project consultation under one roof.</p>
-          <div class="card-action">
-            <span>Learn More</span>
-            <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
-          </div>
-        </a>
-
-        <a href="/contact" class="service-card reveal-up">
-          <span class="card-num">06</span>
-          <h3>Air Conditioning</h3>
-          <p>Supply, installation, servicing and maintenance for domestic, commercial and industrial air conditioning needs.</p>
-          <div class="card-action">
-            <span>Learn More</span>
-            <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
-          </div>
-        </a>
-
-        <a href="/contact" class="service-card reveal-up">
-          <span class="card-num">07</span>
-          <h3>IT Compute</h3>
-          <p>Hardware supply, maintenance, troubleshooting and software solutions for business technology teams.</p>
-          <div class="card-action">
-            <span>Learn More</span>
-            <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
-          </div>
-        </a>
-
-        <a href="/contact" class="service-card reveal-up">
-          <span class="card-num">08</span>
-          <h3>IT Infrastructure</h3>
-          <p>Low-voltage/high-voltage works, testing, commissioning and maintenance support for complete MEP delivery.</p>
-          <div class="card-action">
-            <span>Learn More</span>
-            <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
-          </div>
-        </a>
-      </div>
+      <!-- 05 Security (Span 4) -->
+      <article class="matrix-card card-compact">
+        <div class="card-meta"><span class="card-index">05</span></div>
+        <div class="card-content">
+          <h3>Biometric Access &amp; Surveillance</h3>
+          <p>Perimeter zoning, optical access barriers, and tamper-evident surveillance infrastructure.</p>
+        </div>
+      </article>
     </div>
   </section>
 
@@ -252,9 +227,21 @@ import screwImg from "../assets/images/photos/screw.png";
     width: 100%;
     height: 100%;
   }
+
   html,
   body {
-    overflow-x: clip; /* prevents horizontal scroll while allowing vertical escape */
+    overflow-x: clip;
+  }
+
+  /* semantic section flow */
+  .credibility-strip,
+  .editorial-intro,
+  #services,
+  .services-matrix,
+  #projects,
+  .section-projects {
+    position: relative !important;
+    transform: none !important;
   }
 
   .hero,
@@ -291,10 +278,6 @@ import screwImg from "../assets/images/photos/screw.png";
     inset: 0;
     z-index: -1;
     background-color: #111;
-    will-change: transform;
-    /* composite layer */
-    transform-style: preserve-3d;
-    backface-visibility: hidden;
   }
 
   .bg-img {
@@ -307,7 +290,6 @@ import screwImg from "../assets/images/photos/screw.png";
   .bg-overlay {
     position: absolute;
     inset: 0;
-    /* hero scrim */
     background: linear-gradient(
       to bottom,
       rgba(15, 23, 42, 0.15) 0%,   
@@ -329,45 +311,6 @@ import screwImg from "../assets/images/photos/screw.png";
     margin-top: 10vh;
   }
 
-  /* contextual asset containers */
-  .contextual-asset-wrap {
-    position: absolute;
-    inset: 0;
-    overflow: hidden;
-    pointer-events: none;
-    z-index: 1;
-  }
-
-  .contextual-asset {
-    position: absolute;
-    max-width: 220px;
-    width: clamp(140px, 16vw, 200px);
-    height: auto;
-    opacity: 0;
-    transform: translateY(40px);
-    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-    filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.12));
-    will-change: transform, opacity;
-  }
-
-  /* revealed only when section enters viewport */
-  .is-visible .contextual-asset,
-  .is-revealed .contextual-asset {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  /* placement within parent section */
-  .asset-multimeter {
-    right: -20px;
-    top: 15%;
-  }
-
-  .asset-tool {
-    right: -20px;
-    top: 15%;
-  }
-
   /* section anchor offsets */
   #services,
   #projects,
@@ -386,7 +329,6 @@ import screwImg from "../assets/images/photos/screw.png";
   .hero-title {
     margin-bottom: var(--space-md);
     --text-display-xl: clamp(3.2rem, 5.2vw, 5.64rem);
-    /* title shadow */
     text-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.6);
   }
 
@@ -398,10 +340,10 @@ import screwImg from "../assets/images/photos/screw.png";
     margin-left: auto;
     margin-right: auto;
     color: rgba(255, 255, 255, 0.95);
-    /* subtitle shadow */
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
   }
 
+  /* kinetic dual-layer hero buttons */
   .hero-actions {
     display: flex;
     justify-content: center;
@@ -409,54 +351,70 @@ import screwImg from "../assets/images/photos/screw.png";
     margin-top: 32px;
   }
 
-  .btn-hero-primary {
-    background-color: var(--color-brand);
-    color: #fff;
-    border-radius: 50px;
-    padding: 12px 28px;
+  .btn-quote,
+  .btn-explore {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     font-size: 0.85rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     text-decoration: none;
-    transition: background-color 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    cursor: pointer;
+    border-radius: 9999px;
+    padding: 14px 28px;
+    transition: background-color 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+      border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.15s ease;
   }
 
-  .btn-hero-primary:hover {
+  .btn-quote {
     background-color: #d62828;
+    color: #ffffff;
+    border: none;
   }
 
-  .btn-hero-secondary {
-    background-color: transparent;
-    border: 1px solid #ffffff;
-    color: #fff;
-    border-radius: 50px;
-    padding: 12px 28px;
-    font-size: 0.85rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    text-decoration: none;
-    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  .btn-quote:hover {
+    background-color: #b01e1e;
   }
 
-  .btn-hero-secondary:hover {
-    background-color: #ffffff;
-    color: #0f172a;
+  .btn-explore {
+    background: transparent;
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.25);
   }
 
-  /* force natural document flow on content sections */
-  .credibility-strip,
-  .section-logos,
-  .editorial-intro,
-  .editorial-grid {
-    position: relative !important;
-    transform: none !important; /* wipe any rogue inline scroll transforms */
-    z-index: 5;
-    background-color: #ffffff; /* ensure clean contrast against dark hero */
-    opacity: 1 !important; /* failsafe against stalled observers */
-    visibility: visible !important;
-    overflow: visible;
+  .btn-explore:hover {
+    border-color: rgba(255, 255, 255, 0.6);
+  }
+
+  .btn-quote:active,
+  .btn-explore:active {
+    transform: scale(0.97);
+  }
+
+  .btn-roll-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    height: 1.2em;
+    line-height: 1.2em;
+  }
+
+  .btn-roll-primary,
+  .btn-roll-secondary {
+    display: block;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    white-space: nowrap;
+  }
+
+  .btn-quote:hover .btn-roll-primary,
+  .btn-quote:hover .btn-roll-secondary,
+  .btn-explore:hover .btn-roll-primary,
+  .btn-explore:hover .btn-roll-secondary {
+    transform: translateY(-100%);
   }
 
   /* metrics strip */
@@ -590,7 +548,6 @@ import screwImg from "../assets/images/photos/screw.png";
     margin: 0 0 40px 0;
   }
 
-  /* editorial actions */
   .intro-actions {
     display: flex;
     gap: 16px;
@@ -631,28 +588,25 @@ import screwImg from "../assets/images/photos/screw.png";
     line-height: 1.1; 
   }
 
-  /* character split */
   .btn-text-wrapper :global(.char) {
     position: relative;
     display: inline-block;
     transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-    transition-delay: calc(var(--char-index) * 0.015s); /* stagger delay */
+    transition-delay: calc(var(--char-index) * 0.015s);
   }
 
   .btn-text-wrapper :global(.char)::before {
     content: attr(data-char);
     position: absolute;
-    top: 100%; /* hidden state */
+    top: 100%;
     left: 0;
     color: inherit;
   }
 
-  /* hover effect */
   .btn-editorial:hover :global(.char) {
     transform: translateY(-100%);
   }
 
-  /* spec list */
   .spec-list {
     list-style: none;
     padding: 0;
@@ -669,201 +623,211 @@ import screwImg from "../assets/images/photos/screw.png";
     color: #222;
     cursor: pointer;
     transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), color 0.3s ease, background 0.4s ease;
-    opacity: 0;
-    transform: translateY(20px);
-    animation: fadeUpList 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   }
 
   .spec-list li:first-child {
     border-top: 1px solid rgba(0, 0, 0, 0.08);
   }
 
-  /* spec delays */
-  .spec-list li:nth-child(1) { animation-delay: 0.1s; }
-  .spec-list li:nth-child(2) { animation-delay: 0.2s; }
-  .spec-list li:nth-child(3) { animation-delay: 0.3s; }
-  .spec-list li:nth-child(4) { animation-delay: 0.4s; }
-  .spec-list li:nth-child(5) { animation-delay: 0.5s; }
-
-  /* spec hover */
   .spec-list li:hover {
-    transform: translateX(12px) translateY(0);
+    transform: translateX(12px);
     color: var(--color-brand, #d62828);
     background: linear-gradient(90deg, rgba(214, 40, 40, 0.03) 0%, transparent 100%);
   }
 
-  .glow-dot {
+  .spec-dot {
     display: inline-block;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
+    width: 6px;
+    height: 6px;
+    border-radius: 1px;
     background-color: var(--color-brand, #d62828);
-    margin-right: 20px;
-    transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    margin-right: 18px;
+    flex-shrink: 0;
   }
 
-  /* glow dot hover */
-  .spec-list li:hover .glow-dot {
-    width: 28px;
-    border-radius: 4px;
-    background-color: var(--color-brand, #d62828);
-    box-shadow: none;
+  /* asymmetric blueprint matrix */
+  .services-matrix,
+  #services {
+    scroll-margin-top: 100px;
+    padding: 120px 5%;
+    background-color: #0d0e12;
+    color: #ffffff;
+    position: relative;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
   }
 
-  @keyframes fadeUpList {
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+  .matrix-header {
+    max-width: 1400px;
+    margin: 0 auto 48px auto;
   }
 
-  /* services section */
-  .section-services {
-    padding: var(--space-3xl) 0;
-    background-color: var(--color-background);
-  }
-
-  .section-services .section-header {
-    margin-bottom: var(--space-2xl);
-    border-bottom: 1px solid var(--color-border);
-    padding-bottom: var(--space-lg);
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .services-eyebrow {
-    font-size: 0.85rem;
-    font-weight: 700;
-    text-transform: uppercase;
+  .matrix-tag {
+    display: block;
+    font-family: monospace;
+    font-size: 0.8rem;
     letter-spacing: 0.1em;
-    color: var(--color-brand, #d62828);
+    color: #d62828;
+    text-transform: uppercase;
+    margin-bottom: 12px;
   }
 
-  .services-heading {
+  .matrix-title {
     font-size: clamp(2rem, 3.5vw, 3rem);
     font-weight: 700;
-    color: #111;
+    color: #ffffff;
     line-height: 1.15;
     letter-spacing: -0.02em;
     margin: 0;
   }
 
-  .services-subheading {
-    font-size: clamp(1rem, 1.15vw, 1.15rem);
-    color: var(--color-muted, #666);
-    max-width: 720px;
-    line-height: 1.6;
-    margin: 0;
-  }
-
-  .services-grid {
+  .matrix-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    grid-template-columns: repeat(12, 1fr);
     gap: 24px;
-    padding: 24px 0;
     max-width: 1400px;
     margin: 0 auto;
   }
 
-  .service-card {
+  .matrix-card {
+    background-color: #111216;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 36px 28px;
     position: relative;
-    background: #fdfdfd;
-    border: 1px solid rgba(0, 0, 0, 0.06);
-    border-radius: 24px;
-    padding: 40px 32px;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
-    text-decoration: none;
-    overflow: hidden;
-    transition:
-      transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
-      box-shadow 0.5s cubic-bezier(0.22, 1, 0.36, 1),
-      border-color 0.3s ease;
-    will-change: transform;
+    justify-content: space-between;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+      border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  .service-card .card-num,
-  .service-card h3,
-  .service-card p,
-  .service-card .card-action {
+  .matrix-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(255, 255, 255, 0.16);
+  }
+
+  .card-flagship {
+    grid-column: span 7;
+    min-height: 280px;
+  }
+
+  .card-network {
+    grid-column: span 5;
+    min-height: 280px;
+  }
+
+  .card-compact {
+    grid-column: span 4;
+    min-height: 220px;
+  }
+
+  /* corner registration marks */
+  .corner-mark {
+    font-family: monospace;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.18);
+    position: absolute;
+    pointer-events: none;
+    line-height: 1;
+    user-select: none;
+  }
+
+  .corner-mark.top-left {
+    top: 14px;
+    left: 16px;
+  }
+
+  .corner-mark.bottom-right {
+    bottom: 14px;
+    right: 16px;
+  }
+
+  .card-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+
+  .card-index {
+    font-family: monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #d62828;
+    letter-spacing: 0.08em;
+  }
+
+  .card-badge {
+    font-family: monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    color: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 4px 10px;
+    border-radius: 9999px;
+  }
+
+  .card-content {
     position: relative;
     z-index: 2;
   }
 
-  /* card index */
-  .service-card .card-num {
-    font-size: 0.85rem;
+  .card-content h3 {
+    font-size: 1.35rem;
     font-weight: 600;
-    color: var(--color-brand, #d62828);
-    margin-bottom: 24px;
-    letter-spacing: 0.05em;
+    color: #ffffff;
+    line-height: 1.25;
+    margin: 0 0 12px 0;
+    letter-spacing: -0.015em;
   }
 
-  .service-card h3 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #111;
-    line-height: 1.2;
-    margin-bottom: 16px;
-    letter-spacing: -0.02em;
+  .card-flagship .card-content h3,
+  .card-network .card-content h3 {
+    max-width: 75%;
   }
 
-  .service-card p {
-    font-size: 1rem;
-    color: #555;
+  .card-content p {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.65);
     line-height: 1.6;
-    margin-bottom: 32px;
+    margin: 0;
   }
 
-  .service-card:hover {
-    transform: translateY(-6px);
-    border-color: rgba(0, 0, 0, 0.12);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06);
+  .card-flagship .card-content p,
+  .card-network .card-content p {
+    max-width: 72%;
   }
 
-  .service-card::after {
-    content: '';
+  /* docked assets */
+  .docked-tool {
+    pointer-events: none;
+    user-select: none;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .tool-meter {
     position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 3px;
-    background: var(--color-brand, #d62828);
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    bottom: -15px;
+    right: -10px;
+    width: clamp(130px, 16vw, 175px);
+    height: auto;
+    filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.6));
   }
 
-  .service-card:hover::after {
-    transform: scaleX(1);
+  .tool-driver {
+    position: absolute;
+    bottom: -12px;
+    right: -12px;
+    width: clamp(140px, 17vw, 190px);
+    height: auto;
+    filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.6));
   }
 
-  .service-card .card-action {
-    margin-top: auto;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    color: #111;
-    transition: color 0.3s ease;
-  }
-
-  .service-card .card-arrow {
-    display: inline-block;
-    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-
-  .service-card:hover .card-action {
-    color: var(--color-brand, #d62828);
-  }
-
-  .service-card:hover .card-arrow {
-    transform: translateX(6px);
+  .matrix-card:hover .docked-tool {
+    transform: translate3d(-4px, -4px, 0) scale(1.02);
   }
 
   /* section header */
@@ -873,46 +837,10 @@ import screwImg from "../assets/images/photos/screw.png";
     padding-bottom: var(--space-md);
   }
 
-  .btn-secondary {
-    font-size: var(--text-small);
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--color-foreground);
-    border-bottom: 1px solid var(--color-brand);
-    padding-bottom: 4px;
-    transition: color 0.3s;
-  }
-  .btn-secondary:hover {
-    color: var(--color-brand);
-  }
-
   /* projects section */
   .section-projects {
     padding: var(--space-3xl) 0;
     background-color: var(--color-surface);
-  }
-  .project-left {
-    grid-column: span 5;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-  .project-meta {
-    margin-top: var(--space-md);
-    margin-bottom: var(--space-lg);
-  }
-  .project-right {
-    grid-column: 7 / -1;
-  }
-  .project-image {
-    aspect-ratio: 4/3;
-    width: 100%;
-  }
-
-  .mt-md {
-    margin-top: var(--space-md);
-    align-self: flex-start;
   }
 
   /* cta section */
@@ -922,13 +850,16 @@ import screwImg from "../assets/images/photos/screw.png";
     color: white;
     text-align: center;
   }
+
   .cta-actions {
     margin-top: var(--space-2xl);
   }
+
   .section-cta .btn-primary {
     background-color: var(--color-foreground);
     color: var(--color-background);
   }
+
   .section-cta .btn-primary:hover {
     background-color: var(--color-surface);
   }
@@ -943,7 +874,6 @@ import screwImg from "../assets/images/photos/screw.png";
     stroke-width: 60px !important; 
   }
 
-  /* blueprint animation */
   .stats-icon,
   .stats-icon * {
     fill: none !important;
@@ -984,12 +914,13 @@ import screwImg from "../assets/images/photos/screw.png";
 
   /* responsive breakpoints */
   @media (max-width: 1024px) {
-    .contextual-asset-wrap,
-    .contextual-asset {
-      display: none;
+    .card-flagship,
+    .card-network {
+      grid-column: span 12;
     }
-    .services-grid {
-      gap: 20px;
+
+    .card-compact {
+      grid-column: span 6;
     }
   }
 
@@ -998,13 +929,13 @@ import screwImg from "../assets/images/photos/screw.png";
       grid-template-columns: 1fr;
       gap: 48px;
     }
+
     .bg-watermark {
       top: 2%;
     }
   }
 
   @media (max-width: 768px) {
-
     .hero-title {
       font-size: clamp(2rem, 10vw, 3rem) !important;
       word-wrap: break-word;
@@ -1016,6 +947,19 @@ import screwImg from "../assets/images/photos/screw.png";
     .hero-subtitle {
       padding: 0 16px;
       font-size: 1rem;
+    }
+
+    .hero-actions {
+      flex-direction: column;
+      width: 100%;
+      padding: 0 24px;
+      box-sizing: border-box;
+    }
+
+    .btn-quote,
+    .btn-explore {
+      width: 100%;
+      box-sizing: border-box;
     }
 
     .credibility-strip {
@@ -1047,89 +991,103 @@ import screwImg from "../assets/images/photos/screw.png";
       bottom: -15%;
     }
 
-    .services-grid {
-      grid-template-columns: 1fr;
-      gap: 16px;
+    .services-matrix,
+    #services {
+      padding: 80px 16px;
     }
 
-    .service-card {
-      padding: 32px 24px;
+    .matrix-card {
+      padding: 28px 20px;
+    }
+
+    .card-compact {
+      grid-column: span 12;
+    }
+
+    .card-flagship .card-content h3,
+    .card-network .card-content h3,
+    .card-flagship .card-content p,
+    .card-network .card-content p {
+      max-width: 100%;
+    }
+
+    .docked-tool {
+      display: none;
     }
   }
 </style>
 
 <script>
-  let pageScrollHandler: (() => void) | null = null;
-
+  /* reveal failsafe */
   const initSafeReveals = () => {
     const reveals = document.querySelectorAll('.reveal-up');
     if (!reveals.length) return;
 
-    // Fallback: If IntersectionObserver fails or elements are already near the fold, reveal immediately
-    reveals.forEach(el => {
+    reveals.forEach((el) => {
       const rect = el.getBoundingClientRect();
       if (rect.top < window.innerHeight) {
         el.classList.add('is-visible');
       }
     });
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('is-visible');
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { 
-      threshold: 0.05, /* trigger as soon as 5% is on screen */
-      rootMargin: '50px 0px' /* trigger slightly before entering viewport */
-    });
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      {
+        threshold: 0.05,
+        rootMargin: '50px 0px',
+      }
+    );
 
-    reveals.forEach(el => observer.observe(el));
+    reveals.forEach((el) => {
+      if (!el.classList.contains('is-visible')) {
+        observer.observe(el);
+      }
+    });
   };
 
   const initPage = () => {
-    // scroll handler teardown
-    if (pageScrollHandler) {
-      window.removeEventListener("scroll", pageScrollHandler);
-      pageScrollHandler = null;
-    }
-
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     // button character split
-    document.querySelectorAll(".hover-stagger .btn-text-wrapper").forEach((wrapper) => {
-      if (wrapper.getAttribute("data-initialized")) return;
-      const text = wrapper.textContent?.trim() || "";
-      wrapper.innerHTML = "";
-      text.split("").forEach((char, i) => {
-        const span = document.createElement("span");
-        span.className = "char";
-        if (char === " ") {
-          span.innerHTML = "&nbsp;";
-          span.dataset.char = "";
+    document.querySelectorAll('.hover-stagger .btn-text-wrapper').forEach((wrapper) => {
+      if (wrapper.getAttribute('data-initialized')) return;
+      const text = wrapper.textContent?.trim() || '';
+      wrapper.innerHTML = '';
+      text.split('').forEach((char, i) => {
+        const span = document.createElement('span');
+        span.className = 'char';
+        if (char === ' ') {
+          span.innerHTML = '&nbsp;';
+          span.dataset.char = '';
         } else {
           span.textContent = char;
           span.dataset.char = char;
         }
-        span.style.setProperty("--char-index", String(i));
+        span.style.setProperty('--char-index', String(i));
         wrapper.appendChild(span);
       });
-      wrapper.setAttribute("data-initialized", "true");
+      wrapper.setAttribute('data-initialized', 'true');
     });
 
     // failsafe scroll reveal
     initSafeReveals();
 
     // svg icon draw
-    const credibilityStrip = document.querySelector(".credibility-strip");
-    const svgIcons = document.querySelectorAll(".stats-icon");
+    const credibilityStrip = document.querySelector('.credibility-strip');
+    const svgIcons = document.querySelectorAll('.stats-icon');
 
     if (credibilityStrip && svgIcons.length > 0) {
       if (prefersReducedMotion) {
         svgIcons.forEach((svg) => {
-          const accent = svg.querySelector<HTMLElement>(".draw-accent");
-          if (accent) accent.style.opacity = "1";
+          const accent = svg.querySelector<HTMLElement>('.draw-accent');
+          if (accent) accent.style.opacity = '1';
         });
       } else {
         const svgAnimations: Array<{
@@ -1139,10 +1097,10 @@ import screwImg from "../assets/images/photos/screw.png";
         }> = [];
 
         svgIcons.forEach((svg) => {
-          const paths = svg.querySelectorAll<SVGGeometryElement>(".draw-path");
-          const accent = svg.querySelector<HTMLElement>(".draw-accent");
+          const paths = svg.querySelectorAll<SVGGeometryElement>('.draw-path');
+          const accent = svg.querySelector<HTMLElement>('.draw-accent');
 
-          if (accent) accent.style.opacity = "0";
+          if (accent) accent.style.opacity = '0';
 
           const pathData = Array.from(paths).map((path) => {
             const length = path.getTotalLength();
@@ -1166,13 +1124,13 @@ import screwImg from "../assets/images/photos/screw.png";
           iconData.paths.forEach((p) => {
             const duration = Math.max(250, (p.length / totalLength) * totalDuration);
             p.el.style.transition = `stroke-dashoffset ${duration}ms cubic-bezier(0.22, 1, 0.36, 1) ${currentDelay}ms`;
-            p.el.style.strokeDashoffset = "0";
+            p.el.style.strokeDashoffset = '0';
             currentDelay += duration - 80;
           });
 
           if (iconData.accent) {
             iconData.accent.style.transition = `opacity 400ms ease ${currentDelay}ms`;
-            iconData.accent.style.opacity = "1";
+            iconData.accent.style.opacity = '1';
           }
         };
 
@@ -1189,68 +1147,20 @@ import screwImg from "../assets/images/photos/screw.png";
               }
             });
           },
-          { threshold: 0.35 },
+          { threshold: 0.35 }
         );
 
         statsObserver.observe(credibilityStrip);
       }
     }
-
-    // unified scroll engine
-    if (!prefersReducedMotion && window.innerWidth >= 768) {
-      const heroBg = document.querySelector<HTMLElement>(".hero-bg");
-      const watermark = document.querySelector<HTMLElement>(".bg-watermark");
-      const contextualSections = document.querySelectorAll<HTMLElement>(".has-contextual-asset");
-
-      let ticking = false;
-
-      const updateScroll = () => {
-        const scrolled = window.scrollY;
-
-        if (heroBg && scrolled < window.innerHeight * 1.5) {
-          const yPos = scrolled * 0.35;
-          heroBg.style.transform = `translate3d(0, ${yPos}px, 0) scale(1.15)`;
-        }
-
-        if (watermark && scrolled > 300) {
-          const offset = (scrolled - 300) * -0.15;
-          watermark.style.transform = `translateY(${offset}px)`;
-        }
-
-        // local contextual parallax
-        contextualSections.forEach((section) => {
-          const rect = section.getBoundingClientRect();
-          if (rect.top < window.innerHeight && rect.bottom > 0) {
-            const progress = (window.innerHeight - rect.top) / (window.innerHeight + rect.height);
-            const asset = section.querySelector<HTMLElement>(".contextual-asset");
-            if (asset) {
-              const offset = (progress - 0.5) * -60; // subtle 30px shift
-              asset.style.transform = `translate3d(0, ${offset}px, 0)`;
-            }
-          }
-        });
-
-        ticking = false;
-      };
-
-      pageScrollHandler = () => {
-        if (!ticking) {
-          window.requestAnimationFrame(updateScroll);
-          ticking = true;
-        }
-      };
-
-      window.addEventListener("scroll", pageScrollHandler, { passive: true });
-      updateScroll();
-    }
   };
 
-  document.addEventListener("DOMContentLoaded", initPage);
-  document.addEventListener("astro:page-load", initPage);
-  document.addEventListener("DOMContentLoaded", initSafeReveals);
-  document.addEventListener("astro:page-load", initSafeReveals);
+  document.addEventListener('DOMContentLoaded', initPage);
+  document.addEventListener('astro:page-load', initPage);
+  document.addEventListener('DOMContentLoaded', initSafeReveals);
+  document.addEventListener('astro:page-load', initSafeReveals);
 
-  if (document.readyState === "interactive" || document.readyState === "complete") {
+  if (document.readyState === 'interactive' || document.readyState === 'complete') {
     initPage();
     initSafeReveals();
   }
