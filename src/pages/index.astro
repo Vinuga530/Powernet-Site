@@ -5,8 +5,6 @@ import heroImg from "../assets/images/photos/compress bg.webp";
 import ProjectsGallery from "../components/ProjectsGallery.astro";
 import contractIcon from "../assets/images/icons/contract.svg";
 import mapIcon from "../assets/images/icons/map.svg";
-import meterImg from "../assets/images/photos/meter.png";
-import screwImg from "../assets/images/photos/screw.png";
 ---
 
 <BaseLayout title="Powernet (Pvt) Ltd | Power and Infrastructure Solutions">
@@ -43,20 +41,10 @@ import screwImg from "../assets/images/photos/screw.png";
           critical operations.
         </p>
 
-        <!-- kinetic dual-layer hero cta buttons -->
+        <!-- hero cta buttons -->
         <div class="hero-actions fade-in stagger-5">
-          <a href="/contact" class="btn-quote">
-            <span class="btn-roll-wrapper">
-              <span class="btn-roll-primary">GET A QUOTE</span>
-              <span class="btn-roll-secondary" aria-hidden="true">GET A QUOTE</span>
-            </span>
-          </a>
-          <a href="/projects" class="btn-explore">
-            <span class="btn-roll-wrapper">
-              <span class="btn-roll-primary">EXPLORE PRODUCTS</span>
-              <span class="btn-roll-secondary" aria-hidden="true">EXPLORE PRODUCTS</span>
-            </span>
-          </a>
+          <a href="/contact" class="btn-quote">Get a Quote</a>
+          <a href="/projects" class="btn-explore">Explore Products</a>
         </div>
       </div>
     </div>
@@ -130,50 +118,44 @@ import screwImg from "../assets/images/photos/screw.png";
     </div>
   </section>
 
-  <!-- asymmetric blueprint matrix -->
+  <!-- services matrix -->
   <section id="services" class="services-matrix scroll-reveal reveal-up">
     <div class="matrix-header">
-      <span class="matrix-tag">02 // CAPABILITIES</span>
-      <h2 class="matrix-title">Engineered for Zero Downtime.</h2>
+      <span class="matrix-tag">Our Services</span>
+      <h2 class="matrix-title">Electrical and Network Infrastructure.</h2>
     </div>
 
     <div class="matrix-grid">
-      <!-- 01 Flagship Power (Span 7) -->
+      <!-- 01 Backup Power (Span 7) -->
       <article class="matrix-card card-flagship">
-        <div class="corner-mark top-left">+</div>
-        <div class="corner-mark bottom-right">+</div>
         <div class="card-meta">
           <span class="card-index">01</span>
-          <span class="card-badge">TIER III COMPLIANT</span>
+          <span class="card-badge">Backup Power &amp; UPS</span>
         </div>
         <div class="card-content">
-          <h3>Critical Power &amp; UPS Infrastructure</h3>
-          <p>Dual-bus distribution paths, automated switchgear, and transient surge suppression for continuous industrial loads.</p>
+          <h3>Backup Power &amp; Generator Systems</h3>
+          <p>Installation of industrial UPS units, automatic transfer switches, and backup generators for uninterrupted facility power.</p>
         </div>
-        <img src={meterImg.src} alt="" class="docked-tool tool-meter" loading="lazy" />
       </article>
 
-      <!-- 02 Network Backbone (Span 5) -->
+      <!-- 02 Cabling & Fiber (Span 5) -->
       <article class="matrix-card card-network">
-        <div class="corner-mark top-left">+</div>
-        <div class="corner-mark bottom-right">+</div>
         <div class="card-meta">
           <span class="card-index">02</span>
-          <span class="card-badge">SINGLE-MODE FIBER</span>
+          <span class="card-badge">Data &amp; Cabling</span>
         </div>
         <div class="card-content">
-          <h3>High-Density Cabling &amp; Telecom</h3>
-          <p>Structured optical backbones, server containment zones, and certified low-voltage distribution grids.</p>
+          <h3>Structured Cabling &amp; Fiber Networks</h3>
+          <p>Certified Cat6A and single-mode fiber installations, server rack setups, and organized cable management.</p>
         </div>
-        <img src={screwImg.src} alt="" class="docked-tool tool-driver" loading="lazy" />
       </article>
 
-      <!-- 03 SCADA & Automation (Span 4) -->
+      <!-- 03 Substation Automation (Span 4) -->
       <article class="matrix-card card-compact">
         <div class="card-meta"><span class="card-index">03</span></div>
         <div class="card-content">
-          <h3>Substation Automation &amp; SCADA</h3>
-          <p>Real-time phase telemetry, automated load management, and hardened PLC integration.</p>
+          <h3>Substation &amp; Panel Automation</h3>
+          <p>Control panel assembly, power monitoring meters, and regular electrical distribution maintenance.</p>
         </div>
       </article>
 
@@ -181,8 +163,8 @@ import screwImg from "../assets/images/photos/screw.png";
       <article class="matrix-card card-compact">
         <div class="card-meta"><span class="card-index">04</span></div>
         <div class="card-content">
-          <h3>Clean-Agent Fire Suppression</h3>
-          <p>Zero-residue gaseous suppression systems integrated with early aspirating smoke telemetry.</p>
+          <h3>Server Room Fire Protection</h3>
+          <p>FM-200 clean-agent gas fire suppression systems and high-sensitivity smoke detection units.</p>
         </div>
       </article>
 
@@ -190,23 +172,15 @@ import screwImg from "../assets/images/photos/screw.png";
       <article class="matrix-card card-compact">
         <div class="card-meta"><span class="card-index">05</span></div>
         <div class="card-content">
-          <h3>Biometric Access &amp; Surveillance</h3>
-          <p>Perimeter zoning, optical access barriers, and tamper-evident surveillance infrastructure.</p>
+          <h3>Security &amp; Access Control</h3>
+          <p>Door access controllers, biometric security turnstiles, and IP surveillance cameras.</p>
         </div>
       </article>
     </div>
   </section>
 
-  <!-- featured projects showcase -->
-  <section id="projects" class="section-projects scroll-reveal reveal-up">
-    <div class="container">
-      <div class="section-header fade-in">
-        <span class="text-label">Our Success Stories</span>
-      </div>
-
-      <ProjectsGallery />
-    </div>
-  </section>
+  <!-- projects showcase -->
+  <ProjectsGallery />
 
   <!-- contact section -->
   <section id="contact" class="section-cta scroll-reveal reveal-up">
@@ -239,7 +213,7 @@ import screwImg from "../assets/images/photos/screw.png";
   #services,
   .services-matrix,
   #projects,
-  .section-projects {
+  .projects-pin-wrap {
     position: relative !important;
     transform: none !important;
   }
@@ -343,7 +317,7 @@ import screwImg from "../assets/images/photos/screw.png";
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
   }
 
-  /* kinetic dual-layer hero buttons */
+  /* hero cta buttons */
   .hero-actions {
     display: flex;
     justify-content: center;
@@ -351,28 +325,20 @@ import screwImg from "../assets/images/photos/screw.png";
     margin-top: 32px;
   }
 
-  .btn-quote,
-  .btn-explore {
+  .btn-quote {
+    background: #d62828;
+    color: #ffffff;
+    border: none;
+    border-radius: 9999px;
+    padding: 14px 28px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.85rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    text-decoration: none;
     cursor: pointer;
-    border-radius: 9999px;
-    padding: 14px 28px;
-    transition: background-color 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-      border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-      transform 0.15s ease;
-  }
-
-  .btn-quote {
-    background-color: #d62828;
-    color: #ffffff;
-    border: none;
+    transition: background-color 0.2s ease, transform 0.15s ease;
   }
 
   .btn-quote:hover {
@@ -382,39 +348,27 @@ import screwImg from "../assets/images/photos/screw.png";
   .btn-explore {
     background: transparent;
     color: #ffffff;
-    border: 1px solid rgba(255, 255, 255, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 9999px;
+    padding: 14px 28px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.15s ease;
   }
 
   .btn-explore:hover {
     border-color: rgba(255, 255, 255, 0.6);
+    background-color: rgba(255, 255, 255, 0.05);
   }
 
   .btn-quote:active,
   .btn-explore:active {
     transform: scale(0.97);
-  }
-
-  .btn-roll-wrapper {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    height: 1.2em;
-    line-height: 1.2em;
-  }
-
-  .btn-roll-primary,
-  .btn-roll-secondary {
-    display: block;
-    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    white-space: nowrap;
-  }
-
-  .btn-quote:hover .btn-roll-primary,
-  .btn-quote:hover .btn-roll-secondary,
-  .btn-explore:hover .btn-roll-primary,
-  .btn-explore:hover .btn-roll-secondary {
-    transform: translateY(-100%);
   }
 
   /* metrics strip */
@@ -645,37 +599,37 @@ import screwImg from "../assets/images/photos/screw.png";
     flex-shrink: 0;
   }
 
-  /* asymmetric blueprint matrix */
+  /* grounded services matrix */
   .services-matrix,
   #services {
     scroll-margin-top: 100px;
+    background: #0b0c10;
     padding: 120px 5%;
-    background-color: #0d0e12;
-    color: #ffffff;
+    max-width: 1400px;
+    margin: 0 auto;
+    box-sizing: border-box;
     position: relative;
     border-top: 1px solid rgba(255, 255, 255, 0.08);
   }
 
   .matrix-header {
-    max-width: 1400px;
-    margin: 0 auto 48px auto;
+    margin-bottom: 48px;
   }
 
   .matrix-tag {
-    display: block;
-    font-family: monospace;
-    font-size: 0.8rem;
-    letter-spacing: 0.1em;
     color: #d62828;
+    font-size: 0.85rem;
+    font-weight: 600;
     text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: block;
     margin-bottom: 12px;
   }
 
   .matrix-title {
-    font-size: clamp(2rem, 3.5vw, 3rem);
-    font-weight: 700;
     color: #ffffff;
-    line-height: 1.15;
+    font-size: clamp(2rem, 3.2vw, 2.8rem);
+    font-weight: 700;
     letter-spacing: -0.02em;
     margin: 0;
   }
@@ -684,22 +638,20 @@ import screwImg from "../assets/images/photos/screw.png";
     display: grid;
     grid-template-columns: repeat(12, 1fr);
     gap: 24px;
-    max-width: 1400px;
-    margin: 0 auto;
+    width: 100%;
   }
 
   .matrix-card {
-    background-color: #111216;
+    background: #111216;
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 16px;
-    padding: 36px 28px;
-    position: relative;
-    overflow: hidden;
+    padding: 36px 30px;
+    min-height: 280px;
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-      border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform 0.3s ease, border-color 0.3s ease;
   }
 
   .matrix-card:hover {
@@ -709,38 +661,14 @@ import screwImg from "../assets/images/photos/screw.png";
 
   .card-flagship {
     grid-column: span 7;
-    min-height: 280px;
   }
 
   .card-network {
     grid-column: span 5;
-    min-height: 280px;
   }
 
   .card-compact {
     grid-column: span 4;
-    min-height: 220px;
-  }
-
-  /* corner registration marks */
-  .corner-mark {
-    font-family: monospace;
-    font-size: 13px;
-    color: rgba(255, 255, 255, 0.18);
-    position: absolute;
-    pointer-events: none;
-    line-height: 1;
-    user-select: none;
-  }
-
-  .corner-mark.top-left {
-    top: 14px;
-    left: 16px;
-  }
-
-  .corner-mark.bottom-right {
-    bottom: 14px;
-    right: 16px;
   }
 
   .card-meta {
@@ -751,28 +679,20 @@ import screwImg from "../assets/images/photos/screw.png";
   }
 
   .card-index {
-    font-family: monospace;
     font-size: 0.85rem;
     font-weight: 600;
     color: #d62828;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.05em;
   }
 
   .card-badge {
-    font-family: monospace;
-    font-size: 0.7rem;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    color: rgba(255, 255, 255, 0.7);
     background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.7);
+    border-radius: 6px;
     padding: 4px 10px;
-    border-radius: 9999px;
-  }
-
-  .card-content {
-    position: relative;
-    z-index: 2;
+    font-size: 0.75rem;
+    font-weight: 500;
   }
 
   .card-content h3 {
@@ -784,63 +704,11 @@ import screwImg from "../assets/images/photos/screw.png";
     letter-spacing: -0.015em;
   }
 
-  .card-flagship .card-content h3,
-  .card-network .card-content h3 {
-    max-width: 75%;
-  }
-
   .card-content p {
     font-size: 0.95rem;
     color: rgba(255, 255, 255, 0.65);
     line-height: 1.6;
     margin: 0;
-  }
-
-  .card-flagship .card-content p,
-  .card-network .card-content p {
-    max-width: 72%;
-  }
-
-  /* docked assets */
-  .docked-tool {
-    pointer-events: none;
-    user-select: none;
-    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .tool-meter {
-    position: absolute;
-    bottom: -15px;
-    right: -10px;
-    width: clamp(130px, 16vw, 175px);
-    height: auto;
-    filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.6));
-  }
-
-  .tool-driver {
-    position: absolute;
-    bottom: -12px;
-    right: -12px;
-    width: clamp(140px, 17vw, 190px);
-    height: auto;
-    filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.6));
-  }
-
-  .matrix-card:hover .docked-tool {
-    transform: translate3d(-4px, -4px, 0) scale(1.02);
-  }
-
-  /* section header */
-  .section-header {
-    margin-bottom: var(--space-2xl);
-    border-bottom: 1px solid var(--color-border);
-    padding-bottom: var(--space-md);
-  }
-
-  /* projects section */
-  .section-projects {
-    padding: var(--space-3xl) 0;
-    background-color: var(--color-surface);
   }
 
   /* cta section */
@@ -990,10 +858,12 @@ import screwImg from "../assets/images/photos/screw.png";
       right: -5%;
       bottom: -15%;
     }
+  }
 
+  @media (max-width: 640px) {
     .services-matrix,
     #services {
-      padding: 80px 16px;
+      padding: 80px 20px;
     }
 
     .matrix-card {
@@ -1002,17 +872,6 @@ import screwImg from "../assets/images/photos/screw.png";
 
     .card-compact {
       grid-column: span 12;
-    }
-
-    .card-flagship .card-content h3,
-    .card-network .card-content h3,
-    .card-flagship .card-content p,
-    .card-network .card-content p {
-      max-width: 100%;
-    }
-
-    .docked-tool {
-      display: none;
     }
   }
 </style>
@@ -1055,7 +914,7 @@ import screwImg from "../assets/images/photos/screw.png";
   const initPage = () => {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    // button character split
+    /* button character split */
     document.querySelectorAll('.hover-stagger .btn-text-wrapper').forEach((wrapper) => {
       if (wrapper.getAttribute('data-initialized')) return;
       const text = wrapper.textContent?.trim() || '';
@@ -1076,10 +935,10 @@ import screwImg from "../assets/images/photos/screw.png";
       wrapper.setAttribute('data-initialized', 'true');
     });
 
-    // failsafe scroll reveal
+    /* failsafe scroll reveal */
     initSafeReveals();
 
-    // svg icon draw
+    /* svg icon draw */
     const credibilityStrip = document.querySelector('.credibility-strip');
     const svgIcons = document.querySelectorAll('.stats-icon');
 

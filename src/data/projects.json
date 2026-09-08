@@ -1,48 +1,45 @@
 [
   {
-    "id": "PRJ-01",
+    "id": "Project 01",
     "client": "The World Bank Sri Lanka",
-    "title": "Mission-Critical Power & High-Density Integration",
-    "category": "Data & Critical Power",
+    "title": "Server Room Power & UPS Installation",
+    "category": "Electrical & UPS",
     "year": "2024",
     "image": "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1600&q=80",
-    "summary": "Full turnkey deployment of high-density server rack infrastructure, redundant power pathways, and precision climate control systems.",
+    "summary": "Installed dedicated distribution panels, redundant UPS systems, and structured network drops across the main office.",
     "specs": [
-      "Redundant Tier III Dual-Bus Architecture",
-      "Automated Transfer Switching & SCADA Monitoring",
-      "Sub-millisecond Failover SLA",
-      "Zero-Downtime Live Migration Execution"
-    ],
-    "scope": "Electrical, Structured Cabling, Thermal Management"
+      "Redundant UPS power backup",
+      "Automatic transfer switches",
+      "Server rack layout & cabling",
+      "Zero-downtime cutover"
+    ]
   },
   {
-    "id": "PRJ-02",
-    "client": "National Financial Center",
-    "title": "Core Optical Backbone & Secure Access Zoning",
-    "category": "Network & Telecom",
+    "id": "Project 02",
+    "client": "Commercial Bank Center",
+    "title": "Fiber Backbone & Access Setup",
+    "category": "Network Infrastructure",
     "year": "2023",
     "image": "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=1600&q=80",
-    "summary": "Multi-gigabit optical distribution network with perimeter-grade biometric access control and continuous environmental monitoring.",
+    "summary": "Ran multi-floor fiber cables, installed patch panels, and configured card access for secure server rooms.",
     "specs": [
-      "40G Optical Single-Mode Core Backbone",
-      "Encrypted Biometric Zoning Protocols",
-      "Integrated Clean-Agent Fire Suppression Link"
-    ],
-    "scope": "Fiber Optics, Access Control, CCTV Surveillance"
+      "Multi-strand fiber lines",
+      "Keycard door controllers",
+      "Centralized equipment racks"
+    ]
   },
   {
-    "id": "PRJ-03",
-    "client": "Regional Industrial Grid",
-    "title": "High-Voltage Substation Automation & Telemetry",
+    "id": "Project 03",
+    "client": "Industrial Processing Facility",
+    "title": "Factory Electrical Distribution",
     "category": "Power Systems",
     "year": "2023",
     "image": "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1600&q=80",
-    "summary": "Comprehensive power monitoring and industrial transient surge suppression for primary utility distribution junctions.",
+    "summary": "Installed heavy industrial breaker panels, motor power lines, and surge suppression gear.",
     "specs": [
-      "Real-time Three-Phase Telemetry Grid",
-      "Heavy-Duty Industrial Surge Suppression (TVSS)",
-      "IP66-Rated Hardened Environmental Enclosures"
-    ],
-    "scope": "High Voltage Distribution, Telemetry, Power Quality"
+      "Main distribution board assembly",
+      "Surge protection devices",
+      "Weatherproof conduit runs"
+    ]
   }
 ]

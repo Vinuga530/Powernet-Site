@@ -152,7 +152,7 @@ const navItems = [
 
   #main-header.is-scrolled {
     transform: translateY(0);
-    background-color: rgba(13, 14, 18, 0.92);
+    background-color: rgba(13, 14, 18, 0.94);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
@@ -597,7 +597,7 @@ const navItems = [
       const currentScrollY = window.scrollY;
       const delta = currentScrollY - lastScrollY;
 
-      // drawer open lock
+      /* drawer open lock */
       if (isMenuOpen) {
         lastScrollY = currentScrollY;
         ticking = false;
@@ -605,18 +605,18 @@ const navItems = [
       }
 
       if (currentScrollY < 20) {
-        // page top
+        /* page top */
         header.classList.remove("is-hidden");
         header.classList.remove("is-scrolled");
         header.classList.add("is-top");
       } else {
         header.classList.remove("is-top");
         if (delta > 0 && currentScrollY > 80) {
-          // scroll down past 80px
+          /* scroll down past 80px */
           header.classList.add("is-hidden");
           header.classList.remove("is-scrolled");
         } else if (delta < 0) {
-          // scroll up
+          /* scroll up */
           header.classList.remove("is-hidden");
           header.classList.add("is-scrolled");
         }
@@ -626,7 +626,7 @@ const navItems = [
       ticking = false;
     };
 
-    // initial state on load
+    /* initial state on load */
     if (window.scrollY < 20) {
       header.classList.add("is-top");
       header.classList.remove("is-scrolled", "is-hidden");
@@ -644,7 +644,7 @@ const navItems = [
 
     window.addEventListener("scroll", headerScrollHandler, { passive: true });
 
-    // mobile drawer toggle
+    /* mobile drawer toggle */
     if (menuBtn && mobileNav) {
       const toggleMenu = (open?: boolean) => {
         const willOpen = typeof open === "boolean" ? open : !isMenuOpen;
@@ -670,7 +670,7 @@ const navItems = [
         };
       });
 
-      // backdrop click close
+      /* backdrop click close */
       document.addEventListener("click", (e) => {
         if (isMenuOpen && !mobileNav.contains(e.target as Node) && !menuBtn.contains(e.target as Node)) {
           toggleMenu(false);
