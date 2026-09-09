@@ -6,12 +6,9 @@
 
 html,
 body {
+  background-color: #ffffff;
+  color: #111216;
   overflow-x: clip; /* horizontal clip */
-}
-
-body {
-  background-color: var(--color-background);
-  color: var(--color-foreground);
   font-family: var(--font-sans);
 }
 
