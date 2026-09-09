@@ -118,64 +118,99 @@ import mapIcon from "../assets/images/icons/map.svg";
     </div>
   </section>
 
-  <!-- services matrix -->
-  <section id="services" class="services-matrix scroll-reveal reveal-up">
-    <div class="matrix-header">
-      <span class="matrix-tag">Our Services</span>
-      <h2 class="matrix-title">Electrical and Network Infrastructure.</h2>
+  <section id="services" class="services-spec-section">
+    <div class="services-spec-header">
+      <span class="section-kicker">Core Capabilities</span>
+      <h2 class="section-headline">Electrical & Network Infrastructure</h2>
     </div>
 
-    <div class="matrix-grid">
-      <!-- 01 Backup Power (Span 7) -->
-      <article class="matrix-card card-flagship">
-        <div class="card-meta">
-          <span class="card-index">01</span>
-          <span class="card-badge">Backup Power &amp; UPS</span>
+    <div class="hairline-matrix">
+      <!-- 01 Power -->
+      <div class="matrix-cell cell-wide">
+        <div class="cell-top">
+          <span class="cell-num">01</span>
+          <span class="cell-label">Power & Backup</span>
         </div>
-        <div class="card-content">
-          <h3>Backup Power &amp; Generator Systems</h3>
-          <p>Installation of industrial UPS units, automatic transfer switches, and backup generators for uninterrupted facility power.</p>
+        <div class="cell-body">
+          <h3>Backup Power & Industrial UPS</h3>
+          <p>Three-phase industrial UPS installations, automatic transfer switches (ATS), and generator synchronization for facilities requiring zero cutover loss.</p>
+          <div class="cell-deliverables">
+            <span>Industrial UPS Systems</span>
+            <span>Automatic Transfer Switches</span>
+            <span>Distribution Boards</span>
+            <span>Surge Suppression (TVSS)</span>
+          </div>
         </div>
-      </article>
+      </div>
 
-      <!-- 02 Cabling & Fiber (Span 5) -->
-      <article class="matrix-card card-network">
-        <div class="card-meta">
-          <span class="card-index">02</span>
-          <span class="card-badge">Data &amp; Cabling</span>
+      <!-- 02 Network -->
+      <div class="matrix-cell cell-wide">
+        <div class="cell-top">
+          <span class="cell-num">02</span>
+          <span class="cell-label">Data & Fiber</span>
         </div>
-        <div class="card-content">
-          <h3>Structured Cabling &amp; Fiber Networks</h3>
-          <p>Certified Cat6A and single-mode fiber installations, server rack setups, and organized cable management.</p>
+        <div class="cell-body">
+          <h3>Structured Cabling & Fiber Optics</h3>
+          <p>Certified Cat6A horizontal cabling, single-mode optical trunk runs, server rack cable containment, and multi-cabinet patch management.</p>
+          <div class="cell-deliverables">
+            <span>Single-Mode & OM4 Fiber</span>
+            <span>Cat6A Certified Runs</span>
+            <span>Server Rack Integration</span>
+            <span>Fluke Testing & Certification</span>
+          </div>
         </div>
-      </article>
+      </div>
 
-      <!-- 03 Substation Automation (Span 4) -->
-      <article class="matrix-card card-compact">
-        <div class="card-meta"><span class="card-index">03</span></div>
-        <div class="card-content">
-          <h3>Substation &amp; Panel Automation</h3>
-          <p>Control panel assembly, power monitoring meters, and regular electrical distribution maintenance.</p>
+      <!-- 03 SCADA -->
+      <div class="matrix-cell">
+        <div class="cell-top">
+          <span class="cell-num">03</span>
+          <span class="cell-label">Control</span>
         </div>
-      </article>
+        <div class="cell-body">
+          <h3>Automation & Switchgear</h3>
+          <p>Custom control panel design, digital power metering meters, PLC programming, and routine plant switchgear maintenance.</p>
+          <div class="cell-deliverables">
+            <span>Control Panels</span>
+            <span>Power Quality Meters</span>
+            <span>PLC Integration</span>
+          </div>
+        </div>
+      </div>
 
-      <!-- 04 Fire Suppression (Span 4) -->
-      <article class="matrix-card card-compact">
-        <div class="card-meta"><span class="card-index">04</span></div>
-        <div class="card-content">
+      <!-- 04 Fire -->
+      <div class="matrix-cell">
+        <div class="cell-top">
+          <span class="cell-num">04</span>
+          <span class="cell-label">Safety</span>
+        </div>
+        <div class="cell-body">
           <h3>Server Room Fire Protection</h3>
-          <p>FM-200 clean-agent gas fire suppression systems and high-sensitivity smoke detection units.</p>
+          <p>Zero-residue FM-200 and Novec 1230 clean-agent fire suppression systems paired with high-sensitivity aspirating smoke detectors.</p>
+          <div class="cell-deliverables">
+            <span>FM-200 Clean Agent</span>
+            <span>Aspirating Smoke Sensors</span>
+            <span>Panel Alarms</span>
+          </div>
         </div>
-      </article>
+      </div>
 
-      <!-- 05 Security (Span 4) -->
-      <article class="matrix-card card-compact">
-        <div class="card-meta"><span class="card-index">05</span></div>
-        <div class="card-content">
-          <h3>Security &amp; Access Control</h3>
-          <p>Door access controllers, biometric security turnstiles, and IP surveillance cameras.</p>
+      <!-- 05 Security -->
+      <div class="matrix-cell">
+        <div class="cell-top">
+          <span class="cell-num">05</span>
+          <span class="cell-label">Access</span>
         </div>
-      </article>
+        <div class="cell-body">
+          <h3>Access Control & Surveillance</h3>
+          <p>Biometric door controllers, turnstile lane controls, and centralized IP-based high-definition surveillance infrastructure.</p>
+          <div class="cell-deliverables">
+            <span>Biometric Turnstiles</span>
+            <span>Access Control Panels</span>
+            <span>IP Surveillance Systems</span>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -211,7 +246,7 @@ import mapIcon from "../assets/images/icons/map.svg";
   .credibility-strip,
   .editorial-intro,
   #services,
-  .services-matrix,
+  .services-spec-section,
   #projects,
   .projects-pin-wrap {
     position: relative !important;
@@ -599,116 +634,143 @@ import mapIcon from "../assets/images/icons/map.svg";
     flex-shrink: 0;
   }
 
-  /* grounded services matrix */
-  .services-matrix,
-  #services {
-    scroll-margin-top: 100px;
-    background: #0b0c10;
+  /* architectural monolithic grid */
+  .services-spec-section {
     padding: 120px 5%;
-    max-width: 1400px;
+    max-width: 1440px;
     margin: 0 auto;
-    box-sizing: border-box;
-    position: relative;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    background-color: #0b0c10;
   }
 
-  .matrix-header {
+  .services-spec-header {
     margin-bottom: 48px;
   }
 
-  .matrix-tag {
-    color: #d62828;
+  .section-kicker {
     font-size: 0.85rem;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.08em;
+    color: #d62828;
     display: block;
     margin-bottom: 12px;
   }
 
-  .matrix-title {
-    color: #ffffff;
+  .section-headline {
     font-size: clamp(2rem, 3.2vw, 2.8rem);
     font-weight: 700;
+    color: #ffffff;
     letter-spacing: -0.02em;
-    margin: 0;
   }
 
-  .matrix-grid {
+  /* shared hairline borders */
+  .hairline-matrix {
     display: grid;
-    grid-template-columns: repeat(12, 1fr);
-    gap: 24px;
-    width: 100%;
+    grid-template-columns: repeat(6, 1fr);
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    border-left: 1px solid rgba(255, 255, 255, 0.12);
+    background-color: #0b0c10;
   }
 
-  .matrix-card {
-    background: #111216;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 16px;
-    padding: 36px 30px;
-    min-height: 280px;
-    box-sizing: border-box;
+  .matrix-cell {
+    grid-column: span 2;
+    border-right: 1px solid rgba(255, 255, 255, 0.12);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 40px 32px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    transition: transform 0.3s ease, border-color 0.3s ease;
+    min-height: 320px;
+    transition: background-color 0.25s ease;
   }
 
-  .matrix-card:hover {
-    transform: translateY(-4px);
-    border-color: rgba(255, 255, 255, 0.16);
+  .matrix-cell:hover {
+    background-color: rgba(255, 255, 255, 0.02);
   }
 
-  .card-flagship {
-    grid-column: span 7;
+  .cell-wide {
+    grid-column: span 3;
   }
 
-  .card-network {
-    grid-column: span 5;
-  }
-
-  .card-compact {
-    grid-column: span 4;
-  }
-
-  .card-meta {
+  /* cell metadata */
+  .cell-top {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    margin-bottom: 24px;
+    align-items: baseline;
+    margin-bottom: 32px;
   }
 
-  .card-index {
-    font-size: 0.85rem;
+  .cell-num {
+    font-size: 0.9rem;
     font-weight: 600;
     color: #d62828;
-    letter-spacing: 0.05em;
   }
 
-  .card-badge {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    color: rgba(255, 255, 255, 0.7);
-    border-radius: 6px;
-    padding: 4px 10px;
+  .cell-label {
     font-size: 0.75rem;
     font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: rgba(255, 255, 255, 0.4);
   }
 
-  .card-content h3 {
-    font-size: 1.35rem;
+  /* content */
+  .cell-body h3 {
+    font-size: 1.3rem;
     font-weight: 600;
     color: #ffffff;
-    line-height: 1.25;
-    margin: 0 0 12px 0;
-    letter-spacing: -0.015em;
+    margin-bottom: 12px;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
   }
 
-  .card-content p {
-    font-size: 0.95rem;
-    color: rgba(255, 255, 255, 0.65);
+  .cell-body p {
+    font-size: 0.9rem;
+    color: #8c8f96;
     line-height: 1.6;
-    margin: 0;
+    margin-bottom: 28px;
+  }
+
+  /* technical deliverables list */
+  .cell-deliverables {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    padding-top: 20px;
+  }
+
+  .cell-deliverables span {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.65);
+    position: relative;
+  }
+
+  .cell-deliverables span::after {
+    content: "•";
+    margin-left: 12px;
+    color: rgba(255, 255, 255, 0.2);
+  }
+
+  .cell-deliverables span:last-child::after {
+    content: "";
+  }
+
+  /* responsive grid */
+  @media (max-width: 1024px) {
+    .cell-wide, .matrix-cell {
+      grid-column: span 3;
+    }
+  }
+
+  @media (max-width: 680px) {
+    .hairline-matrix {
+      grid-template-columns: 1fr;
+    }
+    .cell-wide, .matrix-cell {
+      grid-column: span 1;
+      padding: 32px 24px;
+    }
   }
 
   /* cta section */
@@ -781,16 +843,6 @@ import mapIcon from "../assets/images/icons/map.svg";
   }
 
   /* responsive breakpoints */
-  @media (max-width: 1024px) {
-    .card-flagship,
-    .card-network {
-      grid-column: span 12;
-    }
-
-    .card-compact {
-      grid-column: span 6;
-    }
-  }
 
   @media (max-width: 992px) {
     .editorial-grid {
@@ -860,20 +912,7 @@ import mapIcon from "../assets/images/icons/map.svg";
     }
   }
 
-  @media (max-width: 640px) {
-    .services-matrix,
-    #services {
-      padding: 80px 20px;
-    }
 
-    .matrix-card {
-      padding: 28px 20px;
-    }
-
-    .card-compact {
-      grid-column: span 12;
-    }
-  }
 </style>
 
 <script>
