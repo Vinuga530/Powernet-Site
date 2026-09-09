@@ -1,18 +1,17 @@
 :root {
   /* palette */
   --color-background: #ffffff;
-  --color-surface: #fafafa;
-  --color-foreground: #111216;
-  --color-muted: #4a4d56;
-  --color-muted-light: #717682;
-  --color-border: rgba(0, 0, 0, 0.08);
+  --color-surface: #f4f4f5;
+  --color-foreground: #09090b;
+  --color-muted: #71717a;
+  --color-border: #e4e4e7;
   
   /* brand accent */
-  --color-brand: #d62828;
-  --color-brand-dark: #b01e1e;
+  --color-brand: #d32f2f;
+  --color-brand-dark: #b71c1c;
   
-  --color-dark-section: #ffffff;
-  --color-dark-foreground: #111216;
+  --color-dark-section: #000000;
+  --color-dark-foreground: #ffffff;
 
   /* spacing scale */
   --space-xs: clamp(0.5rem, 1vw, 0.75rem);

@@ -58,7 +58,7 @@ import projects from '../data/projects.json';
   .projects-pin-wrap {
     position: relative;
     height: 300vh;
-    background: #ffffff;
+    background: #0b0c10;
     scroll-margin-top: 100px;
   }
 
@@ -86,13 +86,13 @@ import projects from '../data/projects.json';
     font-size: 0.85rem;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.05em;
     display: block;
     margin-bottom: 8px;
   }
 
   .projects-title {
-    color: #111216;
+    color: #ffffff;
     font-size: clamp(2rem, 3.2vw, 2.8rem);
     font-weight: 700;
     letter-spacing: -0.02em;
@@ -113,13 +113,13 @@ import projects from '../data/projects.json';
 
   .project-slide {
     flex: 0 0 clamp(340px, 60vw, 760px);
-    background: #ffffff;
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    border-radius: 20px;
+    background: #111216;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
     overflow: hidden;
     display: grid;
     grid-template-columns: 1.1fr 1fr;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
   }
 
   .project-img-box {
@@ -147,14 +147,13 @@ import projects from '../data/projects.json';
     right: 14px;
     font-size: 0.75rem;
     font-weight: 500;
-    color: #111216;
-    background: rgba(255, 255, 255, 0.9);
+    color: #ffffff;
+    background: rgba(13, 14, 18, 0.75);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     padding: 5px 12px;
     border-radius: 9999px;
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     opacity: 0;
     transform: translateY(4px);
     transition: opacity 0.2s ease, transform 0.2s ease;
@@ -179,7 +178,7 @@ import projects from '../data/projects.json';
     align-items: center;
     gap: 8px;
     font-size: 0.8rem;
-    color: #717682;
+    color: rgba(255, 255, 255, 0.6);
     margin-bottom: 12px;
   }
 
@@ -189,20 +188,19 @@ import projects from '../data/projects.json';
   }
 
   .meta-dot {
-    color: rgba(0, 0, 0, 0.2);
+    color: rgba(255, 255, 255, 0.3);
     font-weight: bold;
   }
 
   .project-cat,
   .project-year {
-    color: #717682;
-    font-weight: 500;
+    color: rgba(255, 255, 255, 0.7);
   }
 
   .project-client {
     font-size: 1.35rem;
-    font-weight: 700;
-    color: #111216;
+    font-weight: 600;
+    color: #ffffff;
     margin: 0 0 8px 0;
     letter-spacing: -0.01em;
   }
@@ -210,7 +208,7 @@ import projects from '../data/projects.json';
   .project-desc {
     font-size: 0.95rem;
     line-height: 1.6;
-    color: #555964;
+    color: rgba(255, 255, 255, 0.7);
     margin: 0 0 20px 0;
   }
 
@@ -224,10 +222,9 @@ import projects from '../data/projects.json';
     font-size: 0.75rem;
     padding: 5px 11px;
     border-radius: 6px;
-    background: rgba(0, 0, 0, 0.04);
-    border: 1px solid rgba(0, 0, 0, 0.06);
-    color: #33363f;
-    font-weight: 500;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    color: rgba(255, 255, 255, 0.75);
   }
 
   /* modal lightbox */
@@ -235,9 +232,9 @@ import projects from '../data/projects.json';
     position: fixed;
     inset: 0;
     z-index: 99999;
-    background: rgba(255, 255, 255, 0.94);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    background: rgba(9, 10, 13, 0.9);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -267,15 +264,15 @@ import projects from '../data/projects.json';
   }
 
   .popout-meta {
-    color: #111216;
-    font-size: 0.95rem;
-    font-weight: 600;
+    color: #ffffff;
+    font-size: 0.9rem;
+    font-weight: 500;
   }
 
   .popout-close {
-    background: rgba(0, 0, 0, 0.05);
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    color: #111216;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #fff;
     width: 34px;
     height: 34px;
     border-radius: 50%;
@@ -284,12 +281,11 @@ import projects from '../data/projects.json';
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background-color 0.2s ease, transform 0.15s ease;
+    transition: background-color 0.2s ease;
   }
 
   .popout-close:hover {
-    background: rgba(0, 0, 0, 0.1);
-    transform: scale(1.05);
+    background: rgba(255, 255, 255, 0.18);
   }
 
   .popout-frame {
@@ -297,9 +293,8 @@ import projects from '../data/projects.json';
     max-height: 78vh;
     border-radius: 12px;
     overflow: hidden;
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    background: #ffffff;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: #000;
   }
 
   .popout-frame img {
