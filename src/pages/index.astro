@@ -43,14 +43,10 @@ import mapIcon from "../assets/images/icons/map.svg";
 
         <!-- hero cta buttons -->
         <div class="hero-actions fade-in stagger-5">
-          <a href="/contact" class="btn-quote" aria-label="Get a Quote">
-            <span class="btn-roll-wrapper" aria-hidden="true">
-              {Array.from("Get a Quote").map((letter, index) => (
-                <span class="char-wrap" style={`--char-index:${index}`}>
-                  <span class="char-main">{letter === " " ? "\u00A0" : letter}</span>
-                  <span class="char-clone" aria-hidden="true">{letter === " " ? "\u00A0" : letter}</span>
-                </span>
-              ))}
+          <a href="/quote" class="btn-primary-kinetic" aria-label="Get a Quote">
+            <span class="btn-track" aria-hidden="true">
+              <span class="btn-text btn-text--default">Get a Quote</span>
+              <span class="btn-text btn-text--hover">Get a Quote</span>
             </span>
           </a>
           <a href="/projects" class="btn-explore" aria-label="Explore Products">
@@ -390,25 +386,70 @@ import mapIcon from "../assets/images/icons/map.svg";
     margin-top: 32px;
   }
 
-  .btn-quote {
-    background: #d62828;
-    color: #ffffff;
-    border: none;
-    border-radius: 9999px;
-    padding: 14px 28px;
-    font-weight: 600;
-    font-size: 0.95rem;
-    text-decoration: none;
+  .btn-primary-kinetic {
+    position: relative;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
+    background-color: #a81c1c; /* match your exact brand red */
+    border-radius: 9999px;
+    padding: 14px 32px;
+    height: 48px;
     overflow: hidden;
-    transition: background-color 0.2s ease, transform 0.15s ease;
+    text-decoration: none;
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: background-color 0.25s ease, transform 0.15s ease;
   }
 
-  .btn-quote:hover {
-    background-color: #b01e1e;
+  .btn-primary-kinetic:hover {
+    background-color: #8e1717; /* subtle darker red on hover */
+  }
+
+  .btn-primary-kinetic:active {
+    transform: scale(0.97);
+  }
+
+  /* kinetic vertical text track */
+  .btn-primary-kinetic .btn-track {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    height: 1.2em;
+    line-height: 1.2em;
+    overflow: hidden;
+  }
+
+  .btn-primary-kinetic .btn-text {
+    display: block;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #ffffff !important; /* enforce visible contrast in all states */
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* default layout offset */
+  .btn-primary-kinetic .btn-text--default {
+    transform: translateY(0);
+  }
+
+  .btn-primary-kinetic .btn-text--hover {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    transform: translateY(0);
+  }
+
+  /* hover shift */
+  .btn-primary-kinetic:hover .btn-text--default {
+    transform: translateY(-100%);
+  }
+
+  .btn-primary-kinetic:hover .btn-text--hover {
+    transform: translateY(-100%);
   }
 
   .btn-explore {
@@ -448,18 +489,12 @@ import mapIcon from "../assets/images/icons/map.svg";
       0 12px 36px rgba(0, 0, 0, 0.35);
   }
 
-  .btn-quote:hover :global(.char-main),
   .btn-explore:hover :global(.char-main) {
     transform: translateY(-100%);
   }
 
-  .btn-quote:hover :global(.char-clone),
   .btn-explore:hover :global(.char-clone) {
     transform: translateY(0);
-  }
-
-  .btn-quote:active {
-    transform: scale(0.97);
   }
 
   .btn-explore:active {
