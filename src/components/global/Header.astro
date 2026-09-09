@@ -70,7 +70,7 @@ const navItems = [
       </button>
 
       <div class="header-actions">
-        <a href="#contact" class="kinetic-btn btn-nav-cta" data-text="Let's Talk">Let's Talk</a>
+        <a href="#contact" class="nav-btn-talk">Let's Talk</a>
       </div>
     </div>
   </div>
@@ -90,7 +90,7 @@ const navItems = [
         }
       </ul>
       <div class="mobile-nav-actions">
-        <a href="#contact" class="kinetic-btn btn-nav-cta mobile-cta" data-text="Let's Talk">Let's Talk</a>
+        <a href="#contact" class="nav-btn-talk mobile-cta">Let's Talk</a>
       </div>
     </div>
   </div>
@@ -281,110 +281,64 @@ const navItems = [
     color: var(--color-brand, #e63946);
   }
 
-/* button wrapper lock */
-.kinetic-btn {
-  display: inline-flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  justify-content: center !important;
-  height: 48px !important;
-  max-height: 48px !important;
-  width: auto !important;
-  padding: 0 28px !important;
-  border-radius: 9999px !important;
-  text-decoration: none !important;
-  overflow: hidden !important;
-  position: relative !important;
-  white-space: nowrap !important;
-  box-sizing: border-box !important;
-  user-select: none;
-  transition: background-color 0.25s ease, border-color 0.25s ease, transform 0.15s ease;
+.nav-btn-talk,
+.btn-solid-red {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  padding: 0 28px;
+  border-radius: 9999px;
+  background-color: #d62828;
+  color: #ffffff !important;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  border: none;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: background-color 0.2s ease, transform 0.15s ease;
 }
 
-.kinetic-btn:active {
+.nav-btn-talk:hover,
+.btn-solid-red:hover {
+  background-color: #b91d1d;
+}
+
+.nav-btn-talk:active,
+.btn-solid-red:active {
   transform: scale(0.97);
 }
 
-/* button color themes */
-.btn-nav-cta,
-.btn-primary {
-  background-color: #d62828 !important;
+.btn-frosted {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  padding: 0 28px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   color: #ffffff !important;
-  border: none !important;
-}
-.btn-nav-cta:hover,
-.btn-primary:hover {
-  background-color: #b91d1d !important;
-}
-
-.btn-secondary {
-  background: rgba(255, 255, 255, 0.12) !important;
-  backdrop-filter: blur(16px) saturate(140%) !important;
-  -webkit-backdrop-filter: blur(16px) saturate(140%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.25) !important;
-  color: #ffffff !important;
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3), 0 8px 24px rgba(0, 0, 0, 0.25) !important;
-}
-.btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.18) !important;
-  border-color: rgba(255, 255, 255, 0.45) !important;
-}
-
-/* track layout: strictly horizontal row */
-.char-track {
-  display: inline-flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  height: 20px !important;
-  line-height: 20px !important;
-  white-space: nowrap !important;
-  pointer-events: none;
-}
-
-/* each individual character container */
-.char-cell {
-  position: relative !important;
-  display: inline-block !important;
-  height: 20px !important;
-  line-height: 20px !important;
-  overflow: hidden !important;
   font-size: 0.95rem;
   font-weight: 600;
-  letter-spacing: 0.02em;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
 }
 
-/* default character layer */
-.char-primary {
-  display: block !important;
-  color: #ffffff !important;
-  height: 20px !important;
-  line-height: 20px !important;
-  transform: translateY(0);
-  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-  transition-delay: calc(var(--char-index) * 20ms);
+.btn-frosted:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.45);
 }
 
-/* incoming clone layer docked below */
-.char-clone {
-  position: absolute !important;
-  top: 100% !important;
-  left: 0 !important;
-  width: 100% !important;
-  height: 20px !important;
-  line-height: 20px !important;
-  color: #ffffff !important;
-  transform: translateY(0);
-  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-  transition-delay: calc(var(--char-index) * 20ms);
-}
-
-/* hover wave execution */
-.kinetic-btn:hover .char-primary {
-  transform: translateY(-100%);
-}
-
-.kinetic-btn:hover .char-clone {
-  transform: translateY(-100%);
+.btn-frosted:active {
+  transform: scale(0.97);
 }
 
   /* mobile menu toggle */
@@ -589,37 +543,11 @@ const navItems = [
 </style>
 
 <script>
-  const setupKineticButtons = () => {
-    document.querySelectorAll('.kinetic-btn').forEach(btn => {
-      const text = btn.getAttribute('data-text') || (btn as HTMLElement).innerText?.trim() || '';
-      btn.setAttribute('data-text', text);
-      btn.setAttribute('aria-label', text);
-      btn.innerHTML = '';
-
-      const track = document.createElement('span');
-      track.className = 'char-track';
-      track.setAttribute('aria-hidden', 'true');
-
-      [...text].forEach((char, i) => {
-        const cell = document.createElement('span');
-        cell.className = 'char-cell';
-        cell.style.setProperty('--char-index', String(i));
-
-        const val = char === ' ' ? '\u00A0' : char;
-        cell.innerHTML = `<span class="char-primary">${val}</span><span class="char-clone">${val}</span>`;
-        track.appendChild(cell);
-      });
-
-      btn.appendChild(track);
-    });
-  };
-
   /* directional scroll and drawer lifecycle */
   let headerScrollHandler: (() => void) | null = null;
   let headerClickHandler: ((e: MouseEvent) => void) | null = null;
 
   const initHeader = () => {
-    setupKineticButtons();
     const header = document.querySelector("header") as HTMLElement | null;
     const menuBtn = document.getElementById("mobile-menu-toggle");
     const mobileNav = document.getElementById("mobile-nav-overlay");
