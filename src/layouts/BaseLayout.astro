@@ -41,7 +41,7 @@ const { title, description = "Powernet (Pvt) Ltd — Sri Lanka's trusted one-sto
     <Footer />
     
     <script>
-      // loader dismissal
+      /* loader dismissal */
       const hideLoader = () => {
         const loader = document.getElementById('initial-loader');
         if (loader && !loader.classList.contains('is-hidden')) {
@@ -52,42 +52,61 @@ const { title, description = "Powernet (Pvt) Ltd — Sri Lanka's trusted one-sto
         }
       };
 
-      // hero image load check
-      const heroImg = document.querySelector('.bg-img');
-      if (heroImg && !heroImg.complete) {
-        heroImg.addEventListener('load', hideLoader);
-        setTimeout(hideLoader, 500); // safety fallback
-      } else {
-        // immediate fallback
-        hideLoader();
-      }
+      const initBaseLayout = () => {
+        /* hero image load check */
+        const heroImg = document.querySelector('.bg-img') as HTMLImageElement | null;
+        if (heroImg && !heroImg.complete) {
+          heroImg.addEventListener('load', hideLoader, { once: true });
+          setTimeout(hideLoader, 600);
+        } else {
+          hideLoader();
+        }
 
-      document.addEventListener('DOMContentLoaded', () => {
-        // scroll reveal observer
+        /* scroll reveal observer */
         const observerOptions = {
           root: null,
-          rootMargin: '0px 0px -10% 0px',
-          threshold: 0
+          rootMargin: '0px 0px -5% 0px',
+          threshold: 0.02
         };
 
-        const observer = new IntersectionObserver((entries, observer) => {
+        const observer = new IntersectionObserver((entries, obs) => {
           entries.forEach(entry => {
             if (entry.isIntersecting) {
               entry.target.classList.add('is-revealed');
-              observer.unobserve(entry.target);
+              obs.unobserve(entry.target);
             }
           });
         }, observerOptions);
 
-        document.querySelectorAll('.scroll-reveal').forEach(el => {
+        document.querySelectorAll('.scroll-reveal:not(.is-revealed)').forEach(el => {
           observer.observe(el);
         });
-      });
+      };
+
+      document.addEventListener('DOMContentLoaded', initBaseLayout);
+      document.addEventListener('astro:page-load', initBaseLayout);
+
+      if (document.readyState === 'interactive' || document.readyState === 'complete') {
+        initBaseLayout();
+      }
     </script>
   </body>
 </html>
 
 <style is:global>
+  html,
+  body {
+    overflow-x: clip;
+  }
+
+  /* section anchor offsets */
+  #services,
+  #projects,
+  #about,
+  #contact {
+    scroll-margin-top: 100px;
+  }
+
   /* swup transition */
   .transition-fade {
     transition: opacity 0.4s;

@@ -43,8 +43,26 @@ import mapIcon from "../assets/images/icons/map.svg";
 
         <!-- hero cta buttons -->
         <div class="hero-actions fade-in stagger-5">
-          <a href="/contact" class="btn-quote">Get a Quote</a>
-          <a href="/projects" class="btn-explore">Explore Products</a>
+          <a href="/contact" class="btn-quote" aria-label="Get a Quote">
+            <span class="btn-roll-wrapper" aria-hidden="true">
+              {Array.from("Get a Quote").map((letter, index) => (
+                <span class="char-wrap" style={`--char-index:${index}`}>
+                  <span class="char-main">{letter === " " ? "\u00A0" : letter}</span>
+                  <span class="char-clone" aria-hidden="true">{letter === " " ? "\u00A0" : letter}</span>
+                </span>
+              ))}
+            </span>
+          </a>
+          <a href="/projects" class="btn-explore" aria-label="Explore Products">
+            <span class="btn-roll-wrapper" aria-hidden="true">
+              {Array.from("Explore Products").map((letter, index) => (
+                <span class="char-wrap" style={`--char-index:${index}`}>
+                  <span class="char-main">{letter === " " ? "\u00A0" : letter}</span>
+                  <span class="char-clone" aria-hidden="true">{letter === " " ? "\u00A0" : letter}</span>
+                </span>
+              ))}
+            </span>
+          </a>
         </div>
       </div>
     </div>
@@ -97,11 +115,25 @@ import mapIcon from "../assets/images/icons/map.svg";
           Powernet coordinates complex scopes as a single, integrated project. By unifying multiple critical disciplines under one roof, we eliminate vendor friction and ensure seamless, high-quality delivery for Sri Lanka's critical operations.
         </p>
         <div class="intro-actions">
-          <a href="/#about" class="btn-editorial btn-solid hover-stagger">
-            <span class="btn-text-wrapper">Explore Company Profile</span>
+          <a href="/#about" class="btn-editorial btn-solid" aria-label="Explore Company Profile">
+            <span class="btn-roll-wrapper" aria-hidden="true">
+              {Array.from("Explore Company Profile").map((letter, index) => (
+                <span class="char-wrap" style={`--char-index:${index}`}>
+                  <span class="char-main">{letter === " " ? "\u00A0" : letter}</span>
+                  <span class="char-clone" aria-hidden="true">{letter === " " ? "\u00A0" : letter}</span>
+                </span>
+              ))}
+            </span>
           </a>
-          <a href="/#about" class="btn-editorial btn-outline hover-stagger">
-            <span class="btn-text-wrapper">Explore Quality Process</span>
+          <a href="/#about" class="btn-editorial btn-outline" aria-label="Explore Quality Process">
+            <span class="btn-roll-wrapper" aria-hidden="true">
+              {Array.from("Explore Quality Process").map((letter, index) => (
+                <span class="char-wrap" style={`--char-index:${index}`}>
+                  <span class="char-main">{letter === " " ? "\u00A0" : letter}</span>
+                  <span class="char-clone" aria-hidden="true">{letter === " " ? "\u00A0" : letter}</span>
+                </span>
+              ))}
+            </span>
           </a>
         </div>
       </div>
@@ -213,9 +245,16 @@ import mapIcon from "../assets/images/icons/map.svg";
     <div class="container fade-in">
       <h2 class="text-display-xl">LET'S BUILD<br />WHAT'S NEXT.</h2>
       <div class="cta-actions">
-        <a href="/contact" class="btn-primary"
-          ><span>DISCUSS A PROJECT &rarr;</span></a
-        >
+        <a href="/contact" class="btn-primary" aria-label="Discuss a Project">
+          <span class="btn-roll-wrapper" aria-hidden="true">
+            {Array.from("DISCUSS A PROJECT \u2192").map((letter, index) => (
+              <span class="char-wrap" style={`--char-index:${index}`}>
+                <span class="char-main">{letter === " " ? "\u00A0" : letter}</span>
+                <span class="char-clone" aria-hidden="true">{letter === " " ? "\u00A0" : letter}</span>
+              </span>
+            ))}
+          </span>
+        </a>
       </div>
     </div>
   </section>
@@ -364,6 +403,7 @@ import mapIcon from "../assets/images/icons/map.svg";
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    overflow: hidden;
     transition: background-color 0.2s ease, transform 0.15s ease;
   }
 
@@ -382,6 +422,7 @@ import mapIcon from "../assets/images/icons/map.svg";
     color: #ffffff;
     text-decoration: none;
     cursor: pointer;
+    overflow: hidden;
     
     /* enhanced liquid frost */
     background: rgba(255, 255, 255, 0.12);
@@ -405,6 +446,16 @@ import mapIcon from "../assets/images/icons/map.svg";
       inset 0 1px 1.5px rgba(255, 255, 255, 0.55),
       inset 0 -1px 1px rgba(0, 0, 0, 0.1),
       0 12px 36px rgba(0, 0, 0, 0.35);
+  }
+
+  .btn-quote:hover :global(.char-main),
+  .btn-explore:hover :global(.char-main) {
+    transform: translateY(-100%);
+  }
+
+  .btn-quote:hover :global(.char-clone),
+  .btn-explore:hover :global(.char-clone) {
+    transform: translateY(0);
   }
 
   .btn-quote:active {
@@ -564,7 +615,8 @@ import mapIcon from "../assets/images/icons/map.svg";
     text-transform: uppercase;
     letter-spacing: 0.05em;
     text-decoration: none;
-    transition: background-color 0.3s ease, border-color 0.3s ease;
+    overflow: hidden;
+    transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.15s ease;
   }
 
   .btn-solid {
@@ -581,29 +633,12 @@ import mapIcon from "../assets/images/icons/map.svg";
   }
   .btn-outline:hover { background-color: #f3f4f6; }
 
-  .btn-text-wrapper {
-    display: inline-flex;
-    overflow: hidden;
-    line-height: 1.1; 
-  }
-
-  .btn-text-wrapper :global(.char) {
-    position: relative;
-    display: inline-block;
-    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-    transition-delay: calc(var(--char-index) * 0.015s);
-  }
-
-  .btn-text-wrapper :global(.char)::before {
-    content: attr(data-char);
-    position: absolute;
-    top: 100%;
-    left: 0;
-    color: inherit;
-  }
-
-  .btn-editorial:hover :global(.char) {
+  .btn-editorial:hover :global(.char-main) {
     transform: translateY(-100%);
+  }
+
+  .btn-editorial:hover :global(.char-clone) {
+    transform: translateY(0);
   }
 
   .spec-list {
@@ -754,12 +789,38 @@ import mapIcon from "../assets/images/icons/map.svg";
   }
 
   .section-cta .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 36px;
+    border-radius: 9999px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
     background-color: var(--color-foreground);
     color: var(--color-background);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    cursor: pointer;
+    transition: background-color 0.25s ease, transform 0.2s ease, box-shadow 0.25s ease;
   }
 
   .section-cta .btn-primary:hover {
     background-color: var(--color-surface);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.15);
+  }
+
+  .section-cta .btn-primary:hover :global(.char-main) {
+    transform: translateY(-100%);
+  }
+
+  .section-cta .btn-primary:hover :global(.char-clone) {
+    transform: translateY(0);
+  }
+
+  .section-cta .btn-primary:active {
+    transform: translateY(0);
   }
 
   /* icon stroke overrides */
@@ -884,72 +945,29 @@ import mapIcon from "../assets/images/icons/map.svg";
 </style>
 
 <script>
-  /* reveal failsafe */
-  const initSafeReveals = () => {
-    const reveals = document.querySelectorAll('.reveal-up');
-    if (!reveals.length) return;
-
-    reveals.forEach((el) => {
-      const rect = el.getBoundingClientRect();
-      if (rect.top < window.innerHeight) {
-        el.classList.add('is-visible');
-      }
-    });
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('is-visible');
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      {
-        threshold: 0.05,
-        rootMargin: '50px 0px',
-      }
-    );
-
-    reveals.forEach((el) => {
-      if (!el.classList.contains('is-visible')) {
-        observer.observe(el);
-      }
-    });
-  };
+  /* scroll reveals and kinetic triggers */
+  let statsObserverInstance: IntersectionObserver | null = null;
 
   const initPage = () => {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    /* button character split */
-    document.querySelectorAll('.hover-stagger .btn-text-wrapper').forEach((wrapper) => {
-      if (wrapper.getAttribute('data-initialized')) return;
-      const text = wrapper.textContent?.trim() || '';
-      wrapper.innerHTML = '';
-      text.split('').forEach((char, i) => {
-        const span = document.createElement('span');
-        span.className = 'char';
-        if (char === ' ') {
-          span.innerHTML = '&nbsp;';
-          span.dataset.char = '';
-        } else {
-          span.textContent = char;
-          span.dataset.char = char;
-        }
-        span.style.setProperty('--char-index', String(i));
-        wrapper.appendChild(span);
-      });
-      wrapper.setAttribute('data-initialized', 'true');
+    /* mark visible reveals immediately */
+    const reveals = document.querySelectorAll('.reveal-up');
+    reveals.forEach((el) => {
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight) {
+        el.classList.add('is-visible');
+        el.classList.add('is-revealed');
+      }
     });
 
-    /* failsafe scroll reveal */
-    initSafeReveals();
-
-    /* svg icon draw */
+    /* svg blueprint draw */
     const credibilityStrip = document.querySelector('.credibility-strip');
     const svgIcons = document.querySelectorAll('.stats-icon');
 
-    if (credibilityStrip && svgIcons.length > 0) {
+    if (credibilityStrip && svgIcons.length > 0 && !credibilityStrip.hasAttribute('data-blueprint-init')) {
+      credibilityStrip.setAttribute('data-blueprint-init', 'true');
+
       if (prefersReducedMotion) {
         svgIcons.forEach((svg) => {
           const accent = svg.querySelector<HTMLElement>('.draw-accent');
@@ -1000,7 +1018,11 @@ import mapIcon from "../assets/images/icons/map.svg";
           }
         };
 
-        const statsObserver = new IntersectionObserver(
+        if (statsObserverInstance) {
+          statsObserverInstance.disconnect();
+        }
+
+        statsObserverInstance = new IntersectionObserver(
           (entries, obs) => {
             entries.forEach((entry) => {
               if (entry.isIntersecting) {
@@ -1016,18 +1038,17 @@ import mapIcon from "../assets/images/icons/map.svg";
           { threshold: 0.35 }
         );
 
-        statsObserver.observe(credibilityStrip);
+        statsObserverInstance.observe(credibilityStrip);
       }
     }
   };
 
-  document.addEventListener('DOMContentLoaded', initPage);
-  document.addEventListener('astro:page-load', initPage);
-  document.addEventListener('DOMContentLoaded', initSafeReveals);
-  document.addEventListener('astro:page-load', initSafeReveals);
-
-  if (document.readyState === 'interactive' || document.readyState === 'complete') {
+  /* lifecycle registrations without duplicate listeners */
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initPage, { once: true });
+  } else {
     initPage();
-    initSafeReveals();
   }
+
+  document.addEventListener('astro:page-load', initPage);
 </script>

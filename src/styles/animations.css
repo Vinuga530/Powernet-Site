@@ -49,18 +49,73 @@
   transform: translateY(0);
 }
 
+/* reveal transitions */
+.reveal-up {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, opacity;
+}
+
+.reveal-up.is-visible,
+.reveal-up.is-revealed {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+}
+
 /* stagger utilities */
 .stagger-1 { transition-delay: 0.1s; }
 .stagger-2 { transition-delay: 0.2s; }
 .stagger-3 { transition-delay: 0.3s; }
 .stagger-4 { transition-delay: 0.4s; }
 
-/* reduced motion */
+/* kinetic character roll */
+.btn-roll-wrapper {
+  display: inline-flex;
+  align-items: center;
+  line-height: 1.2;
+  overflow: hidden;
+  vertical-align: middle;
+}
+
+.char-wrap {
+  display: inline-flex;
+  flex-direction: column;
+  height: 1.2em;
+  line-height: 1.2em;
+  overflow: hidden;
+  vertical-align: top;
+}
+
+.char-main,
+.char-clone {
+  display: block;
+  height: 1.2em;
+  line-height: 1.2em;
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: calc(var(--char-index, 0) * 20ms);
+}
+
+a:hover .char-main,
+a:hover .char-clone,
+a:focus-visible .char-main,
+a:focus-visible .char-clone,
+button:hover .char-main,
+button:hover .char-clone,
+button:focus-visible .char-main,
+button:focus-visible .char-clone {
+  transform: translateY(-100%);
+}
+
+/* reduced motion safety */
 @media (prefers-reduced-motion: reduce) {
   .text-reveal-inner,
   .image-reveal-inner,
   .fade-in,
-  .transition-all {
+  .transition-all,
+  .reveal-up,
+  .char-main,
+  .char-clone {
     transition: none !important;
     transform: none !important;
     opacity: 1 !important;
