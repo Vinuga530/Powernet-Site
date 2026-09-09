@@ -72,15 +72,9 @@ const navItems = [
       <div class="header-actions">
         <a href="/#contact" class="btn-primary" aria-label="Let's Talk">
           <span class="cta-accent" aria-hidden="true"></span>
-          <span class="btn-roll-wrapper" aria-hidden="true">
-            {
-              Array.from("LET'S TALK").map((letter, index) => (
-                <span class="char-wrap" style={`--char-index:${index}`}>
-                  <span class="char-main">{letter === " " ? "\u00A0" : letter}</span>
-                  <span class="char-clone" aria-hidden="true">{letter === " " ? "\u00A0" : letter}</span>
-                </span>
-              ))
-            }
+          <span class="btn-track" aria-hidden="true">
+            <span class="btn-text btn-text--default">Let's Talk</span>
+            <span class="btn-text btn-text--hover">Let's Talk</span>
           </span>
         </a>
       </div>
@@ -103,15 +97,9 @@ const navItems = [
       </ul>
       <div class="mobile-nav-actions">
         <a href="/#contact" class="btn-primary mobile-cta" aria-label="Let's Talk">
-          <span class="btn-roll-wrapper" aria-hidden="true">
-            {
-              Array.from("LET'S TALK").map((letter, index) => (
-                <span class="char-wrap" style={`--char-index:${index}`}>
-                  <span class="char-main">{letter === " " ? "\u00A0" : letter}</span>
-                  <span class="char-clone" aria-hidden="true">{letter === " " ? "\u00A0" : letter}</span>
-                </span>
-              ))
-            }
+          <span class="btn-track" aria-hidden="true">
+            <span class="btn-text btn-text--default">Let's Talk</span>
+            <span class="btn-text btn-text--hover">Let's Talk</span>
           </span>
         </a>
       </div>
@@ -342,9 +330,48 @@ const navItems = [
     width: 24px;
   }
 
-  .btn-primary:hover .char-main,
-  .btn-primary:hover .char-clone {
-    transform: translateY(-100%);
+  /* standardized kinetic roll container */
+  .btn-track {
+    position: relative;
+    display: inline-flex;
+    flex-direction: column;
+    height: 1.25em;
+    line-height: 1.25em;
+    overflow: hidden;
+    vertical-align: middle;
+  }
+
+  .btn-text {
+    display: block;
+    color: inherit;
+    white-space: nowrap;
+    line-height: 1.25em;
+    height: 1.25em;
+    will-change: transform;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* default positioning */
+  .btn-text--default {
+    transform: translate3d(0, 0, 0);
+  }
+
+  .btn-text--hover {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    transform: translate3d(0, 0, 0);
+  }
+
+  /* active transition */
+  :hover > .btn-track > .btn-text--default,
+  :hover.btn-track > .btn-text--default {
+    transform: translate3d(0, -100%, 0);
+  }
+
+  :hover > .btn-track > .btn-text--hover,
+  :hover.btn-track > .btn-text--hover {
+    transform: translate3d(0, -100%, 0);
   }
 
   /* mobile menu toggle */
@@ -554,7 +581,7 @@ const navItems = [
   let headerClickHandler: ((e: MouseEvent) => void) | null = null;
 
   const initHeader = () => {
-    const header = document.getElementById("main-header");
+    const header = document.querySelector("header") as HTMLElement | null;
     const menuBtn = document.getElementById("mobile-menu-toggle");
     const mobileNav = document.getElementById("mobile-nav-overlay");
 
@@ -569,36 +596,42 @@ const navItems = [
       headerClickHandler = null;
     }
 
-    let lastScrollY = window.scrollY;
+    let lastScrollY = Math.max(window.scrollY, 0);
     let ticking = false;
     let isMenuOpen = false;
+    const DELTA_THRESHOLD = 8;
 
-    const updateHeaderState = () => {
-      const currentScrollY = window.scrollY;
-      const delta = currentScrollY - lastScrollY;
-
+    const onScroll = () => {
       /* drawer open lock */
       if (isMenuOpen) {
-        lastScrollY = currentScrollY;
+        lastScrollY = Math.max(window.scrollY, 0);
         ticking = false;
         return;
       }
 
+      const currentScrollY = Math.max(window.scrollY, 0);
+      const delta = currentScrollY - lastScrollY;
+
+      // ignore micro-jitters
+      if (Math.abs(delta) < DELTA_THRESHOLD) {
+        ticking = false;
+        return;
+      }
+
+      // surface behavior at top fold
       if (currentScrollY < 20) {
-        /* page top */
-        header.classList.remove("is-hidden");
-        header.classList.remove("is-scrolled");
-        header.classList.add("is-top");
+        header.classList.remove("is-hidden", "is-scrolled");
+        header.style.transform = "translate3d(0, 0, 0)";
       } else {
-        header.classList.remove("is-top");
+        header.classList.add("is-scrolled");
         if (delta > 0 && currentScrollY > 80) {
-          /* scroll down past 80px */
+          // scrolling down -> hide
           header.classList.add("is-hidden");
-          header.classList.remove("is-scrolled");
+          header.style.transform = "translate3d(0, -100%, 0)";
         } else if (delta < 0) {
-          /* scroll up */
+          // scrolling up -> reveal
           header.classList.remove("is-hidden");
-          header.classList.add("is-scrolled");
+          header.style.transform = "translate3d(0, 0, 0)";
         }
       }
 
@@ -606,18 +639,17 @@ const navItems = [
       ticking = false;
     };
 
-    /* initial state on load */
+    // initialize state
     if (window.scrollY < 20) {
-      header.classList.add("is-top");
-      header.classList.remove("is-scrolled", "is-hidden");
+      header.classList.remove("is-hidden", "is-scrolled");
+      header.style.transform = "translate3d(0, 0, 0)";
     } else {
       header.classList.add("is-scrolled");
-      header.classList.remove("is-top", "is-hidden");
     }
 
     headerScrollHandler = () => {
       if (!ticking) {
-        window.requestAnimationFrame(updateHeaderState);
+        window.requestAnimationFrame(onScroll);
         ticking = true;
       }
     };
@@ -636,6 +668,7 @@ const navItems = [
         if (willOpen) {
           header.classList.remove("is-hidden");
           header.classList.add("is-scrolled");
+          header.style.transform = "translate3d(0, 0, 0)";
         }
       };
 

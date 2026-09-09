@@ -378,8 +378,15 @@ import projects from '../data/projects.json';
     /* horizontal track progression */
     if (pinWrap && track) {
       let ticking = false;
+      let travelDistance = 0;
+      let maxTranslate = 0;
 
-      const updateTrack = () => {
+      const computeBounds = () => {
+        travelDistance = pinWrap.offsetHeight - window.innerHeight;
+        maxTranslate = track.scrollWidth - (track.parentElement ? track.parentElement.clientWidth : 0);
+      };
+
+      const updatePosition = () => {
         if (window.innerWidth <= 900) {
           track.style.transform = '';
           ticking = false;
@@ -387,39 +394,38 @@ import projects from '../data/projects.json';
         }
 
         const rect = pinWrap.getBoundingClientRect();
-        const maxDistance = Math.max(pinWrap.offsetHeight - window.innerHeight, 1);
-        const maxTranslate = Math.max(0, track.scrollWidth - (track.parentElement?.offsetWidth || 0));
 
-        let progress: number;
-        if (rect.top > 0) {
-          progress = 0;
+        if (rect.top <= 0 && rect.bottom >= window.innerHeight) {
+          const progress = Math.min(Math.max(-rect.top / Math.max(travelDistance, 1), 0), 1);
+          track.style.transform = `translate3d(-${(progress * maxTranslate).toFixed(2)}px, 0, 0)`;
+        } else if (rect.top > 0) {
+          track.style.transform = 'translate3d(0, 0, 0)';
         } else if (rect.bottom < window.innerHeight) {
-          progress = 1;
-        } else {
-          progress = Math.min(Math.max(-rect.top / maxDistance, 0), 1);
+          track.style.transform = `translate3d(-${maxTranslate.toFixed(2)}px, 0, 0)`;
         }
-
-        track.style.transform = `translate3d(-${(progress * maxTranslate).toFixed(2)}px, 0, 0)`;
         ticking = false;
+      };
+
+      computeBounds();
+      updatePosition();
+
+      projectsResizeHandler = () => {
+        computeBounds();
+        if (!ticking) {
+          window.requestAnimationFrame(updatePosition);
+          ticking = true;
+        }
       };
 
       projectsScrollHandler = () => {
         if (!ticking) {
-          window.requestAnimationFrame(updateTrack);
+          window.requestAnimationFrame(updatePosition);
           ticking = true;
         }
       };
 
-      projectsResizeHandler = () => {
-        if (!ticking) {
-          window.requestAnimationFrame(updateTrack);
-          ticking = true;
-        }
-      };
-
-      window.addEventListener('scroll', projectsScrollHandler, { passive: true });
       window.addEventListener('resize', projectsResizeHandler, { passive: true });
-      updateTrack();
+      window.addEventListener('scroll', projectsScrollHandler, { passive: true });
     }
 
     /* in-place image inspection */

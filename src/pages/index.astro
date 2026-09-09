@@ -410,46 +410,56 @@ import mapIcon from "../assets/images/icons/map.svg";
     transform: scale(0.97);
   }
 
-  /* kinetic vertical text track */
-  .btn-primary-kinetic .btn-track {
-    display: flex;
-    flex-direction: column;
+  /* standardized kinetic roll container */
+  .btn-track {
     position: relative;
-    height: 1.2em;
-    line-height: 1.2em;
+    display: inline-flex;
+    flex-direction: column;
+    height: 1.25em;
+    line-height: 1.25em;
     overflow: hidden;
+    vertical-align: middle;
+  }
+
+  .btn-text {
+    display: block;
+    color: inherit;
+    white-space: nowrap;
+    line-height: 1.25em;
+    height: 1.25em;
+    will-change: transform;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .btn-primary-kinetic .btn-text {
-    display: block;
     font-size: 0.95rem;
     font-weight: 600;
     color: #ffffff !important; /* enforce visible contrast in all states */
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    white-space: nowrap;
-    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  /* default layout offset */
-  .btn-primary-kinetic .btn-text--default {
-    transform: translateY(0);
+  /* default positioning */
+  .btn-text--default {
+    transform: translate3d(0, 0, 0);
   }
 
-  .btn-primary-kinetic .btn-text--hover {
+  .btn-text--hover {
     position: absolute;
     top: 100%;
     left: 0;
-    transform: translateY(0);
+    transform: translate3d(0, 0, 0);
   }
 
-  /* hover shift */
-  .btn-primary-kinetic:hover .btn-text--default {
-    transform: translateY(-100%);
+  /* active transition */
+  :hover > .btn-track > .btn-text--default,
+  :hover.btn-track > .btn-text--default {
+    transform: translate3d(0, -100%, 0);
   }
 
-  .btn-primary-kinetic:hover .btn-text--hover {
-    transform: translateY(-100%);
+  :hover > .btn-track > .btn-text--hover,
+  :hover.btn-track > .btn-text--hover {
+    transform: translate3d(0, -100%, 0);
   }
 
   .btn-explore {
@@ -982,19 +992,42 @@ import mapIcon from "../assets/images/icons/map.svg";
 <script>
   /* scroll reveals and kinetic triggers */
   let statsObserverInstance: IntersectionObserver | null = null;
+  let revealObserverInstance: IntersectionObserver | null = null;
+
+  const initRevealObserver = () => {
+    const targets = document.querySelectorAll('.reveal-up');
+    if (!targets.length) return;
+
+    if (revealObserverInstance) {
+      revealObserverInstance.disconnect();
+    }
+
+    revealObserverInstance = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          entry.target.classList.add('is-revealed');
+          revealObserverInstance?.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.05, rootMargin: '30px 0px' });
+
+    targets.forEach(target => {
+      // immediate evaluation for above-fold elements
+      const rect = target.getBoundingClientRect();
+      if (rect.top < window.innerHeight) {
+        target.classList.add('is-visible');
+        target.classList.add('is-revealed');
+      } else {
+        revealObserverInstance?.observe(target);
+      }
+    });
+  };
 
   const initPage = () => {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    /* mark visible reveals immediately */
-    const reveals = document.querySelectorAll('.reveal-up');
-    reveals.forEach((el) => {
-      const rect = el.getBoundingClientRect();
-      if (rect.top < window.innerHeight) {
-        el.classList.add('is-visible');
-        el.classList.add('is-revealed');
-      }
-    });
+    initRevealObserver();
 
     /* svg blueprint draw */
     const credibilityStrip = document.querySelector('.credibility-strip');
