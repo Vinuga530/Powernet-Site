@@ -10,6 +10,7 @@ const navItems = [
   { href: "/#about", label: "About" },
   { href: "/#contact", label: "Contact" },
 ];
+const talkLabel = "Let's Talk";
 ---
 
 <header
@@ -70,7 +71,24 @@ const navItems = [
       </button>
 
       <div class="header-actions">
-        <a href="#contact" class="nav-btn-talk">Let's Talk</a>
+        <a href="#contact" class="nav-btn-talk" aria-label={talkLabel}>
+          <span class="nav-word" aria-hidden="true">
+            <span class="nav-layer nav-layer-top">
+              {Array.from(talkLabel).map((letter, index) => (
+                <span class="nav-char" style={`--i:${index}; --char-index:${index}`}>
+                  {letter === " " ? "\u00A0" : letter}
+                </span>
+              ))}
+            </span>
+            <span class="nav-layer nav-layer-bottom" aria-hidden="true">
+              {Array.from(talkLabel).map((letter, index) => (
+                <span class="nav-char" style={`--i:${index}; --char-index:${index}`}>
+                  {letter === " " ? "\u00A0" : letter}
+                </span>
+              ))}
+            </span>
+          </span>
+        </a>
       </div>
     </div>
   </div>
@@ -90,7 +108,24 @@ const navItems = [
         }
       </ul>
       <div class="mobile-nav-actions">
-        <a href="#contact" class="nav-btn-talk mobile-cta">Let's Talk</a>
+        <a href="#contact" class="nav-btn-talk mobile-cta" aria-label={talkLabel}>
+          <span class="nav-word" aria-hidden="true">
+            <span class="nav-layer nav-layer-top">
+              {Array.from(talkLabel).map((letter, index) => (
+                <span class="nav-char" style={`--i:${index}; --char-index:${index}`}>
+                  {letter === " " ? "\u00A0" : letter}
+                </span>
+              ))}
+            </span>
+            <span class="nav-layer nav-layer-bottom" aria-hidden="true">
+              {Array.from(talkLabel).map((letter, index) => (
+                <span class="nav-char" style={`--i:${index}; --char-index:${index}`}>
+                  {letter === " " ? "\u00A0" : letter}
+                </span>
+              ))}
+            </span>
+          </span>
+        </a>
       </div>
     </div>
   </div>
@@ -252,6 +287,7 @@ const navItems = [
     display: block;
     height: 1.2em;
     line-height: 1.2em;
+    overflow: hidden;
   }
 
   .nav-layer {
@@ -272,7 +308,13 @@ const navItems = [
   }
 
   .nav-link:hover .nav-layer-top .nav-char,
-  .nav-link:hover .nav-layer-bottom .nav-char {
+  .nav-link:hover .nav-layer-bottom .nav-char,
+  .nav-link:focus-visible .nav-layer-top .nav-char,
+  .nav-link:focus-visible .nav-layer-bottom .nav-char,
+  .nav-btn-talk:hover .nav-layer-top .nav-char,
+  .nav-btn-talk:hover .nav-layer-bottom .nav-char,
+  .nav-btn-talk:focus-visible .nav-layer-top .nav-char,
+  .nav-btn-talk:focus-visible .nav-layer-bottom .nav-char {
     transform: translateY(-100%);
   }
 
@@ -298,6 +340,7 @@ const navItems = [
   border: none;
   cursor: pointer;
   box-sizing: border-box;
+  overflow: hidden;
   transition: background-color 0.2s ease, transform 0.15s ease;
 }
 
@@ -538,6 +581,13 @@ const navItems = [
     .nav-links-wrapper {
       top: 68px;
       padding: 24px 18px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nav-char {
+      transition: none !important;
+      transform: none !important;
     }
   }
 </style>
