@@ -1,0 +1,14 @@
+{
+  "name": "Powernet (Pvt) Ltd",
+  "short_name": "Powernet",
+  "icons": [
+    {
+      "src": "/powernet-logo-coloured.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#ee1c25",
+  "background_color": "#0a0a0c",
+  "display": "standalone"
+}
