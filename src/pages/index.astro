@@ -44,15 +44,40 @@ import mapIcon from "../assets/images/icons/map.svg";
         <!-- hero cta buttons -->
         <div class="hero-actions">
           <a href="/quote" class="btn-pill btn-solid-red" aria-label="Get a Quote">
-            <span class="btn-roller" aria-hidden="true">
-              <span class="btn-label btn-label--base">Get a Quote</span>
-              <span class="btn-label btn-label--clone">Get a Quote</span>
+            <span class="nav-word" aria-hidden="true">
+              <span class="nav-layer nav-layer-top">
+                {Array.from("Get a Quote").map((letter, index) => (
+                  <span class="nav-char" style={`--char-index:${index}`}>
+                    {letter === " " ? "\u00A0" : letter}
+                  </span>
+                ))}
+              </span>
+              <span class="nav-layer nav-layer-bottom" aria-hidden="true">
+                {Array.from("Get a Quote").map((letter, index) => (
+                  <span class="nav-char" style={`--char-index:${index}`}>
+                    {letter === " " ? "\u00A0" : letter}
+                  </span>
+                ))}
+              </span>
             </span>
           </a>
+
           <a href="#products" class="btn-pill btn-frosted" aria-label="Explore Products">
-            <span class="btn-roller" aria-hidden="true">
-              <span class="btn-label btn-label--base">Explore Products</span>
-              <span class="btn-label btn-label--clone">Explore Products</span>
+            <span class="nav-word" aria-hidden="true">
+              <span class="nav-layer nav-layer-top">
+                {Array.from("Explore Products").map((letter, index) => (
+                  <span class="nav-char" style={`--char-index:${index}`}>
+                    {letter === " " ? "\u00A0" : letter}
+                  </span>
+                ))}
+              </span>
+              <span class="nav-layer nav-layer-bottom" aria-hidden="true">
+                {Array.from("Explore Products").map((letter, index) => (
+                  <span class="nav-char" style={`--char-index:${index}`}>
+                    {letter === " " ? "\u00A0" : letter}
+                  </span>
+                ))}
+              </span>
             </span>
           </a>
         </div>
@@ -107,24 +132,41 @@ import mapIcon from "../assets/images/icons/map.svg";
           Powernet coordinates complex scopes as a single, integrated project. By unifying multiple critical disciplines under one roof, we eliminate vendor friction and ensure seamless, high-quality delivery for Sri Lanka's critical operations.
         </p>
         <div class="intro-actions">
-          <a href="/#about" class="btn-editorial btn-solid" aria-label="Explore Company Profile">
-            <span class="btn-roll-wrapper" aria-hidden="true">
-              {Array.from("Explore Company Profile").map((letter, index) => (
-                <span class="char-wrap" style={`--char-index:${index}`}>
-                  <span class="char-main">{letter === " " ? "\u00A0" : letter}</span>
-                  <span class="char-clone" aria-hidden="true">{letter === " " ? "\u00A0" : letter}</span>
-                </span>
-              ))}
+          <a href="/#about" class="btn-pill btn-solid-red" aria-label="Explore Company Profile">
+            <span class="nav-word" aria-hidden="true">
+              <span class="nav-layer nav-layer-top">
+                {Array.from("Explore Company Profile").map((letter, index) => (
+                  <span class="nav-char" style={`--char-index:${index}`}>
+                    {letter === " " ? "\u00A0" : letter}
+                  </span>
+                ))}
+              </span>
+              <span class="nav-layer nav-layer-bottom" aria-hidden="true">
+                {Array.from("Explore Company Profile").map((letter, index) => (
+                  <span class="nav-char" style={`--char-index:${index}`}>
+                    {letter === " " ? "\u00A0" : letter}
+                  </span>
+                ))}
+              </span>
             </span>
           </a>
-          <a href="/#about" class="btn-editorial btn-outline" aria-label="Explore Quality Process">
-            <span class="btn-roll-wrapper" aria-hidden="true">
-              {Array.from("Explore Quality Process").map((letter, index) => (
-                <span class="char-wrap" style={`--char-index:${index}`}>
-                  <span class="char-main">{letter === " " ? "\u00A0" : letter}</span>
-                  <span class="char-clone" aria-hidden="true">{letter === " " ? "\u00A0" : letter}</span>
-                </span>
-              ))}
+
+          <a href="/#about" class="btn-pill btn-frosted" style="color: #111 !important; border-color: rgba(0,0,0,0.15);" aria-label="Explore Quality Process">
+            <span class="nav-word" aria-hidden="true">
+              <span class="nav-layer nav-layer-top">
+                {Array.from("Explore Quality Process").map((letter, index) => (
+                  <span class="nav-char" style={`--char-index:${index}`}>
+                    {letter === " " ? "\u00A0" : letter}
+                  </span>
+                ))}
+              </span>
+              <span class="nav-layer nav-layer-bottom" aria-hidden="true">
+                {Array.from("Explore Quality Process").map((letter, index) => (
+                  <span class="nav-char" style={`--char-index:${index}`}>
+                    {letter === " " ? "\u00A0" : letter}
+                  </span>
+                ))}
+              </span>
             </span>
           </a>
         </div>
@@ -237,10 +279,22 @@ import mapIcon from "../assets/images/icons/map.svg";
     <div class="container fade-in">
       <h2 class="text-display-xl">LET'S BUILD<br />WHAT'S NEXT.</h2>
       <div class="cta-actions">
-        <a href="/contact" class="btn-pill btn-primary" aria-label="Discuss a Project">
-          <span class="btn-roller" aria-hidden="true">
-            <span class="btn-label btn-label--base">DISCUSS A PROJECT &rarr;</span>
-            <span class="btn-label btn-label--clone">DISCUSS A PROJECT &rarr;</span>
+        <a href="/contact" class="btn-pill btn-solid-red" style="background-color: #ffffff; color: #111 !important;" aria-label="Discuss a Project">
+          <span class="nav-word" aria-hidden="true">
+            <span class="nav-layer nav-layer-top">
+              {Array.from("Discuss a Project →").map((letter, index) => (
+                <span class="nav-char" style={`--char-index:${index}`}>
+                  {letter === " " ? "\u00A0" : letter}
+                </span>
+              ))}
+            </span>
+            <span class="nav-layer nav-layer-bottom" aria-hidden="true">
+              {Array.from("Discuss a Project →").map((letter, index) => (
+                <span class="nav-char" style={`--char-index:${index}`}>
+                  {letter === " " ? "\u00A0" : letter}
+                </span>
+              ))}
+            </span>
           </span>
         </a>
       </div>
@@ -428,52 +482,6 @@ import mapIcon from "../assets/images/icons/map.svg";
   border-color: rgba(255, 255, 255, 0.45);
 }
 
-/* rolling text track */
-.btn-roller {
-  position: relative;
-  display: inline-flex;
-  flex-direction: column;
-  height: 1.3em;
-  line-height: 1.3em;
-  overflow: hidden;
-  pointer-events: none;
-}
-
-.btn-label {
-  display: block;
-  height: 1.3em;
-  line-height: 1.3em;
-  font-size: 0.95rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  color: #ffffff !important;
-  will-change: transform;
-  transition: transform 0.38s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-/* resting baseline */
-.btn-label--base {
-  transform: translateY(0);
-}
-
-.btn-label--clone {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  transform: translateY(100%); /* docked below boundary */
-}
-
-/* hover state: base exits upward, clone takes center stage */
-.btn-pill:hover .btn-label--base,
-.btn-pill:focus-visible .btn-label--base {
-  transform: translateY(-100%);
-}
-
-.btn-pill:hover .btn-label--clone,
-.btn-pill:focus-visible .btn-label--clone {
-  transform: translateY(0); /* locks in center during hover */
-}
 
   /* metrics strip */
   .credibility-strip {
@@ -805,10 +813,6 @@ import mapIcon from "../assets/images/icons/map.svg";
     background-color: var(--color-surface);
     transform: translateY(-2px);
     box-shadow: 0 10px 24px rgba(0, 0, 0, 0.15);
-  }
-
-  .section-cta .btn-primary .btn-label {
-    color: var(--color-background) !important;
   }
 
   /* icon stroke overrides */

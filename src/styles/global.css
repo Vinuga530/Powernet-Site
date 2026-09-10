@@ -49,7 +49,6 @@ a {
 /* ========================================
    UNIVERSAL ROLLING BUTTON SYSTEM
    ======================================== */
-/* button boundary box */
 .btn-pill {
   display: inline-flex;
   align-items: center;
@@ -96,55 +95,50 @@ a {
   border-color: rgba(255, 255, 255, 0.45);
 }
 
-/* rolling text track */
-.btn-roller {
+/* letter-by-letter kinetic cascade copied from header nav-word */
+.btn-pill .nav-word {
   position: relative;
-  display: inline-flex;
-  flex-direction: column;
-  height: 1.3em;
-  line-height: 1.3em;
+  display: block;
+  height: 1.2em;
+  line-height: 1.2em;
   overflow: hidden;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   pointer-events: none;
 }
 
-.btn-label {
-  display: block;
-  height: 1.3em;
-  line-height: 1.3em;
-  font-size: 0.95rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  color: #ffffff !important;
-  will-change: transform;
-  transition: transform 0.38s cubic-bezier(0.16, 1, 0.3, 1);
+.btn-pill .nav-layer {
+  display: flex;
+  white-space: nowrap;
 }
 
-/* resting baseline */
-.btn-label--base {
-  transform: translateY(0);
-}
-
-.btn-label--clone {
+.btn-pill .nav-layer-bottom {
   position: absolute;
-  top: 0;
   left: 0;
-  width: 100%;
-  transform: translateY(100%); /* docked below boundary */
+  top: 100%;
 }
 
-/* hover state: base exits upward, clone takes center stage */
-.btn-pill:hover .btn-label--base,
-.btn-pill:focus-visible .btn-label--base {
+.btn-pill .nav-char {
+  display: inline-block;
+  color: inherit;
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: calc(var(--char-index) * 20ms);
+}
+
+/* hover state: layer-top slides up, layer-bottom slides into view */
+.btn-pill:hover .nav-layer-top .nav-char,
+.btn-pill:hover .nav-layer-bottom .nav-char,
+.btn-pill:focus-visible .nav-layer-top .nav-char,
+.btn-pill:focus-visible .nav-layer-bottom .nav-char {
   transform: translateY(-100%);
 }
 
-.btn-pill:hover .btn-label--clone,
-.btn-pill:focus-visible .btn-label--clone {
-  transform: translateY(0); /* locks in center during hover */
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .btn-label {
+  .btn-pill .nav-char {
     transition: none !important;
+    transform: none !important;
   }
 }
+

@@ -69,11 +69,24 @@ const navItems = [
         <span class="hamburger-line"></span>
       </button>
 
+      <!-- Desktop CTA -->
       <div class="header-actions">
         <a href="#contact" class="btn-pill btn-nav-cta" aria-label="Let's Talk">
-          <span class="btn-roller" aria-hidden="true">
-            <span class="btn-label btn-label--base">Let's Talk</span>
-            <span class="btn-label btn-label--clone">Let's Talk</span>
+          <span class="nav-word" aria-hidden="true">
+            <span class="nav-layer nav-layer-top">
+              {Array.from("Let's Talk").map((letter, index) => (
+                <span class="nav-char" style={`--char-index:${index}`}>
+                  {letter === " " ? "\u00A0" : letter}
+                </span>
+              ))}
+            </span>
+            <span class="nav-layer nav-layer-bottom" aria-hidden="true">
+              {Array.from("Let's Talk").map((letter, index) => (
+                <span class="nav-char" style={`--char-index:${index}`}>
+                  {letter === " " ? "\u00A0" : letter}
+                </span>
+              ))}
+            </span>
           </span>
         </a>
       </div>
@@ -96,9 +109,21 @@ const navItems = [
       </ul>
       <div class="mobile-nav-actions">
         <a href="#contact" class="btn-pill btn-nav-cta mobile-cta" aria-label="Let's Talk">
-          <span class="btn-roller" aria-hidden="true">
-            <span class="btn-label btn-label--base">Let's Talk</span>
-            <span class="btn-label btn-label--clone">Let's Talk</span>
+          <span class="nav-word" aria-hidden="true">
+            <span class="nav-layer nav-layer-top">
+              {Array.from("Let's Talk").map((letter, index) => (
+                <span class="nav-char" style={`--char-index:${index}`}>
+                  {letter === " " ? "\u00A0" : letter}
+                </span>
+              ))}
+            </span>
+            <span class="nav-layer nav-layer-bottom" aria-hidden="true">
+              {Array.from("Let's Talk").map((letter, index) => (
+                <span class="nav-char" style={`--char-index:${index}`}>
+                  {letter === " " ? "\u00A0" : letter}
+                </span>
+              ))}
+            </span>
           </span>
         </a>
       </div>
@@ -339,53 +364,6 @@ const navItems = [
 .btn-frosted:hover {
   background: rgba(255, 255, 255, 0.18);
   border-color: rgba(255, 255, 255, 0.45);
-}
-
-/* rolling text track */
-.btn-roller {
-  position: relative;
-  display: inline-flex;
-  flex-direction: column;
-  height: 1.3em;
-  line-height: 1.3em;
-  overflow: hidden;
-  pointer-events: none;
-}
-
-.btn-label {
-  display: block;
-  height: 1.3em;
-  line-height: 1.3em;
-  font-size: 0.95rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  color: #ffffff !important;
-  will-change: transform;
-  transition: transform 0.38s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-/* resting baseline */
-.btn-label--base {
-  transform: translateY(0);
-}
-
-.btn-label--clone {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  transform: translateY(100%); /* docked below boundary */
-}
-
-/* hover state: base exits upward, clone takes center stage */
-.btn-pill:hover .btn-label--base,
-.btn-pill:focus-visible .btn-label--base {
-  transform: translateY(-100%);
-}
-
-.btn-pill:hover .btn-label--clone,
-.btn-pill:focus-visible .btn-label--clone {
-  transform: translateY(0); /* locks in center during hover */
 }
 
   /* mobile menu toggle */
