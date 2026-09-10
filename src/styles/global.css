@@ -45,3 +45,106 @@ a {
     grid-template-columns: repeat(4, 1fr);
   }
 }
+
+/* ========================================
+   UNIVERSAL ROLLING BUTTON SYSTEM
+   ======================================== */
+/* button boundary box */
+.btn-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  padding: 0 30px;
+  border-radius: 9999px;
+  overflow: hidden;
+  position: relative;
+  text-decoration: none;
+  cursor: pointer;
+  box-sizing: border-box;
+  white-space: nowrap;
+  user-select: none;
+  transition: background-color 0.25s ease, border-color 0.25s ease, transform 0.15s ease;
+}
+
+.btn-pill:active {
+  transform: scale(0.97);
+}
+
+/* styling variants */
+.btn-solid-red,
+.btn-nav-cta {
+  background-color: #d62828;
+  color: #ffffff !important;
+  border: 1px solid transparent;
+}
+.btn-solid-red:hover,
+.btn-nav-cta:hover {
+  background-color: #b91d1d;
+}
+
+.btn-frosted {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #ffffff !important;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3), 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+.btn-frosted:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.45);
+}
+
+/* rolling text track */
+.btn-roller {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  height: 1.3em;
+  line-height: 1.3em;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.btn-label {
+  display: block;
+  height: 1.3em;
+  line-height: 1.3em;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #ffffff !important;
+  will-change: transform;
+  transition: transform 0.38s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* resting baseline */
+.btn-label--base {
+  transform: translateY(0);
+}
+
+.btn-label--clone {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  transform: translateY(100%); /* docked below boundary */
+}
+
+/* hover state: base exits upward, clone takes center stage */
+.btn-pill:hover .btn-label--base,
+.btn-pill:focus-visible .btn-label--base {
+  transform: translateY(-100%);
+}
+
+.btn-pill:hover .btn-label--clone,
+.btn-pill:focus-visible .btn-label--clone {
+  transform: translateY(0); /* locks in center during hover */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-label {
+    transition: none !important;
+  }
+}
