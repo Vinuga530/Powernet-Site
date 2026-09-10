@@ -1,49 +1,75 @@
 ---
-import projects from '../data/projects.json';
+import projects from "../data/projects.json";
 ---
 
-<section id="projects" class="projects-pin-wrap">
-  <div class="projects-sticky-frame">
-    <div class="projects-header-compact">
-      <span class="projects-tag">Completed Work</span>
-      <h2 class="projects-title">Recent Installations.</h2>
+<section id="projects" class="projects-focal-section">
+  <div class="projects-container">
+    <div class="projects-header">
+      <span class="projects-eyebrow">Completed Work</span>
+      <h2 class="projects-headline">Recent Installations.</h2>
     </div>
-    <div class="projects-track-window">
-      <div class="projects-track" id="projectsTrack">
-        {projects.map((project) => (
-          <article class="project-slide">
-            <div class="project-img-box" role="button" tabindex="0" aria-label={`View image for ${project.title}`} data-img={project.image} data-meta={`${project.client} — ${project.title}`}>
-              <img src={project.image} alt={project.title} loading="lazy" />
-              <span class="inspect-hint">View Image</span>
-            </div>
-            <div class="project-details">
-              <div class="project-meta-row">
-                <span class="project-index">{project.id}</span>
-                <span class="meta-dot">·</span>
-                <span class="project-cat">{project.category}</span>
-                <span class="meta-dot">·</span>
-                <span class="project-year">{project.year}</span>
-              </div>
-              <h3 class="project-client">{project.client}</h3>
-              <p class="project-desc">{project.summary}</p>
-              <div class="project-specs">
-                {project.specs.map(spec => (
-                  <span class="spec-chip">{spec}</span>
-                ))}
-              </div>
-            </div>
-          </article>
-        ))}
+
+    <!-- asymmetric focal stage -->
+    <div class="focal-stage" id="focalStage">
+      <!-- left offset preview (floated high) -->
+      <div class="flank-card flank-left" id="flankLeft" role="button" tabindex="0" aria-label="View previous project">
+        <div class="flank-img-wrap">
+          <img src="" alt="" id="flankLeftImg" />
+        </div>
+        <div class="flank-meta">
+          <span class="flank-index" id="flankLeftIndex"></span>
+          <span class="flank-title" id="flankLeftTitle"></span>
+        </div>
       </div>
+
+      <!-- main center focus unit -->
+      <div class="center-focus-unit">
+        <div class="focus-image-card" id="focusCard" role="button" tabindex="0" aria-label="Inspect project image">
+          <img src="" alt="" id="focusImage" />
+          <span class="inspect-tag">Inspect Image</span>
+        </div>
+
+        <div class="focus-details">
+          <div class="focus-meta-row">
+            <span class="focus-index" id="focusIndex"></span>
+            <span class="meta-separator">·</span>
+            <span class="focus-category" id="focusCategory"></span>
+            <span class="meta-separator">·</span>
+            <span class="focus-year" id="focusYear"></span>
+          </div>
+          <h3 class="focus-client" id="focusClient"></h3>
+          <h4 class="focus-title" id="focusTitle"></h4>
+          <p class="focus-summary" id="focusSummary"></p>
+          <ul class="focus-specs" id="focusSpecs"></ul>
+        </div>
+      </div>
+
+      <!-- right offset preview (floated low) -->
+      <div class="flank-card flank-right" id="flankRight" role="button" tabindex="0" aria-label="View next project">
+        <div class="flank-img-wrap">
+          <img src="" alt="" id="flankRightImg" />
+        </div>
+        <div class="flank-meta">
+          <span class="flank-index" id="flankRightIndex"></span>
+          <span class="flank-title" id="flankRightTitle"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- navigation arrows -->
+    <div class="focal-controls">
+      <button type="button" class="ctrl-btn" id="ctrlPrev" aria-label="Previous installation">&larr;</button>
+      <span class="ctrl-counter" id="ctrlCounter">1 / 3</span>
+      <button type="button" class="ctrl-btn" id="ctrlNext" aria-label="Next installation">&rarr;</button>
     </div>
   </div>
 
-  <!-- in-place image inspection popout -->
+  <!-- in-place inspection popout -->
   <aside id="projectImagePopout" class="image-popout-overlay" aria-hidden="true">
     <div class="popout-container">
       <div class="popout-header">
         <span class="popout-meta" id="popoutMeta"></span>
-        <button type="button" class="popout-close" id="popoutClose" aria-label="Close image">×</button>
+        <button type="button" class="popout-close" id="popoutClose" aria-label="Close preview">&times;</button>
       </div>
       <div class="popout-frame">
         <img src="" alt="" id="popoutTargetImg" />
@@ -53,181 +79,295 @@ import projects from '../data/projects.json';
 </section>
 
 <style>
-  /* sticky pin */
-  #projects,
-  .projects-pin-wrap {
+  .projects-focal-section {
+    padding: 120px 5%;
+    background-color: #0b0c10;
+    color: #ffffff;
     position: relative;
-    height: 300vh;
-    background: #0b0c10;
-    scroll-margin-top: 100px;
-  }
-
-  .projects-sticky-frame {
-    position: sticky;
-    top: 0;
-    height: 100vh;
-    width: 100%;
     overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: 0 5%;
-    max-width: 1500px;
+  }
+
+  .projects-container {
+    max-width: 1440px;
     margin: 0 auto;
-    box-sizing: border-box;
   }
 
-  .projects-header-compact {
-    margin-bottom: 32px;
+  .projects-header {
+    margin-bottom: 64px;
   }
 
-  .projects-tag {
-    color: #d62828;
+  .projects-eyebrow {
     font-size: 0.85rem;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.08em;
+    color: #d62828;
     display: block;
-    margin-bottom: 8px;
+    margin-bottom: 12px;
   }
 
-  .projects-title {
-    color: #ffffff;
-    font-size: clamp(2rem, 3.2vw, 2.8rem);
+  .projects-headline {
+    font-size: clamp(2.2rem, 3.5vw, 3.2rem);
     font-weight: 700;
+    color: #ffffff;
     letter-spacing: -0.02em;
-    margin: 0;
   }
 
-  /* horizontal track */
-  .projects-track-window {
-    width: 100%;
-    overflow: hidden;
+  /* stage layout */
+  .focal-stage {
+    display: grid;
+    grid-template-columns: 200px 1fr 200px;
+    gap: 36px;
+    align-items: center;
+    min-height: 540px;
+    position: relative;
   }
 
-  .projects-track {
-    display: flex;
-    gap: 32px;
-    will-change: transform;
-  }
-
-  .project-slide {
-    flex: 0 0 clamp(340px, 60vw, 760px);
+  /* center focal unit (dominant image + adjacent copy) */
+  .center-focus-unit {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 48px;
+    align-items: center;
     background: #111216;
     border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 18px;
-    overflow: hidden;
-    display: grid;
-    grid-template-columns: 1.1fr 1fr;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    border-radius: 28px;
+    padding: 32px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+    z-index: 10;
   }
 
-  .project-img-box {
+  .focus-image-card {
     position: relative;
-    min-height: 380px;
-    cursor: pointer;
+    width: 100%;
+    height: 440px;
+    border-radius: 20px;
     overflow: hidden;
+    cursor: pointer;
+    background: #000;
+    border: 1px solid rgba(255, 255, 255, 0.06);
   }
 
-  .project-img-box img {
+  .focus-image-card img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
-    transition: transform 0.4s ease;
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  .project-img-box:hover img {
+  .focus-image-card:hover img {
     transform: scale(1.03);
   }
 
-  .inspect-hint {
+  .inspect-tag {
     position: absolute;
-    bottom: 14px;
-    right: 14px;
+    bottom: 16px;
+    right: 16px;
     font-size: 0.75rem;
-    font-weight: 500;
+    font-weight: 600;
     color: #ffffff;
-    background: rgba(13, 14, 18, 0.75);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    padding: 5px 12px;
+    background: rgba(13, 14, 18, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 6px 14px;
     border-radius: 9999px;
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     opacity: 0;
     transform: translateY(4px);
-    transition: opacity 0.2s ease, transform 0.2s ease;
+    transition: opacity 0.25s ease, transform 0.25s ease;
     pointer-events: none;
   }
 
-  .project-img-box:hover .inspect-hint {
+  .focus-image-card:hover .inspect-tag {
     opacity: 1;
     transform: translateY(0);
   }
 
-  /* slide details */
-  .project-details {
-    padding: 28px 24px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
-
-  .project-meta-row {
+  /* editorial copy alongside center image */
+  .focus-meta-row {
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.85rem;
+    margin-bottom: 16px;
+  }
+
+  .focus-index {
+    font-weight: 700;
+    color: #d62828;
+  }
+
+  .meta-separator {
+    color: rgba(255, 255, 255, 0.25);
+  }
+
+  .focus-category,
+  .focus-year {
+    color: rgba(255, 255, 255, 0.55);
+    font-weight: 500;
+  }
+
+  .focus-client {
+    font-size: clamp(1.6rem, 2.2vw, 2.1rem);
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1.2;
+    margin-bottom: 6px;
+    letter-spacing: -0.01em;
+  }
+
+  .focus-title {
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: #d62828;
+    margin-bottom: 20px;
+  }
+
+  .focus-summary {
+    font-size: 0.95rem;
+    line-height: 1.65;
+    color: #8f929b;
+    margin-bottom: 28px;
+  }
+
+  .focus-specs {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 20px;
+  }
+
+  .focus-specs :global(li) {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+    position: relative;
+    padding-left: 16px;
+  }
+
+  .focus-specs :global(li::before) {
+    content: "—";
+    position: absolute;
+    left: 0;
+    color: #d62828;
+  }
+
+  /* flanking offset cards (asymmetric height positioning) */
+  .flank-card {
+    background: #111216;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 18px;
+    padding: 14px;
+    cursor: pointer;
+    transition: transform 0.35s ease, opacity 0.35s ease, border-color 0.25s ease;
+    opacity: 0.45;
+    user-select: none;
+  }
+
+  .flank-card:hover {
+    opacity: 0.85;
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+
+  .flank-left {
+    transform: translateY(-40px) scale(0.92); /* floated high */
+  }
+
+  .flank-left:hover {
+    transform: translateY(-44px) scale(0.95);
+  }
+
+  .flank-right {
+    transform: translateY(40px) scale(0.92); /* floated low */
+  }
+
+  .flank-right:hover {
+    transform: translateY(44px) scale(0.95);
+  }
+
+  .flank-img-wrap {
+    width: 100%;
+    height: 180px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #000;
     margin-bottom: 12px;
   }
 
-  .project-index {
+  .flank-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .flank-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 0 4px;
+  }
+
+  .flank-index {
+    font-size: 0.75rem;
     font-weight: 600;
     color: #d62828;
   }
 
-  .meta-dot {
-    color: rgba(255, 255, 255, 0.3);
-    font-weight: bold;
-  }
-
-  .project-cat,
-  .project-year {
-    color: rgba(255, 255, 255, 0.7);
-  }
-
-  .project-client {
-    font-size: 1.35rem;
-    font-weight: 600;
+  .flank-title {
+    font-size: 0.85rem;
+    font-weight: 500;
     color: #ffffff;
-    margin: 0 0 8px 0;
-    letter-spacing: -0.01em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
-  .project-desc {
-    font-size: 0.95rem;
-    line-height: 1.6;
-    color: rgba(255, 255, 255, 0.7);
-    margin: 0 0 20px 0;
-  }
-
-  .project-specs {
+  /* controls */
+  .focal-controls {
     display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    margin-top: 48px;
   }
 
-  .spec-chip {
-    font-size: 0.75rem;
-    padding: 5px 11px;
-    border-radius: 6px;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    color: rgba(255, 255, 255, 0.75);
+  .ctrl-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
   }
 
-  /* modal lightbox */
+  .ctrl-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+
+  .ctrl-btn:active {
+    transform: scale(0.95);
+  }
+
+  .ctrl-counter {
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  /* image popout */
   .image-popout-overlay {
     position: fixed;
     inset: 0;
@@ -250,7 +390,7 @@ import projects from '../data/projects.json';
   }
 
   .popout-container {
-    max-width: 1000px;
+    max-width: 1080px;
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -265,33 +405,29 @@ import projects from '../data/projects.json';
 
   .popout-meta {
     color: #ffffff;
-    font-size: 0.9rem;
-    font-weight: 500;
+    font-size: 0.95rem;
+    font-weight: 600;
   }
 
   .popout-close {
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.15);
     color: #fff;
-    width: 34px;
-    height: 34px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     font-size: 1.4rem;
+    line-height: 1;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background-color 0.2s ease;
-  }
-
-  .popout-close:hover {
-    background: rgba(255, 255, 255, 0.18);
   }
 
   .popout-frame {
     width: 100%;
-    max-height: 78vh;
-    border-radius: 12px;
+    max-height: 80vh;
+    border-radius: 16px;
     overflow: hidden;
     border: 1px solid rgba(255, 255, 255, 0.1);
     background: #000;
@@ -300,279 +436,152 @@ import projects from '../data/projects.json';
   .popout-frame img {
     width: 100%;
     height: 100%;
-    max-height: 78vh;
+    max-height: 80vh;
     object-fit: contain;
     display: block;
   }
 
-  /* responsive */
-  @media (max-width: 900px) {
-    .projects-pin-wrap {
-      height: auto;
+  /* responsive queries */
+  @media (max-width: 1100px) {
+    .focal-stage {
+      grid-template-columns: 1fr;
+      gap: 24px;
     }
-
-    .projects-sticky-frame {
-      position: relative;
-      height: auto;
-      padding: 80px 5%;
-    }
-
-    .projects-track-window {
-      overflow-x: auto;
-      scroll-snap-type: x mandatory;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
-    }
-
-    .projects-track-window::-webkit-scrollbar {
+    .flank-card {
       display: none;
     }
-
-    .projects-track {
-      transform: none !important;
-      padding-bottom: 8px;
-    }
-
-    .project-slide {
-      flex: 0 0 88vw;
+    .center-focus-unit {
       grid-template-columns: 1fr;
-      scroll-snap-align: center;
+      gap: 28px;
+      padding: 24px;
     }
-
-    .project-img-box {
-      min-height: 220px;
-      height: 220px;
+    .focus-image-card {
+      height: 320px;
     }
-  }
-
-  /* Universal rolling button system */
-  .btn-pill {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    height: 48px;
-    padding: 0 30px;
-    border-radius: 9999px;
-    overflow: hidden;
-    position: relative;
-    text-decoration: none;
-    cursor: pointer;
-    box-sizing: border-box;
-    white-space: nowrap;
-    user-select: none;
-    transition: background-color 0.25s ease, border-color 0.25s ease, transform 0.15s ease;
-  }
-
-  .btn-pill:active {
-    transform: scale(0.97);
-  }
-
-  .btn-solid-red,
-  .btn-nav-cta {
-    background-color: #d62828;
-    color: #ffffff !important;
-    border: 1px solid transparent;
-  }
-  .btn-solid-red:hover,
-  .btn-nav-cta:hover {
-    background-color: #b91d1d;
-  }
-
-  .btn-frosted {
-    background: rgba(255, 255, 255, 0.12);
-    backdrop-filter: blur(16px) saturate(140%);
-    -webkit-backdrop-filter: blur(16px) saturate(140%);
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    color: #ffffff !important;
-    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3), 0 8px 24px rgba(0, 0, 0, 0.2);
-  }
-  .btn-frosted:hover {
-    background: rgba(255, 255, 255, 0.18);
-    border-color: rgba(255, 255, 255, 0.45);
-  }
-
-  .btn-roller {
-    position: relative;
-    display: inline-flex;
-    flex-direction: column;
-    height: 1.3em;
-    line-height: 1.3em;
-    overflow: hidden;
-    pointer-events: none;
-  }
-
-  .btn-label {
-    display: block;
-    height: 1.3em;
-    line-height: 1.3em;
-    font-size: 0.95rem;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-    color: #ffffff !important;
-    will-change: transform;
-    transition: transform 0.38s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .btn-label--base {
-    transform: translateY(0);
-  }
-
-  .btn-label--clone {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    transform: translateY(100%);
-  }
-
-  .btn-pill:hover .btn-label--base,
-  .btn-pill:focus-visible .btn-label--base {
-    transform: translateY(-100%);
-  }
-
-  .btn-pill:hover .btn-label--clone,
-  .btn-pill:focus-visible .btn-label--clone {
-    transform: translateY(0);
   }
 </style>
 
-<script>
-  /* scroll track and popout lifecycle */
-  let projectsScrollHandler: (() => void) | null = null;
-  let projectsResizeHandler: (() => void) | null = null;
-  let projectsKeydownHandler: ((e: KeyboardEvent) => void) | null = null;
+<script define:vars={{ projects }}>
+  const initFocalGallery = () => {
+    let currentIndex = 0;
+    const total = projects.length;
 
-  const initProjectsShowcase = () => {
-    const pinWrap = document.querySelector('.projects-pin-wrap') as HTMLElement | null;
-    const track = document.getElementById('projectsTrack') as HTMLElement | null;
-    const overlay = document.getElementById('projectImagePopout') as HTMLElement | null;
-    const targetImg = document.getElementById('popoutTargetImg') as HTMLImageElement | null;
-    const metaLabel = document.getElementById('popoutMeta');
-    const closeBtn = document.getElementById('popoutClose');
-    const triggers = document.querySelectorAll('.project-img-box');
+    /* center references */
+    const focusImage = document.getElementById("focusImage");
+    const focusIndex = document.getElementById("focusIndex");
+    const focusCategory = document.getElementById("focusCategory");
+    const focusYear = document.getElementById("focusYear");
+    const focusClient = document.getElementById("focusClient");
+    const focusTitle = document.getElementById("focusTitle");
+    const focusSummary = document.getElementById("focusSummary");
+    const focusSpecs = document.getElementById("focusSpecs");
+    const focusCard = document.getElementById("focusCard");
 
-    /* cleanup previous listeners */
-    if (projectsScrollHandler) {
-      window.removeEventListener('scroll', projectsScrollHandler);
-      projectsScrollHandler = null;
-    }
-    if (projectsResizeHandler) {
-      window.removeEventListener('resize', projectsResizeHandler);
-      projectsResizeHandler = null;
-    }
-    if (projectsKeydownHandler) {
-      window.removeEventListener('keydown', projectsKeydownHandler);
-      projectsKeydownHandler = null;
-    }
+    /* flank references */
+    const flankLeft = document.getElementById("flankLeft");
+    const flankLeftImg = document.getElementById("flankLeftImg");
+    const flankLeftIndex = document.getElementById("flankLeftIndex");
+    const flankLeftTitle = document.getElementById("flankLeftTitle");
 
-    /* horizontal track progression */
-    if (pinWrap && track) {
-      let ticking = false;
-      let travelDistance = 0;
-      let maxTranslate = 0;
+    const flankRight = document.getElementById("flankRight");
+    const flankRightImg = document.getElementById("flankRightImg");
+    const flankRightIndex = document.getElementById("flankRightIndex");
+    const flankRightTitle = document.getElementById("flankRightTitle");
 
-      const computeBounds = () => {
-        travelDistance = pinWrap.offsetHeight - window.innerHeight;
-        maxTranslate = track.scrollWidth - (track.parentElement ? track.parentElement.clientWidth : 0);
-      };
+    /* controls */
+    const ctrlPrev = document.getElementById("ctrlPrev");
+    const ctrlNext = document.getElementById("ctrlNext");
+    const ctrlCounter = document.getElementById("ctrlCounter");
 
-      const updatePosition = () => {
-        if (window.innerWidth <= 900) {
-          track.style.transform = '';
-          ticking = false;
-          return;
-        }
+    /* popout */
+    const popout = document.getElementById("projectImagePopout");
+    const popoutTarget = document.getElementById("popoutTargetImg");
+    const popoutMeta = document.getElementById("popoutMeta");
+    const popoutClose = document.getElementById("popoutClose");
 
-        const rect = pinWrap.getBoundingClientRect();
+    const render = () => {
+      const current = projects[currentIndex];
+      const prevIndex = (currentIndex - 1 + total) % total;
+      const nextIndex = (currentIndex + 1) % total;
+      const prev = projects[prevIndex];
+      const next = projects[nextIndex];
 
-        if (rect.top <= 0 && rect.bottom >= window.innerHeight) {
-          const progress = Math.min(Math.max(-rect.top / Math.max(travelDistance, 1), 0), 1);
-          track.style.transform = `translate3d(-${(progress * maxTranslate).toFixed(2)}px, 0, 0)`;
-        } else if (rect.top > 0) {
-          track.style.transform = 'translate3d(0, 0, 0)';
-        } else if (rect.bottom < window.innerHeight) {
-          track.style.transform = `translate3d(-${maxTranslate.toFixed(2)}px, 0, 0)`;
-        }
-        ticking = false;
-      };
+      /* update center card */
+      if (focusImage) {
+        focusImage.src = current.image;
+        focusImage.alt = current.title;
+      }
+      if (focusIndex) focusIndex.textContent = current.id;
+      if (focusCategory) focusCategory.textContent = current.category;
+      if (focusYear) focusYear.textContent = current.year;
+      if (focusClient) focusClient.textContent = current.client;
+      if (focusTitle) focusTitle.textContent = current.title;
+      if (focusSummary) focusSummary.textContent = current.summary;
+      if (focusSpecs) {
+        focusSpecs.innerHTML = current.specs.map(s => `<li>${s}</li>`).join("");
+      }
 
-      computeBounds();
-      updatePosition();
+      /* update flanks */
+      if (flankLeftImg) flankLeftImg.src = prev.image;
+      if (flankLeftIndex) flankLeftIndex.textContent = prev.id;
+      if (flankLeftTitle) flankLeftTitle.textContent = prev.client;
 
-      projectsResizeHandler = () => {
-        computeBounds();
-        if (!ticking) {
-          window.requestAnimationFrame(updatePosition);
-          ticking = true;
-        }
-      };
+      if (flankRightImg) flankRightImg.src = next.image;
+      if (flankRightIndex) flankRightIndex.textContent = next.id;
+      if (flankRightTitle) flankRightTitle.textContent = next.client;
 
-      projectsScrollHandler = () => {
-        if (!ticking) {
-          window.requestAnimationFrame(updatePosition);
-          ticking = true;
-        }
-      };
+      /* update counter */
+      if (ctrlCounter) ctrlCounter.textContent = `${currentIndex + 1} / ${total}`;
+    };
 
-      window.addEventListener('resize', projectsResizeHandler, { passive: true });
-      window.addEventListener('scroll', projectsScrollHandler, { passive: true });
-    }
+    const prev = () => {
+      currentIndex = (currentIndex - 1 + total) % total;
+      render();
+    };
 
-    /* in-place image inspection */
-    if (overlay && targetImg) {
-      const openModal = (src: string, meta: string) => {
-        targetImg.src = src;
-        targetImg.alt = meta || 'Project Image';
-        if (metaLabel) metaLabel.textContent = meta || '';
-        overlay.classList.add('is-active');
-        overlay.setAttribute('aria-hidden', 'false');
-        document.body.style.overflow = 'hidden';
-        closeBtn?.focus();
-      };
+    const next = () => {
+      currentIndex = (currentIndex + 1) % total;
+      render();
+    };
 
-      const closeModal = () => {
-        overlay.classList.remove('is-active');
-        overlay.setAttribute('aria-hidden', 'true');
-        document.body.style.overflow = '';
-        setTimeout(() => {
-          if (targetImg && !overlay.classList.contains('is-active')) {
-            targetImg.src = '';
-          }
-        }, 250);
-      };
+    ctrlPrev?.addEventListener("click", prev);
+    ctrlNext?.addEventListener("click", next);
+    flankLeft?.addEventListener("click", prev);
+    flankRight?.addEventListener("click", next);
 
-      triggers.forEach((box) => {
-        const el = box as HTMLElement;
-        const imgSrc = el.getAttribute('data-img') || '';
-        const meta = el.getAttribute('data-meta') || '';
+    /* image popout */
+    const openPopout = () => {
+      const current = projects[currentIndex];
+      if (!popout || !popoutTarget || !popoutMeta) return;
+      popoutTarget.src = current.image;
+      popoutMeta.textContent = `${current.client} — ${current.title}`;
+      popout.classList.add("is-active");
+      popout.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+    };
 
-        el.onclick = () => openModal(imgSrc, meta);
-        el.onkeydown = (e: KeyboardEvent) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            openModal(imgSrc, meta);
-          }
-        };
-      });
+    const closePopout = () => {
+      if (!popout || !popoutTarget) return;
+      popout.classList.remove("is-active");
+      popout.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+      setTimeout(() => { popoutTarget.src = ""; }, 250);
+    };
 
-      if (closeBtn) closeBtn.onclick = closeModal;
-      overlay.onclick = (e: MouseEvent) => {
-        if (e.target === overlay) closeModal();
-      };
+    focusCard?.addEventListener("click", openPopout);
+    popoutClose?.addEventListener("click", closePopout);
+    popout?.addEventListener("click", (e) => {
+      if (e.target === popout) closePopout();
+    });
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && popout?.classList.contains("is-active")) closePopout();
+      if (e.key === "ArrowLeft") prev();
+      if (e.key === "ArrowRight") next();
+    });
 
-      projectsKeydownHandler = (e: KeyboardEvent) => {
-        if (e.key === 'Escape' && overlay.classList.contains('is-active')) {
-          closeModal();
-        }
-      };
-      window.addEventListener('keydown', projectsKeydownHandler);
-    }
+    render();
   };
 
-  document.addEventListener('DOMContentLoaded', initProjectsShowcase);
-  document.addEventListener('astro:page-load', initProjectsShowcase);
-
-  if (document.readyState === 'interactive' || document.readyState === 'complete') {
-    initProjectsShowcase();
-  }
+  document.addEventListener("DOMContentLoaded", initFocalGallery);
+  document.addEventListener("astro:page-load", initFocalGallery);
 </script>
