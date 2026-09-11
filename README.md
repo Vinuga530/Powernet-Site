@@ -4,7 +4,7 @@ Official web platform for Powernet (Pvt) Ltd — Sri Lanka's trusted one-stop in
 
 ## Tech Stack
 
-- **Framework**: [Astro 5](https://astro.build/)
+- **Framework**: [Astro 7](https://astro.build/)
 - **Styling**: Vanilla CSS (CSS Variables, Grid, Flexbox)
 - **Typography**: Inter & Roboto Mono
 - **Deployment**: Vercel
