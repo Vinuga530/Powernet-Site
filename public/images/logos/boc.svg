@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 50" width="120" height="50" fill="none">
+  <g transform="translate(10, 10)">
+    <rect x="0" y="0" width="30" height="30" rx="6" fill="#F59E0B" />
+    <circle cx="15" cy="15" r="7" stroke="#111827" stroke-width="2" fill="none" />
+    <path d="M15 10v10M10 15h10" stroke="#111827" stroke-width="1.5" />
+    <text x="38" y="16" font-family="'Inter', -apple-system, sans-serif" font-size="14" font-weight="800" fill="#111827" letter-spacing="1">BOC</text>
+    <text x="38" y="25" font-family="'Inter', -apple-system, sans-serif" font-size="6" font-weight="600" fill="#6B7280" letter-spacing="0.5">BANK OF CEYLON</text>
+  </g>
+</svg>

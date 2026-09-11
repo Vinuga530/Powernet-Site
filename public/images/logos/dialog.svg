@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 50" width="120" height="50" fill="none">
+  <g transform="translate(10, 10)">
+    <path d="M6 21L15 7l9 14H6z" fill="#DC2626" />
+    <path d="M15 13l5 8h-10l5-8z" fill="#F59E0B" />
+    <text x="34" y="17" font-family="'Inter', -apple-system, sans-serif" font-size="13" font-weight="800" fill="#111827" letter-spacing="-0.2">Dialog</text>
+    <text x="34" y="25" font-family="'Inter', -apple-system, sans-serif" font-size="6" font-weight="600" fill="#6B7280" letter-spacing="0.8">AXIATA</text>
+  </g>
+</svg>
