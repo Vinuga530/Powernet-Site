@@ -1,8 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 50" width="120" height="50" fill="none">
-  <g transform="translate(10, 10)">
-    <rect x="0" y="0" width="30" height="30" rx="6" fill="#1E3A8A" />
-    <path d="M15 6L8 11v8c0 5 7 8 7 8s7-3 7-8v-8l-7-5z" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-    <text x="38" y="16" font-family="'Inter', -apple-system, sans-serif" font-size="14" font-weight="800" fill="#111827" letter-spacing="1">SEC</text>
-    <text x="38" y="25" font-family="'Inter', -apple-system, sans-serif" font-size="6" font-weight="600" fill="#6B7280" letter-spacing="0.5">SRI LANKA</text>
+  <defs>
+    <linearGradient id="silver" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="50%" stop-color="#E5E7EB" />
+      <stop offset="100%" stop-color="#9CA3AF" />
+    </linearGradient>
+  </defs>
+  <g transform="translate(10, 8)">
+    <rect x="0" y="0" width="34" height="34" rx="4" fill="#004EA1" />
+    <text x="17" y="24" font-family="'Times New Roman', Georgia, serif" font-size="14" font-weight="700" fill="url(#silver)" text-anchor="middle" letter-spacing="0.5">SEC</text>
+    <text x="42" y="18" font-family="'Inter', -apple-system, sans-serif" font-size="13" font-weight="800" fill="#111827" letter-spacing="1">SEC</text>
+    <text x="42" y="28" font-family="'Inter', -apple-system, sans-serif" font-size="5.5" font-weight="600" fill="#6B7280" letter-spacing="0.5">SRI LANKA</text>
   </g>
 </svg>
