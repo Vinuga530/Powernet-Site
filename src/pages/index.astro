@@ -276,10 +276,13 @@ import mapIcon from "../assets/images/icons/map.svg";
 
   <!-- contact section -->
   <section id="contact" class="section-cta scroll-reveal reveal-up">
-    <div class="container fade-in">
-      <h2 class="text-display-xl">LET'S BUILD<br />WHAT'S NEXT.</h2>
-      <div class="cta-actions">
-        <a href="/contact" class="btn-pill btn-solid-red" style="background-color: #ffffff; color: #111 !important;" aria-label="Discuss a Project">
+    <div class="container cta-grid fade-in">
+      <div class="cta-headline-col">
+        <h2 class="text-display-xl">LET'S BUILD<br />WHAT'S NEXT.</h2>
+        <p class="cta-subtitle">
+          Tell us about the project and our engineering team will get back to you within one business day.
+        </p>
+        <a href="/contact" class="btn-pill btn-solid-red cta-btn" style="background-color: #ffffff; color: #111 !important;" aria-label="Discuss a Project">
           <span class="nav-word" aria-hidden="true">
             <span class="nav-layer nav-layer-top">
               {Array.from("Discuss a Project →").map((letter, index) => (
@@ -297,6 +300,21 @@ import mapIcon from "../assets/images/icons/map.svg";
             </span>
           </span>
         </a>
+      </div>
+
+      <div class="cta-info-card">
+        <div class="cta-info-row">
+          <span class="cta-info-label">Call us</span>
+          <a href="tel:0114736151" class="cta-info-value">011 4 736 151</a>
+        </div>
+        <div class="cta-info-row">
+          <span class="cta-info-label">Email</span>
+          <a href="mailto:powernet@powernet.lk" class="cta-info-value">powernet@powernet.lk</a>
+        </div>
+        <div class="cta-info-row">
+          <span class="cta-info-label">Head Office</span>
+          <span class="cta-info-value cta-info-value-static">#74, Temple Road, Maradana, Colombo 10</span>
+        </div>
       </div>
     </div>
   </section>
@@ -797,22 +815,93 @@ import mapIcon from "../assets/images/icons/map.svg";
     padding: var(--space-3xl) 0;
     background-color: var(--color-brand);
     color: white;
-    text-align: center;
   }
 
-  .cta-actions {
-    margin-top: var(--space-2xl);
+  .cta-grid {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: var(--space-2xl);
+    align-items: center;
   }
 
-  .section-cta .btn-primary {
-    background-color: var(--color-foreground);
-    border: 1px solid rgba(0, 0, 0, 0.1);
+  .cta-headline-col {
+    text-align: left;
   }
 
-  .section-cta .btn-primary:hover {
-    background-color: var(--color-surface);
-    transform: translateY(-2px);
-    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.15);
+  .cta-subtitle {
+    margin-top: var(--space-md);
+    max-width: 34ch;
+    font-size: var(--text-body-large);
+    color: rgba(255, 255, 255, 0.82);
+  }
+
+  .cta-btn {
+    margin-top: var(--space-xl);
+  }
+
+  .cta-info-card {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 28px;
+    padding: var(--space-xl);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+
+  .cta-info-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: var(--space-md) 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+  }
+
+  .cta-info-row:first-child {
+    padding-top: 0;
+  }
+
+  .cta-info-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .cta-info-label {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: rgba(255, 255, 255, 0.65);
+  }
+
+  .cta-info-value {
+    font-size: var(--text-h4);
+    font-weight: 600;
+    color: #ffffff;
+  }
+
+  .cta-info-value:hover {
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .cta-info-value-static {
+    font-weight: 500;
+    font-size: var(--text-body);
+  }
+
+  @media (max-width: 900px) {
+    .cta-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .cta-headline-col {
+      text-align: center;
+    }
+
+    .cta-subtitle {
+      margin-left: auto;
+      margin-right: auto;
+    }
   }
 
   /* icon stroke overrides */
