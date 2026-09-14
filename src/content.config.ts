@@ -4,21 +4,13 @@ import { glob } from 'astro/loaders';
 const projectsCollection = defineCollection({
   loader: glob({ pattern: "*.{md,mdx}", base: "./src/content/projects" }),
   schema: z.object({
-    title: z.string(),
     client: z.string(),
-    sector: z.string().optional(),
-    location: z.string().optional(),
-    year: z.number().optional(),
+    title: z.string(),
     category: z.string(),
-    services: z.array(z.string()),
+    year: z.number(),
+    image: z.string(),
     summary: z.string(),
-    challenge: z.string().optional(),
-    solution: z.string().optional(),
-    scope: z.array(z.string()),
-    technologies: z.array(z.string()).optional(),
-    heroImage: z.string(),
-    gallery: z.array(z.string()).optional(),
-    featured: z.boolean().default(false),
+    specs: z.array(z.string()),
     order: z.number().default(99)
   })
 });

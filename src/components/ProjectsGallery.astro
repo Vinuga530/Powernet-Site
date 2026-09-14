@@ -1,19 +1,19 @@
 ---
 import { getCollection } from "astro:content";
 
-const rawEntries = await getCollection("projects");
-const projects = rawEntries
-  .sort((a, b) => a.data.order - b.data.order)
-  .map((entry) => ({
-    id: `Project ${String(entry.data.order).padStart(2, "0")}`,
-    client: entry.data.client,
-    title: entry.data.title,
-    category: entry.data.category,
-    year: String(entry.data.year ?? ""),
-    image: entry.data.heroImage,
-    summary: entry.data.summary,
-    specs: entry.data.scope,
-  }));
+const entries = await getCollection("projects");
+entries.sort((a, b) => a.data.order - b.data.order);
+
+const projects = entries.map((entry, index) => ({
+  id: `Project ${String(index + 1).padStart(2, "0")}`,
+  client: entry.data.client,
+  title: entry.data.title,
+  category: entry.data.category,
+  year: String(entry.data.year),
+  image: entry.data.image,
+  summary: entry.data.summary,
+  specs: entry.data.specs,
+}));
 ---
 
 <section id="projects" class="projects-focal-section">
