@@ -1,4 +1,3 @@
----
 client: "Industrial Processing Facility"
 title: "Factory Electrical Distribution"
 category: "Power Systems"
@@ -10,4 +9,3 @@ specs:
   - "Surge protection devices"
   - "Weatherproof conduit runs"
 order: 3
----

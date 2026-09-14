@@ -1,4 +1,3 @@
----
 client: "The World Bank Sri Lanka"
 title: "Server Room Power & UPS Installation"
 category: "Electrical & UPS"
@@ -11,4 +10,3 @@ specs:
   - "Server rack layout & cabling"
   - "Zero-downtime cutover"
 order: 1
----

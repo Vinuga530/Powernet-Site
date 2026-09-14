@@ -14,6 +14,7 @@ export default config({
       label: 'Projects',
       slugField: 'title',
       path: 'src/content/projects/*',
+      format: { data: 'yaml' },
       entryLayout: 'form',
       schema: {
         title: fields.slug({

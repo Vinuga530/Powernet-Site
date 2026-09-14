@@ -1,4 +1,3 @@
----
 client: "Commercial Bank Center"
 title: "Fiber Backbone & Access Setup"
 category: "Network Infrastructure"
@@ -10,4 +9,3 @@ specs:
   - "Keycard door controllers"
   - "Centralized equipment racks"
 order: 2
----
