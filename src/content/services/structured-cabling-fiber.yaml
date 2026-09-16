@@ -1,0 +1,9 @@
+title: "Structured Cabling & Fiber Optics"
+summary: "Physical cabling is the most enduring layer of any technical infrastructure. We install certified Cat6A distributions and single-mode optical trunk runs, complete with server rack layout, airflow containment, and Fluke-certified field terminations."
+scope:
+  - "Single-mode & multimode fiber"
+  - "Cat6A shielded networks"
+  - "Server cabinet containment"
+  - "Network audit & testing"
+anchorId: "data-voice"
+order: 2

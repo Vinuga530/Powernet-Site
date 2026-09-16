@@ -1,10 +1,14 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { Image, Picture } from "astro:assets";
+import { getCollection } from "astro:content";
 import heroImg from "../assets/images/photos/compress bg.webp";
 import ProjectsGallery from "../components/ProjectsGallery.astro";
 import contractIcon from "../assets/images/icons/contract.svg";
 import mapIcon from "../assets/images/icons/map.svg";
+
+const serviceEntries = await getCollection("services");
+serviceEntries.sort((a, b) => a.data.order - b.data.order);
 ---
 
 <BaseLayout title="Powernet (Pvt) Ltd | Power and Infrastructure Solutions">
@@ -202,80 +206,17 @@ import mapIcon from "../assets/images/icons/map.svg";
     </header>
 
     <div class="capabilities-list">
-      <!-- 01 Power -->
-      <article class="capability-entry">
-        <div class="entry-title">
-          <h3>Backup Power &amp; Industrial UPS</h3>
-        </div>
-        <div class="entry-content">
-          <p>
-            Uninterrupted facility power demands synchronized systems that react in milliseconds. We deploy three-phase industrial UPS installations, automatic transfer switches, and backup diesel generators engineered for clean handoffs during grid disturbances.
-          </p>
-          <p class="entry-scope">
-            Industrial UPS systems · Automatic transfer switches · Main switchboards · Surge suppression
-          </p>
-        </div>
-      </article>
-
-      <!-- 02 Network -->
-      <article class="capability-entry" id="data-voice">
-        <div class="entry-title">
-          <h3>Structured Cabling &amp; Fiber Optics</h3>
-        </div>
-        <div class="entry-content">
-          <p>
-            Physical cabling is the most enduring layer of any technical infrastructure. We install certified Cat6A distributions and single-mode optical trunk runs, complete with server rack layout, airflow containment, and Fluke-certified field terminations.
-          </p>
-          <p class="entry-scope">
-            Single-mode &amp; multimode fiber · Cat6A shielded networks · Server cabinet containment · Network audit &amp; testing
-          </p>
-        </div>
-      </article>
-
-      <!-- 03 Automation -->
-      <article class="capability-entry" id="mep-solutions">
-        <div class="entry-title">
-          <h3>Switchgear &amp; Panel Automation</h3>
-        </div>
-        <div class="entry-content">
-          <p>
-            Centralized power visibility prevents cascading equipment failures. We build custom motor control centers, integrate digital power meters, and program automated load-shedding switchboards for industrial facilities.
-          </p>
-          <p class="entry-scope">
-            Motor control centers · Digital power metering · PLC integration · Switchgear maintenance
-          </p>
-        </div>
-      </article>
-
-      <!-- 04 Fire -->
-      <article class="capability-entry" id="fire-protection">
-        <div class="entry-title">
-          <h3>Server Room Fire Protection</h3>
-        </div>
-        <div class="entry-content">
-          <p>
-            Critical IT archives and power switchrooms cannot survive water-based suppression. We install zero-residue FM-200 clean-agent gas suppression networks connected to aspirating early-smoke detection sensors.
-          </p>
-          <p class="entry-scope">
-            FM-200 suppression systems · Aspirating smoke sensors · Panel interlocks · Room integrity testing
-          </p>
-        </div>
-      </article>
-
-      <!-- 05 Security -->
-      <article class="capability-entry" id="security-solutions">
-        <div class="entry-title">
-          <h3>Physical Access &amp; Surveillance</h3>
-        </div>
-        <div class="entry-content">
-          <p>
-            Physical facility protection pairs hard access zoning with high-definition surveillance. We deploy multi-factor biometric door controllers, optical turnstiles, and tamper-resistant IP camera backbones.
-          </p>
-          <p class="entry-scope">
-            Biometric access control · Speed gate turnstiles · Enterprise IP CCTV · Central management software
-          </p>
-        </div>
-      </article>
+      {serviceEntries.map((service) => (
+        <article class="capability-entry" id={service.data.anchorId || undefined}>
+          <div class="entry-title">
+            <h3>{service.data.title}</h3>
+          </div>
+          <div class="entry-content">
+            <p>{service.data.summary}</p>
+            <p class="entry-scope">{service.data.scope.join(" · ")}</p>
+          </div>
+        </article>
+      ))}
     </div>
   </section>
 
@@ -371,7 +312,7 @@ import mapIcon from "../assets/images/icons/map.svg";
         </div>
         <div class="cta-info-row">
           <span class="cta-info-label">Head Office</span>
-          <span class="cta-info-value cta-info-value-static">#74, Temple Road, Maradana, Colombo 10</span>
+          <span class="cta-info-value cta-info-value-static">No 9, Park Avenue, Colombo 8</span>
         </div>
       </div>
     </div>
@@ -383,7 +324,7 @@ import mapIcon from "../assets/images/icons/map.svg";
       <div class="location-map-wrap">
         <iframe
           class="location-map"
-          src="https://www.google.com/maps?q=%2374+Temple+Road%2C+Maradana%2C+Colombo+10%2C+Sri+Lanka&output=embed"
+          src="https://www.google.com/maps?q=No+9%2C+Park+Avenue%2C+Colombo+8%2C+Sri+Lanka&output=embed"
           loading="lazy"
           referrerpolicy="no-referrer-when-downgrade"
           title="Powernet Head Office location"
@@ -391,9 +332,9 @@ import mapIcon from "../assets/images/icons/map.svg";
 
         <div class="location-card">
           <span class="text-label">Head Office</span>
-          <p class="location-address">#74, Temple Road, Maradana, Colombo 10</p>
+          <p class="location-address">No 9, Park Avenue, Colombo 8</p>
           <a
-            href="https://www.google.com/maps/search/?api=1&query=%2374+Temple+Road%2C+Maradana%2C+Colombo+10%2C+Sri+Lanka"
+            href="https://www.google.com/maps/search/?api=1&query=No+9%2C+Park+Avenue%2C+Colombo+8%2C+Sri+Lanka"
             target="_blank"
             rel="noopener noreferrer"
             class="location-directions"

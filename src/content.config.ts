@@ -16,13 +16,13 @@ const projectsCollection = defineCollection({
 });
 
 const servicesCollection = defineCollection({
-  loader: glob({ pattern: "*.{md,mdx}", base: "./src/content/services" }),
+  loader: glob({ pattern: "*.yaml", base: "./src/content/services" }),
   schema: z.object({
     title: z.string(),
-    shortDescription: z.string(),
-    iconIdentifier: z.string().optional(),
-    includes: z.array(z.string()),
-    order: z.number()
+    summary: z.string(),
+    scope: z.array(z.string()),
+    anchorId: z.string().optional(),
+    order: z.number().default(99)
   })
 });
 

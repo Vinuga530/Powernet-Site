@@ -57,5 +57,43 @@ export default config({
         }),
       },
     }),
+
+    services: collection({
+      label: 'Services',
+      slugField: 'title',
+      path: 'src/content/services/*',
+      format: { data: 'yaml' },
+      entryLayout: 'form',
+      schema: {
+        title: fields.slug({
+          name: {
+            label: 'Service Title',
+            description: 'e.g. "Backup Power & Industrial UPS"',
+          },
+        }),
+        summary: fields.text({
+          label: 'Description',
+          description: 'The paragraph shown under the title',
+          multiline: true,
+        }),
+        scope: fields.array(
+          fields.text({ label: 'Item' }),
+          {
+            label: 'What This Covers',
+            description: 'Shown as a single line separated by dots',
+            itemLabel: (props) => props.value || 'New item',
+          }
+        ),
+        anchorId: fields.text({
+          label: 'Anchor ID (optional)',
+          description: 'Only set this if the footer links to this specific service, e.g. "data-voice". Leave blank otherwise.',
+        }),
+        order: fields.integer({
+          label: 'Display Order',
+          description: 'Lower numbers show first (1, 2, 3...)',
+          defaultValue: 99,
+        }),
+      },
+    }),
   },
 });
