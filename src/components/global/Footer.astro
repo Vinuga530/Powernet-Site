@@ -1,4 +1,9 @@
 ---
+import { getEntry } from 'astro:content';
+
+const companyEntry = await getEntry('settings', 'company');
+const company = companyEntry.data;
+
 /* footer */
 const navLinks = [
   { href: "/#services", label: "Services" },
@@ -28,11 +33,11 @@ const navLinks = [
         </a>
       </div>
 
-      <a href="mailto:powernet@powernet.lk" class="footer-email">powernet@powernet.lk</a>
+      <a href={`mailto:${company.primaryEmail}`} class="footer-email">{company.primaryEmail}</a>
 
       <p class="footer-address text-small">
-        No 9, Park Avenue,<br />
-        Colombo 8, Sri Lanka
+        {company.addressLine1},<br />
+        {company.addressLine2}, {company.country}
       </p>
     </div>
 

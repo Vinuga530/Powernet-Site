@@ -1,5 +1,12 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import { getEntry, getCollection } from 'astro:content';
+
+const companyEntry = await getEntry('settings', 'company');
+const company = companyEntry.data;
+
+const hotlineEntries = await getCollection('hotlines');
+hotlineEntries.sort((a, b) => a.data.order - b.data.order);
 ---
 
 <BaseLayout title="Contact Us | Powernet (Pvt) Ltd">
@@ -16,26 +23,12 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         <div class="contact-card" style="background-color: var(--color-surface); padding: var(--space-xl); border: 1px solid var(--color-border);">
           <h2 class="text-h1" style="margin-bottom: var(--space-lg);">Department Hotlines</h2>
           <ul style="list-style: none; display: flex; flex-direction: column; gap: var(--space-md); padding: 0;">
-            <li>
-              <span class="text-label" style="display: block; color: var(--color-brand); margin-bottom: 4px;">Network Support</span>
-              <a href="tel:0777788793" class="text-h4">0777 788 793</a>
-            </li>
-            <li>
-              <span class="text-label" style="display: block; color: var(--color-brand); margin-bottom: 4px;">Electrical</span>
-              <a href="tel:0770066844" class="text-h4">0770 066844</a>
-            </li>
-            <li>
-              <span class="text-label" style="display: block; color: var(--color-brand); margin-bottom: 4px;">Fire Protection</span>
-              <a href="tel:0777321393" class="text-h4">0777 321 393</a>
-            </li>
-            <li>
-              <span class="text-label" style="display: block; color: var(--color-brand); margin-bottom: 4px;">Computer Systems</span>
-              <a href="tel:0767464422" class="text-h4">0767 464 422</a>
-            </li>
-            <li>
-              <span class="text-label" style="display: block; color: var(--color-brand); margin-bottom: 4px;">UPS</span>
-              <a href="tel:0703073133" class="text-h4">0703 073 133</a>
-            </li>
+            {hotlineEntries.map((entry) => (
+              <li>
+                <span class="text-label" style="display: block; color: var(--color-brand); margin-bottom: 4px;">{entry.data.department}</span>
+                <a href={`tel:${entry.data.phone.replace(/\s+/g, '')}`} class="text-h4">{entry.data.phone}</a>
+              </li>
+            ))}
           </ul>
         </div>
 
@@ -44,13 +37,12 @@ import BaseLayout from "../layouts/BaseLayout.astro";
           <div class="contact-card" style="background-color: var(--color-surface); padding: var(--space-xl); border: 1px solid var(--color-border);">
             <h2 class="text-h1" style="margin-bottom: var(--space-lg);">Head Office</h2>
             <p class="text-body-large" style="color: var(--color-muted);">
-              No 9, Park Avenue<br />
-              Colombo 8
+              {company.addressLine1}<br />
+              {company.addressLine2}
             </p>
             <div style="margin-top: var(--space-md);">
-              <p>General Tel: 011 4 736 151 / 171</p>
-              <p>Fax: 011 4 795 110</p>
-              <p>Email: <a href="mailto:powernet@powernet.lk" style="color: var(--color-brand);">powernet@powernet.lk</a></p>
+              <p>General Tel: <a href={`tel:${company.primaryPhone.replace(/\s+/g, '')}`}>{company.primaryPhone}</a></p>
+              <p>Email: <a href={`mailto:${company.primaryEmail}`} style="color: var(--color-brand);">{company.primaryEmail}</a></p>
             </div>
           </div>
 

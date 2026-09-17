@@ -26,7 +26,31 @@ const servicesCollection = defineCollection({
   })
 });
 
+const settingsCollection = defineCollection({
+  loader: glob({ pattern: "*.yaml", base: "./src/content/settings" }),
+  schema: z.object({
+    addressLine1: z.string(),
+    addressLine2: z.string(),
+    country: z.string().default("Sri Lanka"),
+    primaryPhone: z.string(),
+    primaryEmail: z.string(),
+    mapsEmbedUrl: z.string(),
+    mapsSearchUrl: z.string(),
+  }),
+});
+
+const hotlinesCollection = defineCollection({
+  loader: glob({ pattern: "*.yaml", base: "./src/content/hotlines" }),
+  schema: z.object({
+    department: z.string(),
+    phone: z.string(),
+    order: z.number().default(99),
+  }),
+});
+
 export const collections = {
   'projects': projectsCollection,
   'services': servicesCollection,
+  'settings': settingsCollection,
+  'hotlines': hotlinesCollection,
 };

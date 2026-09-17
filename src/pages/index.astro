@@ -1,7 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { Image, Picture } from "astro:assets";
-import { getCollection } from "astro:content";
+import { getCollection, getEntry } from "astro:content";
 import heroImg from "../assets/images/photos/compress bg.webp";
 import ProjectsGallery from "../components/ProjectsGallery.astro";
 import contractIcon from "../assets/images/icons/contract.svg";
@@ -9,6 +9,9 @@ import mapIcon from "../assets/images/icons/map.svg";
 
 const serviceEntries = await getCollection("services");
 serviceEntries.sort((a, b) => a.data.order - b.data.order);
+
+const companyEntry = await getEntry('settings', 'company');
+const company = companyEntry.data;
 ---
 
 <BaseLayout title="Powernet (Pvt) Ltd | Power and Infrastructure Solutions">
@@ -334,11 +337,11 @@ serviceEntries.sort((a, b) => a.data.order - b.data.order);
         </div>
         <div class="cta-info-row">
           <span class="cta-info-label">Email</span>
-          <a href="mailto:powernet@powernet.lk" class="cta-info-value">powernet@powernet.lk</a>
+          <a href={`mailto:${company.primaryEmail}`} class="cta-info-value">{company.primaryEmail}</a>
         </div>
         <div class="cta-info-row">
           <span class="cta-info-label">Head Office</span>
-          <span class="cta-info-value cta-info-value-static">No 9, Park Avenue, Colombo 8</span>
+          <span class="cta-info-value cta-info-value-static">{company.addressLine1}, {company.addressLine2}</span>
         </div>
       </div>
     </div>
@@ -350,7 +353,7 @@ serviceEntries.sort((a, b) => a.data.order - b.data.order);
       <div class="location-map-wrap">
         <iframe
           class="location-map"
-          src="https://www.google.com/maps?q=No+9%2C+Park+Avenue%2C+Colombo+8%2C+Sri+Lanka&output=embed"
+          src={company.mapsEmbedUrl}
           loading="lazy"
           referrerpolicy="no-referrer-when-downgrade"
           title="Powernet Head Office location"
@@ -358,9 +361,9 @@ serviceEntries.sort((a, b) => a.data.order - b.data.order);
 
         <div class="location-card">
           <span class="text-label">Head Office</span>
-          <p class="location-address">No 9, Park Avenue, Colombo 8</p>
+          <p class="location-address">{company.addressLine1}, {company.addressLine2}</p>
           <a
-            href="https://www.google.com/maps/search/?api=1&query=No+9%2C+Park+Avenue%2C+Colombo+8%2C+Sri+Lanka"
+            href={company.mapsSearchUrl}
             target="_blank"
             rel="noopener noreferrer"
             class="location-directions"
