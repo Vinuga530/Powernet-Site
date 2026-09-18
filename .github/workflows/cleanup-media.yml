@@ -1,13 +1,6 @@
 name: Clean Up Unused Media
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'src/content/**'
-      - 'public/images/**'
-      - 'public/videos/**'
   workflow_dispatch:
     inputs:
       dry_run:

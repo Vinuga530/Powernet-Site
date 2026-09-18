@@ -1,19 +1,19 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro';
 import fs from 'node:fs';
 import path from 'node:path';
 
 export const prerender = false;
 
+const GITHUB_REPO = 'Vinuga530/Powernet-Site';
 const rootDir = process.cwd();
 const publicDir = path.join(rootDir, 'public');
 const srcDir = path.join(rootDir, 'src');
 
 const managedDirs = [
-  { category: 'Projects', dir: path.join(publicDir, 'images', 'projects') },
-  { category: 'Logos', dir: path.join(publicDir, 'images', 'logos') },
-  { category: 'Hero Images', dir: path.join(publicDir, 'images', 'hero') },
-  { category: 'Hero Videos', dir: path.join(publicDir, 'videos', 'hero') },
+  { category: 'Projects', dir: path.join(publicDir, 'images', 'projects'), prefix: 'public/images/projects/', icon: '🏗️' },
+  { category: 'Logos', dir: path.join(publicDir, 'images', 'logos'), prefix: 'public/images/logos/', icon: '🏷️' },
+  { category: 'Hero Images', dir: path.join(publicDir, 'images', 'hero'), prefix: 'public/images/hero/', icon: '🖼️' },
+  { category: 'Hero Videos', dir: path.join(publicDir, 'videos', 'hero'), prefix: 'public/videos/hero/', icon: '🎬' },
 ];
 
 const PROTECTED_FILES = new Set([
@@ -22,308 +22,653 @@ const PROTECTED_FILES = new Set([
   'favicon.svg',
   'site.webmanifest',
   'powernet-logo-coloured.png',
+  'apple-touch-icon.png',
 ]);
 
-function getAllFiles(dirPath: string, arrayOfFiles: string[] = []): string[] {
-  if (!fs.existsSync(dirPath)) return arrayOfFiles;
-  const entries = fs.readdirSync(dirPath, { withFileTypes: true });
-
-  for (const entry of entries) {
-    const fullPath = path.join(dirPath, entry.name);
-    if (entry.isDirectory()) {
-      getAllFiles(fullPath, arrayOfFiles);
-    } else {
-      arrayOfFiles.push(fullPath);
-    }
+function getAllFiles(dirPath, arr = []) {
+  if (!fs.existsSync(dirPath)) return arr;
+  for (const e of fs.readdirSync(dirPath, { withFileTypes: true })) {
+    const fp = path.join(dirPath, e.name);
+    if (e.isDirectory()) getAllFiles(fp, arr);
+    else arr.push(fp);
   }
-  return arrayOfFiles;
+  return arr;
 }
 
-function collectReferencedAssets(srcDir: string): Map<string, string[]> {
-  const usageMap = new Map<string, string[]>();
-  const textFiles = getAllFiles(srcDir).filter((file) => {
-    const ext = path.extname(file).toLowerCase();
-    return ['.yaml', '.yml', '.astro', '.ts', '.js', '.jsx', '.tsx', '.json', '.md', '.mdx', '.css'].includes(ext);
-  });
+function collectReferencedAssets(sDir) {
+  const map = new Map();
+  if (!fs.existsSync(sDir)) return map;
 
-  for (const file of textFiles) {
+  const txtExts = ['.yaml', '.yml', '.astro', '.ts', '.js', '.jsx', '.tsx', '.json', '.md', '.mdx', '.css'];
+  const files = getAllFiles(sDir).filter((f) => txtExts.includes(path.extname(f).toLowerCase()));
+
+  for (const file of files) {
     try {
       const content = fs.readFileSync(file, 'utf-8');
-      const relativeFile = path.relative(srcDir, file).replace(/\\/g, '/');
-
-      const matches = content.match(/["']?(\/(images|videos)\/[^"'\s\n\r]+)/g);
-      if (matches) {
-        for (const rawMatch of matches) {
-          const cleaned = rawMatch.replace(/^['"]/, '').replace(/['",;]$/, '').trim();
-          const normSlash = cleaned.replace(/\\/g, '/');
-          const fileName = path.basename(cleaned).toLowerCase();
-
-          const existing = usageMap.get(normSlash) || [];
-          if (!existing.includes(relativeFile)) existing.push(relativeFile);
-          usageMap.set(normSlash, existing);
-
-          const existingByFn = usageMap.get(fileName) || [];
-          if (!existingByFn.includes(relativeFile)) existingByFn.push(relativeFile);
-          usageMap.set(fileName, existingByFn);
+      const rel = path.relative(sDir, file).replace(/\\/g, '/');
+      const matches = content.match(/["']?(\/(images|videos)\/[^"'\s\n\r]+)/g) || [];
+      for (const m of matches) {
+        const cleaned = m.replace(/^['"]/, '').replace(/['",;]$/, '').trim().replace(/\\/g, '/');
+        const fn = path.basename(cleaned).toLowerCase();
+        for (const key of [cleaned, fn]) {
+          const ex = map.get(key) || [];
+          if (!ex.includes(rel)) ex.push(rel);
+          map.set(key, ex);
         }
       }
-
-      const fnMatches = content.match(/[\w\-.]+\.(png|jpe?g|webp|svg|mp4|webm|gif|avif)/gi);
-      if (fnMatches) {
-        for (const fn of fnMatches) {
-          const fnLower = fn.toLowerCase();
-          const existing = usageMap.get(fnLower) || [];
-          if (!existing.includes(relativeFile)) existing.push(relativeFile);
-          usageMap.set(fnLower, existing);
-        }
+      const fnm = content.match(/[\w\-.]+\.(png|jpe?g|webp|svg|mp4|webm|gif|avif)/gi) || [];
+      for (const fn of fnm) {
+        const fnl = fn.toLowerCase();
+        const ex = map.get(fnl) || [];
+        if (!ex.includes(rel)) ex.push(rel);
+        map.set(fnl, ex);
       }
     } catch {}
   }
-
-  return usageMap;
+  return map;
 }
 
 const usageMap = collectReferencedAssets(srcDir);
-const mediaItems: any[] = [];
+const mediaItems = [];
 
+// 1. Scan local disk
+let localCount = 0;
 for (const group of managedDirs) {
-  if (!fs.existsSync(group.dir)) continue;
-  const files = getAllFiles(group.dir);
+  if (fs.existsSync(group.dir)) {
+    for (const filePath of getAllFiles(group.dir)) {
+      const fileName = path.basename(filePath);
+      if (PROTECTED_FILES.has(fileName.toLowerCase())) continue;
 
-  for (const filePath of files) {
-    const fileName = path.basename(filePath);
-    if (PROTECTED_FILES.has(fileName.toLowerCase())) continue;
+      const rel = '/' + path.relative(publicDir, filePath).replace(/\\/g, '/');
+      const isVideo = ['.mp4', '.webm', '.mov', '.ogg'].includes(path.extname(filePath).toLowerCase());
+      const usedIn = usageMap.get(rel) || usageMap.get(rel.slice(1)) || usageMap.get(fileName.toLowerCase()) || [];
+      let size = 0;
+      try {
+        size = fs.statSync(filePath).size;
+      } catch {}
 
-    const relPathSlash = '/' + path.relative(publicDir, filePath).replace(/\\/g, '/');
-    const relPathNoSlash = relPathSlash.slice(1);
-    const isVideo = ['.mp4', '.webm', '.mov', '.ogg'].includes(path.extname(filePath).toLowerCase());
-
-    const usedIn = usageMap.get(relPathSlash) || usageMap.get(relPathNoSlash) || usageMap.get(fileName.toLowerCase()) || [];
-    const stats = fs.statSync(filePath);
-
-    mediaItems.push({
-      name: fileName,
-      path: relPathSlash,
-      category: group.category,
-      size: stats.size,
-      isVideo,
-      inUse: usedIn.length > 0,
-      usedIn: usedIn,
-    });
+      localCount++;
+      mediaItems.push({
+        name: fileName,
+        path: rel,
+        category: group.category,
+        icon: group.icon,
+        size,
+        isVideo,
+        inUse: usedIn.length > 0,
+        usedIn,
+      });
+    }
   }
+}
+
+// 2. In production on Vercel lambda where public/ is not mounted on disk, query GitHub Trees API
+if (localCount === 0) {
+  try {
+    const ghToken =
+      Astro.cookies.get('keystatic-gh-access-token')?.value ||
+      Astro.request.headers.get('cookie')?.match(/keystatic-gh-access-token=([^;]+)/)?.[1] ||
+      Astro.request.headers.get('x-github-token') ||
+      process.env.KEYSTATIC_GITHUB_TOKEN ||
+      process.env.GITHUB_TOKEN ||
+      process.env.GH_TOKEN;
+
+    const ghHeaders = {
+      'Accept': 'application/vnd.github+json',
+      'User-Agent': 'Powernet-CMS-MediaManager',
+    };
+    if (ghToken) ghHeaders['Authorization'] = `Bearer ${ghToken}`;
+
+    const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/git/trees/main?recursive=1`, {
+      headers: ghHeaders,
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      for (const item of data.tree || []) {
+        if (item.type !== 'blob') continue;
+        const p = item.path;
+        const fn = path.basename(p);
+        if (PROTECTED_FILES.has(fn.toLowerCase())) continue;
+
+        let matched = null;
+        for (const g of managedDirs) {
+          if (p.startsWith(g.prefix)) {
+            matched = g;
+            break;
+          }
+        }
+        if (matched) {
+          const rel = '/' + p.replace(/^public\//, '');
+          const isVideo = ['.mp4', '.webm', '.mov', '.ogg'].includes(path.extname(fn).toLowerCase());
+          const usedIn = usageMap.get(rel) || usageMap.get(fn.toLowerCase()) || [];
+
+          mediaItems.push({
+            name: fn,
+            path: rel,
+            category: matched.category,
+            icon: matched.icon,
+            size: item.size || 0,
+            isVideo,
+            inUse: usedIn.length > 0,
+            usedIn,
+          });
+        }
+      }
+    }
+  } catch {}
 }
 
 const totalCount = mediaItems.length;
-const unusedCount = mediaItems.filter(m => !m.inUse).length;
-const totalBytes = mediaItems.reduce((acc, m) => acc + m.size, 0);
-const unusedBytes = mediaItems.filter(m => !m.inUse).reduce((acc, m) => acc + m.size, 0);
+const unusedCount = mediaItems.filter((m) => !m.inUse).length;
+const totalBytes = mediaItems.reduce((a, m) => a + m.size, 0);
+const unusedBytes = mediaItems.filter((m) => !m.inUse).reduce((a, m) => a + m.size, 0);
 
-function formatBytes(bytes: number) {
-  if (bytes === 0) return '0 B';
-  const k = 1024;
-  const sizes = ['B', 'KB', 'MB', 'GB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return `${(bytes / Math.pow(k, i)).toFixed(2)} ${sizes[i]}`;
+function fmtBytes(b) {
+  if (!b) return '0 B';
+  const k = 1024,
+    s = ['B', 'KB', 'MB', 'GB'],
+    i = Math.floor(Math.log(b) / Math.log(k));
+  return `${(b / Math.pow(k, i)).toFixed(1)} ${s[i]}`;
 }
 ---
-
-<BaseLayout title="Media Manager & Cleanup | Powernet">
-  <main class="media-admin-page">
-    <div class="admin-container">
-      <!-- top nav bar -->
-      <header class="admin-header">
-        <div class="header-left">
-          <a href="/keystatic" class="btn-back">&larr; Back to CMS</a>
-          <h1 class="admin-title">Media Library &amp; Clean Up</h1>
-          <p class="admin-subtitle">Inspect uploaded photos and videos, select files, and clean up unreferenced media.</p>
-        </div>
-        <div class="header-actions">
-          <a href="/" class="btn-secondary" target="_blank">View Site &nearr;</a>
-          <button id="btnAutoCleanup" class="btn-danger" disabled={unusedCount === 0}>
-            🧹 Clean All Unused ({unusedCount})
-          </button>
-        </div>
-      </header>
-
-      <!-- metrics cards -->
-      <section class="metrics-row">
-        <div class="metric-box">
-          <span class="metric-label">Total Uploads</span>
-          <span class="metric-val">{totalCount} <small>files</small></span>
-          <span class="metric-sub">{formatBytes(totalBytes)}</span>
-        </div>
-        <div class="metric-box">
-          <span class="metric-label">In-Use Assets</span>
-          <span class="metric-val status-green">{totalCount - unusedCount}</span>
-          <span class="metric-sub">Actively linked on site</span>
-        </div>
-        <div class="metric-box">
-          <span class="metric-label">Unused / Orphaned</span>
-          <span class="metric-val status-warn">{unusedCount}</span>
-          <span class="metric-sub">{formatBytes(unusedBytes)} reclaimable</span>
-        </div>
-      </section>
-
-      <!-- controls and toolbar -->
-      <section class="toolbar">
-        <div class="filter-tabs">
-          <button class="tab-btn active" data-filter="all">All ({totalCount})</button>
-          <button class="tab-btn" data-filter="unused">Unused ({unusedCount})</button>
-          <button class="tab-btn" data-filter="projects">Projects</button>
-          <button class="tab-btn" data-filter="logos">Logos</button>
-          <button class="tab-btn" data-filter="hero">Hero Media</button>
-        </div>
-
-        <div class="selection-actions">
-          <button id="btnSelectUnused" class="btn-outline">Select All Unused</button>
-          <button id="btnDeselectAll" class="btn-outline">Deselect All</button>
-          <button id="btnDeleteSelected" class="btn-danger-outline" disabled>
-            Delete Selected (<span id="selectedCount">0</span>)
-          </button>
-        </div>
-      </section>
-
-      <!-- media grid -->
-      <section class="media-grid" id="mediaGrid">
-        {mediaItems.length === 0 ? (
-          <div class="empty-state">
-            <span class="empty-icon">📁</span>
-            <h3>No managed media files found</h3>
-            <p>Upload photos and videos in Keystatic to see them here.</p>
-          </div>
-        ) : (
-          mediaItems.map((item) => (
-            <article
-              class={`media-card ${!item.inUse ? 'is-unused' : 'is-in-use'}`}
-              data-path={item.path}
-              data-category={item.category.toLowerCase()}
-              data-inuse={item.inUse ? 'true' : 'false'}
-            >
-              <div class="card-thumb-wrap">
-                <label class="card-checkbox-label">
-                  <input type="checkbox" class="file-checkbox" value={item.path} />
-                  <span class="checkbox-custom"></span>
-                </label>
-
-                {item.isVideo ? (
-                  <video src={item.path} muted loop playsinline class="card-preview-video" preload="metadata" />
-                ) : (
-                  <img src={item.path} alt={item.name} loading="lazy" class="card-preview-img" />
-                )}
-
-                <span class={`status-badge ${item.inUse ? 'badge-in-use' : 'badge-unused'}`}>
-                  {item.inUse ? 'In Use' : 'Unused'}
-                </span>
-              </div>
-
-              <div class="card-body">
-                <h4 class="card-filename" title={item.name}>{item.name}</h4>
-                <div class="card-meta">
-                  <span class="meta-size">{formatBytes(item.size)}</span>
-                  <span class="meta-cat">{item.category}</span>
-                </div>
-
-                <div class="card-usage">
-                  {item.inUse ? (
-                    <span class="usage-text" title={item.usedIn.join(', ')}>
-                      Used in: {item.usedIn.map((f: string) => f.split('/').pop()).join(', ')}
-                    </span>
-                  ) : (
-                    <span class="unused-text">⚠️ Not linked to any content</span>
-                  )}
-                </div>
-
-                <button type="button" class="btn-single-delete" data-delete-path={item.path} title="Delete this file">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="3 6 5 6 21 6"></polyline>
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                  </svg>
-                  Delete
-                </button>
-              </div>
-            </article>
-          ))
-        )}
-      </section>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Media Manager — Powernet CMS</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+<div class="app-shell">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-logo">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">Powernet</span>
+        <span class="brand-label">CMS Admin</span>
+      </div>
     </div>
 
-    <!-- toast notification -->
-    <div id="toast" class="toast"></div>
+    <nav class="sidebar-nav">
+      <p class="nav-section-label">Content</p>
+      <a href="/keystatic" class="nav-item">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
+      <a href="/keystatic/collection/projects" class="nav-item">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        Projects
+      </a>
+      <a href="/keystatic/collection/services" class="nav-item">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        Services
+      </a>
+      <a href="/keystatic/collection/clients" class="nav-item">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Clients / Logos
+      </a>
+      <a href="/keystatic/singleton/hero" class="nav-item">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        Hero Section
+      </a>
+
+      <div class="nav-divider"></div>
+
+      <p class="nav-section-label">Media & Management</p>
+      <a href="/admin/media" class="nav-item active">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        Media Manager
+        <span class="nav-badge">{totalCount}</span>
+      </a>
+      <a href="/" target="_blank" class="nav-item">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        View Live Site ↗
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="storage-info">
+        <div class="storage-label">
+          <span>Storage</span>
+          <span class="storage-used">{fmtBytes(totalBytes)}</span>
+        </div>
+        <div class="storage-bar">
+          <div class="storage-fill" style={`width: ${Math.min(100, Math.max(5, Math.round((totalBytes / (50 * 1024 * 1024)) * 100)))}%`}></div>
+        </div>
+        <div class="storage-sub">{totalCount} files &bull; {unusedCount} unused</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN VIEW -->
+  <main class="main">
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="topbar-title-wrap">
+        <h1 class="page-title">Media Manager</h1>
+        <p class="page-sub">View, select, and delete uploaded images and videos</p>
+      </div>
+
+      <div class="topbar-actions">
+        <a href="/keystatic" class="btn btn-ghost">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+          Back to CMS
+        </a>
+        <button id="btnAutoCleanup" class="btn btn-danger" data-unused={unusedCount} disabled={unusedCount === 0}>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          Clean Up All Unused ({unusedCount})
+        </button>
+      </div>
+    </header>
+
+    <!-- STATS ROW -->
+    <section class="stats">
+      <div class="stat-card">
+        <div class="sic sic-blue">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        </div>
+        <div class="si">
+          <span class="sv" id="statTotal">{totalCount}</span>
+          <span class="sl">Total Assets</span>
+        </div>
+        <div class="ss" id="statTotalBytes">{fmtBytes(totalBytes)}</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="sic sic-green">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        </div>
+        <div class="si">
+          <span class="sv c-green" id="statInUse">{totalCount - unusedCount}</span>
+          <span class="sl">In Active Use</span>
+        </div>
+        <div class="ss">Linked in CMS Content</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="sic sic-amber">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
+        <div class="si">
+          <span class="sv c-amber" id="statUnused">{unusedCount}</span>
+          <span class="sl">Unused Assets</span>
+        </div>
+        <div class="ss" id="statUnusedBytes">{fmtBytes(unusedBytes)} reclaimable</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="sic sic-purple">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+        </div>
+        <div class="si">
+          <span class="sv">4</span>
+          <span class="sl">Categories</span>
+        </div>
+        <div class="ss">Projects, Logos, Hero</div>
+      </div>
+    </section>
+
+    <!-- TOOLBAR -->
+    <section class="toolbar">
+      <div class="toolbar-left">
+        <div class="ftabs">
+          <button class="tab active" data-f="all">All ({totalCount})</button>
+          <button class="tab" data-f="unused">⚠ Unused ({unusedCount})</button>
+          <button class="tab" data-f="projects">🏗️ Projects</button>
+          <button class="tab" data-f="logos">🏷️ Logos</button>
+          <button class="tab" data-f="hero-images">🖼️ Hero Images</button>
+          <button class="tab" data-f="hero-videos">🎬 Hero Videos</button>
+        </div>
+
+        <div class="search-box">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="searchInput" placeholder="Filter files…" />
+        </div>
+      </div>
+
+      <div class="sel-bar">
+        <span id="selInfo" class="sel-info" hidden><strong id="selCount">0</strong> selected</span>
+        <button id="btnSelAll" class="btn btn-ghost">Select All</button>
+        <button id="btnSelUnused" class="btn btn-ghost">Select Unused</button>
+        <button id="btnDesel" class="btn btn-ghost" hidden>Deselect</button>
+        <button id="btnDelSel" class="btn btn-del" disabled>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          Delete Selected
+        </button>
+      </div>
+    </section>
+
+    <!-- MEDIA GRID -->
+    <section class="grid-wrap">
+      {mediaItems.length === 0 ? (
+        <div class="empty">
+          <div class="empty-icon">
+            <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          </div>
+          <h2 class="empty-title">No media files found</h2>
+          <p class="empty-body">Uploaded media for Projects, Logos, and Hero will appear here automatically.</p>
+          <a href="/keystatic" class="btn btn-primary">Go to Keystatic CMS →</a>
+        </div>
+      ) : (
+        <div class="mgrid" id="mgrid">
+          {mediaItems.map((item) => (
+            <article
+              class={`mcard${!item.inUse ? ' is-unused' : ''}`}
+              data-path={item.path}
+              data-name={item.name.toLowerCase()}
+              data-cat={item.category.toLowerCase().replace(/ /g, '-')}
+              data-inuse={item.inUse ? 'true' : 'false'}
+              data-size={item.size}
+            >
+              <label class="chk-wrap" title="Select">
+                <input type="checkbox" class="fchk sr-only" value={item.path} />
+                <span class="chkbox"></span>
+              </label>
+
+              <div class="mthumb" data-preview-path={item.path} data-is-video={item.isVideo ? 'true' : 'false'} data-name={item.name}>
+                {item.isVideo ? (
+                  <video src={item.path} muted loop playsinline class="mmedia" preload="metadata" />
+                ) : (
+                  <img src={item.path} alt={item.name} loading="lazy" class="mmedia" />
+                )}
+                <span class={`upill${item.inUse ? ' up-active' : ' up-unused'}`}>
+                  {item.inUse ? '✓ In Use' : '⚠ Unused'}
+                </span>
+                {item.isVideo && <span class="vpill">VIDEO</span>}
+                <div class="thumb-hover-overlay" title="Click to preview">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+                </div>
+              </div>
+
+              <div class="minfo">
+                <div class="mname-row">
+                  <p class="mname" title={item.name}>{item.name}</p>
+                  <button type="button" class="del-btn" data-dpath={item.path} title={`Delete ${item.name}`}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                  </button>
+                </div>
+                <div class="mmeta">
+                  <span class="mbadge">{item.icon} {item.category}</span>
+                  <span class="msize">{fmtBytes(item.size)}</span>
+                </div>
+                {item.inUse && (
+                  <p class="musedIn" title={`Used in: ${item.usedIn.join(', ')}`}>
+                    Used in: {item.usedIn.map((f) => f.split('/').pop()).join(', ')}
+                  </p>
+                )}
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
+    </section>
   </main>
-</BaseLayout>
+</div>
+
+<!-- CONFIRMATION MODAL -->
+<div id="dlg" class="dlg-overlay" hidden>
+  <div class="dlg-box">
+    <div class="dlg-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    </div>
+    <h2 class="dlg-title">Delete Selected Files?</h2>
+    <p id="dlgMsg" class="dlg-msg">This will permanently delete the files from the project and the GitHub repository.</p>
+    <div id="dlgWarning" class="dlg-warning" hidden>
+      ⚠️ <strong>Warning:</strong> One or more selected files are actively in use on the live site!
+    </div>
+    <div class="dlg-actions">
+      <button id="dlgCancel" class="btn btn-ghost">Cancel</button>
+      <button id="dlgConfirm" class="btn btn-solid">Yes, Delete Files</button>
+    </div>
+  </div>
+</div>
+
+<!-- LIGHTBOX MODAL -->
+<div id="lightbox" class="lb-overlay" hidden>
+  <div class="lb-box">
+    <div class="lb-header">
+      <span id="lbTitle" class="lb-title"></span>
+      <button id="lbClose" class="lb-close" title="Close preview">&times;</button>
+    </div>
+    <div class="lb-media-wrap" id="lbMediaWrap"></div>
+    <div class="lb-footer">
+      <span id="lbPath" class="lb-path"></span>
+      <button id="lbDelete" class="btn btn-del">Delete This File</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="toast"></div>
 
 <script>
-  const checkboxes = document.querySelectorAll<HTMLInputElement>('.file-checkbox');
-  const selectedCountEl = document.getElementById('selectedCount');
-  const btnDeleteSelected = document.getElementById('btnDeleteSelected') as HTMLButtonElement;
-  const btnSelectUnused = document.getElementById('btnSelectUnused');
-  const btnDeselectAll = document.getElementById('btnDeselectAll');
+  const toast = document.getElementById('toast');
+  function showToast(msg, type = 'info') {
+    if (!toast) return;
+    toast.textContent = msg;
+    toast.className = 'toast toast-' + type + ' t-on';
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => {
+      toast.className = 'toast';
+    }, 4500);
+  }
+
+  // Confirmation dialog
+  const dlg = document.getElementById('dlg');
+  const dlgMsg = document.getElementById('dlgMsg');
+  const dlgWarning = document.getElementById('dlgWarning');
+  const dlgConfirm = document.getElementById('dlgConfirm');
+  const dlgCancel = document.getElementById('dlgCancel');
+  let resolveCfm = null;
+
+  function openDlg(msg, hasInUse = false) {
+    if (dlgMsg) dlgMsg.textContent = msg;
+    if (dlgWarning) dlgWarning.hidden = !hasInUse;
+    dlg.hidden = false;
+    dlg.classList.add('open');
+    return new Promise((r) => {
+      resolveCfm = r;
+    });
+  }
+
+  dlgConfirm?.addEventListener('click', () => {
+    dlg.hidden = true;
+    dlg.classList.remove('open');
+    resolveCfm?.(true);
+  });
+  dlgCancel?.addEventListener('click', () => {
+    dlg.hidden = true;
+    dlg.classList.remove('open');
+    resolveCfm?.(false);
+  });
+
+  // Lightbox
+  const lightbox = document.getElementById('lightbox');
+  const lbTitle = document.getElementById('lbTitle');
+  const lbPath = document.getElementById('lbPath');
+  const lbMediaWrap = document.getElementById('lbMediaWrap');
+  const lbClose = document.getElementById('lbClose');
+  const lbDelete = document.getElementById('lbDelete');
+  let currentLbPath = '';
+
+  function openLightbox(src, isVideo, name) {
+    if (!lightbox || !lbMediaWrap) return;
+    currentLbPath = src;
+    if (lbTitle) lbTitle.textContent = name;
+    if (lbPath) lbPath.textContent = src;
+    lbMediaWrap.innerHTML = isVideo
+      ? `<video src="${src}" controls autoplay playsinline class="lb-media"></video>`
+      : `<img src="${src}" alt="${name}" class="lb-media" />`;
+    lightbox.hidden = false;
+    lightbox.classList.add('open');
+  }
+
+  function closeLightbox() {
+    if (!lightbox || !lbMediaWrap) return;
+    lightbox.hidden = true;
+    lightbox.classList.remove('open');
+    lbMediaWrap.innerHTML = '';
+  }
+
+  lbClose?.addEventListener('click', closeLightbox);
+  lightbox?.addEventListener('click', (e) => {
+    if (e.target === lightbox) closeLightbox();
+  });
+  lbDelete?.addEventListener('click', () => {
+    if (currentLbPath) {
+      closeLightbox();
+      doDelete([currentLbPath]);
+    }
+  });
+
+  // Selection & UI elements
+  const btnDelSel = document.getElementById('btnDelSel');
+  const btnSelAll = document.getElementById('btnSelAll');
+  const btnSelUnused = document.getElementById('btnSelUnused');
+  const btnDesel = document.getElementById('btnDesel');
   const btnAutoCleanup = document.getElementById('btnAutoCleanup');
-  const tabButtons = document.querySelectorAll('.tab-btn');
-  const mediaCards = document.querySelectorAll<HTMLElement>('.media-card');
-  const singleDeleteBtns = document.querySelectorAll('[data-delete-path]');
-  const toastEl = document.getElementById('toast');
+  const selCount = document.getElementById('selCount');
+  const selInfo = document.getElementById('selInfo');
+  const tabs = document.querySelectorAll('.tab');
+  const searchInput = document.getElementById('searchInput');
 
-  function showToast(msg: string, isError = false) {
-    if (!toastEl) return;
-    toastEl.textContent = msg;
-    toastEl.className = `toast is-visible ${isError ? 'toast-error' : 'toast-success'}`;
-    setTimeout(() => {
-      toastEl.className = 'toast';
-    }, 4000);
+  function cards() {
+    return Array.from(document.querySelectorAll('.mcard'));
+  }
+  function checks() {
+    return Array.from(document.querySelectorAll('.fchk'));
   }
 
-  function updateSelection() {
-    const selected = document.querySelectorAll<HTMLInputElement>('.file-checkbox:checked');
-    const count = selected.length;
-    if (selectedCountEl) selectedCountEl.textContent = String(count);
-    if (btnDeleteSelected) btnDeleteSelected.disabled = count === 0;
-  }
+  function updateSel() {
+    const checked = checks().filter((c) => c.checked);
+    const n = checked.length;
+    if (selCount) selCount.textContent = n;
+    if (selInfo) selInfo.hidden = n === 0;
+    if (btnDelSel) btnDelSel.disabled = n === 0;
+    if (btnDesel) btnDesel.hidden = n === 0;
 
-  checkboxes.forEach(cb => cb.addEventListener('change', updateSelection));
-
-  btnSelectUnused?.addEventListener('click', () => {
-    checkboxes.forEach(cb => {
-      const card = cb.closest('.media-card') as HTMLElement;
-      cb.checked = card?.dataset.inuse === 'false';
+    cards().forEach((card) => {
+      const cb = card.querySelector('.fchk');
+      card.classList.toggle('is-sel', !!cb?.checked);
     });
-    updateSelection();
+  }
+
+  document.addEventListener('change', (e) => {
+    if (e.target?.classList.contains('fchk')) updateSel();
   });
 
-  btnDeselectAll?.addEventListener('click', () => {
-    checkboxes.forEach(cb => cb.checked = false);
-    updateSelection();
+  // Card click (select vs preview)
+  document.addEventListener('click', (e) => {
+    const thumb = e.target.closest('.mthumb');
+    if (thumb) {
+      const p = thumb.getAttribute('data-preview-path');
+      const isVid = thumb.getAttribute('data-is-video') === 'true';
+      const nm = thumb.getAttribute('data-name') || '';
+      openLightbox(p, isVid, nm);
+      return;
+    }
+
+    const card = e.target.closest('.mcard');
+    if (!card) return;
+    if (e.target.closest('.del-btn') || e.target.closest('.chk-wrap')) return;
+
+    const cb = card.querySelector('.fchk');
+    if (cb) {
+      cb.checked = !cb.checked;
+      updateSel();
+    }
   });
 
-  // Filter tabs
-  tabButtons.forEach(tab => {
+  // Filter tabs & Search
+  let activeFilter = 'all';
+  let searchTerm = '';
+
+  function applyFilters() {
+    cards().forEach((card) => {
+      const cat = card.dataset.cat || '';
+      const inUse = card.dataset.inuse === 'true';
+      const name = card.dataset.name || '';
+
+      let matchTab = true;
+      if (activeFilter === 'unused') matchTab = !inUse;
+      else if (activeFilter !== 'all') matchTab = cat === activeFilter;
+
+      let matchSearch = true;
+      if (searchTerm) matchSearch = name.includes(searchTerm);
+
+      card.style.display = matchTab && matchSearch ? '' : 'none';
+    });
+  }
+
+  tabs.forEach((tab) => {
     tab.addEventListener('click', () => {
-      tabButtons.forEach(t => t.classList.remove('active'));
+      tabs.forEach((t) => t.classList.remove('active'));
       tab.classList.add('active');
-      const filter = tab.getAttribute('data-filter');
-
-      mediaCards.forEach(card => {
-        if (filter === 'all') {
-          card.style.display = '';
-        } else if (filter === 'unused') {
-          card.style.display = card.dataset.inuse === 'false' ? '' : 'none';
-        } else if (filter === 'projects') {
-          card.style.display = card.dataset.category === 'projects' ? '' : 'none';
-        } else if (filter === 'logos') {
-          card.style.display = card.dataset.category === 'logos' ? '' : 'none';
-        } else if (filter === 'hero') {
-          card.style.display = (card.dataset.category?.includes('hero')) ? '' : 'none';
-        }
-      });
+      activeFilter = tab.dataset.f || 'all';
+      applyFilters();
     });
   });
 
-  async function executeDelete(paths: string[]) {
-    if (paths.length === 0) return;
-    const confirmMsg = `Are you sure you want to permanently delete ${paths.length} file(s)?`;
-    if (!window.confirm(confirmMsg)) return;
+  searchInput?.addEventListener('input', (e) => {
+    searchTerm = e.target.value.toLowerCase().trim();
+    applyFilters();
+  });
 
-    showToast(`Deleting ${paths.length} file(s)...`);
+  // Bulk selectors
+  btnSelAll?.addEventListener('click', () => {
+    cards().forEach((card) => {
+      if (card.style.display !== 'none') {
+        const cb = card.querySelector('.fchk');
+        if (cb) cb.checked = true;
+      }
+    });
+    updateSel();
+  });
+
+  btnSelUnused?.addEventListener('click', () => {
+    cards().forEach((card) => {
+      const cb = card.querySelector('.fchk');
+      if (cb) {
+        cb.checked = card.dataset.inuse === 'false' && card.style.display !== 'none';
+      }
+    });
+    updateSel();
+  });
+
+  btnDesel?.addEventListener('click', () => {
+    checks().forEach((cb) => (cb.checked = false));
+    updateSel();
+  });
+
+  // Delete Action
+  async function doDelete(paths) {
+    if (!paths || !paths.length) return;
+
+    // Check if any file is in use
+    const hasInUse = paths.some((p) => {
+      const c = document.querySelector(`.mcard[data-path="${p}"]`);
+      return c && c.dataset.inuse === 'true';
+    });
+
+    const ok = await openDlg(
+      `Permanently delete ${paths.length} file${paths.length !== 1 ? 's' : ''}? This will remove them immediately from disk and commit the deletion to GitHub.`,
+      hasInUse
+    );
+    if (!ok) return;
+
+    showToast(`Deleting ${paths.length} file(s) via CMS…`, 'info');
+    if (btnDelSel) btnDelSel.disabled = true;
+    if (btnAutoCleanup) btnAutoCleanup.disabled = true;
 
     try {
       const res = await fetch('/api/admin/media', {
@@ -333,345 +678,1036 @@ function formatBytes(bytes: number) {
       });
 
       const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Delete failed');
+      if (!res.ok) throw new Error(data.error || 'Delete request failed');
+
+      const deleted = data.deleted || paths;
+      const errors = data.errors || [];
+
+      deleted.forEach((p) => {
+        const c = document.querySelector(`.mcard[data-path="${p}"]`);
+        if (c) {
+          c.style.transition = 'all 0.3s ease';
+          c.style.opacity = '0';
+          c.style.transform = 'scale(0.85)';
+          setTimeout(() => c.remove(), 300);
+        }
+      });
+
+      if (errors.length > 0) {
+        showToast(`Deleted ${deleted.length} file(s). ${errors.length} failed: ${errors[0]}`, 'error');
+      } else {
+        showToast(`✓ Successfully deleted ${deleted.length} file${deleted.length !== 1 ? 's' : ''}`, 'success');
       }
 
-      showToast(`Successfully deleted ${data.deleted?.length || paths.length} file(s)! Reloading...`);
-      setTimeout(() => {
-        window.location.reload();
-      }, 1200);
-    } catch (err: any) {
-      showToast(`Error: ${err.message}`, true);
+      setTimeout(updateSel, 350);
+    } catch (err) {
+      showToast('Error: ' + err.message, 'error');
+      if (btnDelSel) btnDelSel.disabled = false;
+      if (btnAutoCleanup) btnAutoCleanup.disabled = false;
     }
   }
 
-  btnDeleteSelected?.addEventListener('click', () => {
-    const selected = Array.from(document.querySelectorAll<HTMLInputElement>('.file-checkbox:checked'))
-      .map(cb => cb.value);
-    executeDelete(selected);
+  btnDelSel?.addEventListener('click', () => {
+    const selected = checks()
+      .filter((c) => c.checked)
+      .map((c) => c.value);
+    doDelete(selected);
   });
 
   btnAutoCleanup?.addEventListener('click', () => {
-    const unused = Array.from(document.querySelectorAll<HTMLElement>('.media-card[data-inuse="false"]'))
-      .map(card => card.dataset.path)
-      .filter(Boolean) as string[];
-    executeDelete(unused);
+    const unused = cards()
+      .filter((c) => c.dataset.inuse === 'false')
+      .map((c) => c.dataset.path)
+      .filter(Boolean);
+    doDelete(unused);
   });
 
-  singleDeleteBtns.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const path = btn.getAttribute('data-delete-path');
-      if (path) executeDelete([path]);
-    });
+  // Single card delete button
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-dpath]');
+    if (!btn) return;
+    e.stopPropagation();
+    doDelete([btn.getAttribute('data-dpath')]);
   });
 </script>
 
 <style>
-  .media-admin-page {
-    background-color: #0d0f12;
-    color: #e5e7eb;
-    min-height: 100vh;
-    padding: 40px 5% 80px;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  }
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-  .admin-container {
-    max-width: 1400px;
-    margin: 0 auto;
-  }
+:root {
+  --bg: #0b0d10;
+  --sf: #12151a;
+  --sf2: #181c23;
+  --bd: rgba(255, 255, 255, 0.07);
+  --bd2: rgba(255, 255, 255, 0.12);
+  --tx: #e8eaf0;
+  --mt: #7a828e;
+  --ac: #e5342a;
+  --gr: #22c55e;
+  --am: #f59e0b;
+  --bl: #3b82f6;
+  --pu: #a855f7;
+  --r: 12px;
+  --sw: 240px;
+}
 
-  .admin-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    padding-bottom: 28px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    margin-bottom: 28px;
-    flex-wrap: wrap;
-    gap: 16px;
-  }
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--tx);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
 
-  .btn-back {
-    display: inline-block;
-    color: #9ca3af;
-    text-decoration: none;
-    font-size: 0.85rem;
-    margin-bottom: 8px;
-    transition: color 0.2s;
-  }
-  .btn-back:hover { color: #ffffff; }
+.app-shell {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
 
-  .admin-title {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #ffffff;
-    margin: 0 0 6px 0;
-  }
+/* SIDEBAR */
+.sidebar {
+  width: var(--sw);
+  min-width: var(--sw);
+  background: var(--sf);
+  border-right: 1px solid var(--bd);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
 
-  .admin-subtitle {
-    color: #9ca3af;
-    font-size: 0.95rem;
-    margin: 0;
-  }
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 16px;
+  border-bottom: 1px solid var(--bd);
+}
 
-  .header-actions {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-  }
+.brand-logo {
+  width: 34px;
+  height: 34px;
+  background: linear-gradient(135deg, var(--ac), #c0201a);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(229, 52, 42, 0.3);
+}
 
-  .btn-secondary,
-  .btn-danger,
-  .btn-outline,
-  .btn-danger-outline {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    height: 40px;
-    padding: 0 18px;
-    border-radius: 8px;
-    font-size: 0.88rem;
-    font-weight: 500;
-    cursor: pointer;
-    text-decoration: none;
-    transition: all 0.2s ease;
-    border: none;
-  }
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
 
-  .btn-secondary {
-    background: rgba(255, 255, 255, 0.08);
-    color: #ffffff;
-  }
-  .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
+.brand-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--tx);
+  letter-spacing: -0.01em;
+}
 
-  .btn-danger {
-    background: #d62828;
-    color: #ffffff;
-  }
-  .btn-danger:hover:not(:disabled) { background: #b91d1d; }
-  .btn-danger:disabled { opacity: 0.4; cursor: not-allowed; }
+.brand-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--mt);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
 
-  .btn-outline {
-    background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: #e5e7eb;
-  }
-  .btn-outline:hover { background: rgba(255, 255, 255, 0.08); }
+.sidebar-nav {
+  padding: 12px 10px;
+  flex-grow: 1;
+}
 
-  .btn-danger-outline {
-    background: transparent;
-    border: 1px solid rgba(214, 40, 40, 0.5);
-    color: #ef4444;
-  }
-  .btn-danger-outline:hover:not(:disabled) {
-    background: rgba(214, 40, 40, 0.15);
-  }
-  .btn-danger-outline:disabled { opacity: 0.4; cursor: not-allowed; }
+.nav-section-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--mt);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 8px 10px 4px;
+}
 
-  /* Metrics */
-  .metrics-row {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 16px;
-    margin-bottom: 28px;
-  }
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 11px;
+  border-radius: 7px;
+  color: #9ca3af;
+  text-decoration: none;
+  font-size: 0.83rem;
+  font-weight: 500;
+  transition: all 0.15s;
+  margin-bottom: 2px;
+}
 
-  .metric-box {
-    background: #161920;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 12px;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
+.nav-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--tx);
+}
 
-  .metric-label { font-size: 0.8rem; text-transform: uppercase; color: #9ca3af; letter-spacing: 0.05em; }
-  .metric-val { font-size: 1.8rem; font-weight: 700; color: #ffffff; }
-  .metric-val small { font-size: 0.9rem; font-weight: 400; color: #9ca3af; }
-  .metric-sub { font-size: 0.82rem; color: #6b7280; }
-  .status-green { color: #10b981; }
-  .status-warn { color: #f59e0b; }
+.nav-item.active {
+  background: rgba(229, 52, 42, 0.12);
+  color: #ff6b63;
+  font-weight: 600;
+}
 
-  /* Toolbar */
-  .toolbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 16px;
-    margin-bottom: 24px;
-    background: #161920;
-    padding: 12px 16px;
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-  }
+.nav-item svg {
+  opacity: 0.75;
+  flex-shrink: 0;
+}
 
-  .filter-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
-  .tab-btn {
-    background: transparent;
-    border: none;
-    color: #9ca3af;
-    padding: 8px 14px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 0.85rem;
-    font-weight: 500;
-    transition: all 0.2s;
-  }
-  .tab-btn:hover { color: #ffffff; background: rgba(255, 255, 255, 0.05); }
-  .tab-btn.active { color: #ffffff; background: rgba(255, 255, 255, 0.14); }
+.nav-item.active svg {
+  opacity: 1;
+}
 
-  .selection-actions { display: flex; gap: 10px; align-items: center; }
+.nav-badge {
+  margin-left: auto;
+  font-size: 0.68rem;
+  background: rgba(229, 52, 42, 0.2);
+  color: #ff6b63;
+  padding: 1px 6px;
+  border-radius: 50px;
+  font-weight: 700;
+}
 
-  /* Grid */
-  .media-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 20px;
-  }
+.nav-divider {
+  height: 1px;
+  background: var(--bd);
+  margin: 10px 0;
+}
 
-  .media-card {
-    background: #161920;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 12px;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    transition: transform 0.2s, border-color 0.2s;
-    position: relative;
-  }
-  .media-card:hover {
-    transform: translateY(-2px);
-    border-color: rgba(255, 255, 255, 0.2);
-  }
-  .media-card.is-unused {
-    border-color: rgba(245, 158, 11, 0.3);
-  }
+.sidebar-footer {
+  padding: 14px 16px;
+  border-top: 1px solid var(--bd);
+}
 
-  .card-thumb-wrap {
-    height: 170px;
-    background: #0a0c10;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-  }
+.storage-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
 
-  .card-preview-img,
-  .card-preview-video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
+.storage-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--mt);
+}
 
-  .card-checkbox-label {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    z-index: 5;
-    cursor: pointer;
-  }
+.storage-used {
+  color: var(--tx);
+  font-weight: 600;
+}
 
-  .file-checkbox {
-    width: 20px;
-    height: 20px;
-    cursor: pointer;
-    accent-color: #d62828;
-  }
+.storage-bar {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+  overflow: hidden;
+}
 
-  .status-badge {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    font-size: 0.72rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    padding: 3px 8px;
-    border-radius: 6px;
-    z-index: 5;
-  }
-  .badge-in-use { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
-  .badge-unused { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
+.storage-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--ac), #ff8f8a);
+  border-radius: 2px;
+  transition: width 0.5s;
+  min-width: 4px;
+}
 
-  .card-body {
-    padding: 14px;
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    gap: 8px;
-  }
+.storage-sub {
+  font-size: 0.7rem;
+  color: var(--mt);
+}
 
-  .card-filename {
-    font-size: 0.88rem;
-    font-weight: 600;
-    margin: 0;
-    color: #ffffff;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
+/* MAIN CONTENT */
+.main {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
 
-  .card-meta {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.78rem;
-    color: #9ca3af;
-  }
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--bd);
+  background: var(--bg);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  gap: 12px;
+  flex-wrap: wrap;
+}
 
-  .card-usage {
-    font-size: 0.75rem;
-    min-height: 28px;
-  }
-  .usage-text { color: #9ca3af; }
-  .unused-text { color: #f87171; font-weight: 500; }
+.page-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--tx);
+  letter-spacing: -0.02em;
+}
 
-  .btn-single-delete {
-    margin-top: auto;
-    background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: #9ca3af;
-    border-radius: 6px;
-    height: 32px;
-    font-size: 0.78rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .btn-single-delete:hover {
-    background: rgba(239, 68, 68, 0.15);
-    border-color: rgba(239, 68, 68, 0.4);
-    color: #f87171;
-  }
+.page-sub {
+  font-size: 0.8rem;
+  color: var(--mt);
+  margin-top: 1px;
+}
 
-  /* Toast */
-  .toast {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    padding: 12px 20px;
-    border-radius: 8px;
-    background: #1f2937;
-    color: #ffffff;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-    font-size: 0.9rem;
-    z-index: 1000;
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* BUTTONS */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 14px;
+  height: 34px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.18s;
+  border: none;
+  white-space: nowrap;
+}
+
+.btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--ac);
+  color: #fff;
+}
+.btn-primary:hover {
+  background: #c0201a;
+}
+
+.btn-danger {
+  background: rgba(229, 52, 42, 0.15);
+  color: #ff6b63;
+  border: 1px solid rgba(229, 52, 42, 0.3);
+}
+.btn-danger:hover:not(:disabled) {
+  background: rgba(229, 52, 42, 0.25);
+}
+
+.btn-solid {
+  background: var(--ac);
+  color: #fff;
+}
+.btn-solid:hover {
+  background: #c0201a;
+}
+
+.btn-del {
+  background: rgba(229, 52, 42, 0.12);
+  color: #ff6b63;
+  border: 1px solid rgba(229, 52, 42, 0.25);
+}
+.btn-del:hover:not(:disabled) {
+  background: rgba(229, 52, 42, 0.22);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: #9ca3af;
+  border: 1px solid var(--bd2);
+}
+.btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--tx);
+}
+
+/* STATS */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--bd);
+}
+
+.stat-card {
+  background: var(--sf);
+  border: 1px solid var(--bd);
+  border-radius: var(--r);
+  padding: 14px;
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  grid-template-rows: auto auto;
+  gap: 2px 12px;
+  align-items: center;
+  transition: border-color 0.2s;
+}
+
+.stat-card:hover {
+  border-color: var(--bd2);
+}
+
+.sic {
+  width: 40px;
+  height: 40px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  grid-row: 1/3;
+}
+
+.sic-blue {
+  background: rgba(59, 130, 246, 0.12);
+  color: var(--bl);
+}
+.sic-green {
+  background: rgba(34, 197, 94, 0.12);
+  color: var(--gr);
+}
+.sic-amber {
+  background: rgba(245, 158, 11, 0.12);
+  color: var(--am);
+}
+.sic-purple {
+  background: rgba(168, 85, 247, 0.12);
+  color: var(--pu);
+}
+
+.si {
+  display: flex;
+  flex-direction: column;
+}
+
+.sv {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--tx);
+  line-height: 1;
+}
+
+.sl {
+  font-size: 0.72rem;
+  color: var(--mt);
+  margin-top: 2px;
+}
+
+.c-green {
+  color: var(--gr);
+}
+.c-amber {
+  color: var(--am);
+}
+
+.ss {
+  font-size: 0.7rem;
+  color: var(--mt);
+  grid-column: 2;
+}
+
+/* TOOLBAR */
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 12px 24px;
+  border-bottom: 1px solid var(--bd);
+  background: var(--bg);
+  position: sticky;
+  top: 66px;
+  z-index: 15;
+}
+
+.toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.ftabs {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.tab {
+  height: 30px;
+  padding: 0 11px;
+  border-radius: 6px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--mt);
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.tab:hover {
+  color: var(--tx);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.tab.active {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--bd2);
+  color: var(--tx);
+  font-weight: 600;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--sf);
+  border: 1px solid var(--bd);
+  border-radius: 6px;
+  padding: 0 10px;
+  height: 30px;
+  color: var(--mt);
+}
+
+.search-box input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--tx);
+  font-size: 0.78rem;
+  width: 140px;
+}
+
+.search-box input::placeholder {
+  color: var(--mt);
+}
+
+.sel-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sel-info {
+  font-size: 0.8rem;
+  color: var(--mt);
+}
+
+/* MEDIA GRID */
+.grid-wrap {
+  padding: 20px 24px;
+  flex: 1;
+}
+
+.mgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 14px;
+}
+
+.mcard {
+  background: var(--sf);
+  border: 1px solid var(--bd);
+  border-radius: var(--r);
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.mcard:hover {
+  border-color: var(--bd2);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.mcard.is-unused {
+  border-color: rgba(245, 158, 11, 0.25);
+}
+
+.mcard.is-sel {
+  border-color: var(--ac);
+  box-shadow: 0 0 0 2px rgba(229, 52, 42, 0.25);
+}
+
+.chk-wrap {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 5;
+  cursor: pointer;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.chkbox {
+  display: block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-radius: 5px;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  transition: all 0.15s;
+  position: relative;
+}
+
+.fchk:checked ~ .chkbox {
+  background: var(--ac);
+  border-color: var(--ac);
+}
+
+.fchk:checked ~ .chkbox::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 7px;
+  height: 11px;
+  border: 2px solid white;
+  border-top: none;
+  border-left: none;
+  transform: rotate(45deg);
+}
+
+.mthumb {
+  height: 150px;
+  background: #0a0c10;
+  position: relative;
+  overflow: hidden;
+}
+
+.mmedia {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.35s;
+}
+
+.mcard:hover .mmedia {
+  transform: scale(1.05);
+}
+
+.thumb-hover-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+  color: #fff;
+}
+
+.mthumb:hover .thumb-hover-overlay {
+  opacity: 1;
+}
+
+.upill {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 7px;
+  border-radius: 50px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.up-active {
+  background: rgba(34, 197, 94, 0.2);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.4);
+}
+
+.up-unused {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+}
+
+.vpill {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 0.58rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(168, 85, 247, 0.25);
+  color: #c084fc;
+  border: 1px solid rgba(168, 85, 247, 0.4);
+  z-index: 2;
+}
+
+.minfo {
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex: 1;
+}
+
+.mname-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.mname {
+  flex: 1;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--tx);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.del-btn {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  color: var(--mt);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.del-btn:hover {
+  background: rgba(229, 52, 42, 0.15);
+  border-color: rgba(229, 52, 42, 0.3);
+  color: #ff6b63;
+}
+
+.mmeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.mbadge {
+  font-size: 0.66rem;
+  font-weight: 500;
+  color: var(--mt);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 2px 7px;
+  border-radius: 50px;
+  border: 1px solid var(--bd);
+}
+
+.msize {
+  font-size: 0.68rem;
+  color: var(--mt);
+}
+
+.musedIn {
+  font-size: 0.66rem;
+  color: var(--mt);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* EMPTY STATE */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  text-align: center;
+  padding: 80px 40px;
+  color: var(--mt);
+}
+
+.empty-icon {
+  color: rgba(255, 255, 255, 0.1);
+}
+
+.empty-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--tx);
+}
+
+.empty-body {
+  font-size: 0.86rem;
+  max-width: 360px;
+}
+
+/* CONFIRM MODAL */
+.dlg-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
+
+.dlg-overlay[hidden] {
+  display: none;
+}
+
+.dlg-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.dlg-box {
+  background: var(--sf2);
+  border: 1px solid var(--bd2);
+  border-radius: 14px;
+  padding: 26px;
+  max-width: 360px;
+  width: 90%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+  animation: din 0.2s ease;
+}
+
+@keyframes din {
+  from {
+    transform: scale(0.95) translateY(8px);
     opacity: 0;
-    transform: translateY(20px);
-    transition: all 0.3s ease;
-    pointer-events: none;
   }
-  .toast.is-visible {
+  to {
+    transform: scale(1) translateY(0);
     opacity: 1;
-    transform: translateY(0);
   }
-  .toast-success { background: #065f46; border: 1px solid #10b981; }
-  .toast-error { background: #7f1d1d; border: 1px solid #ef4444; }
+}
+
+.dlg-icon {
+  width: 50px;
+  height: 50px;
+  background: rgba(245, 158, 11, 0.12);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--am);
+  margin-bottom: 3px;
+}
+
+.dlg-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--tx);
+}
+
+.dlg-msg {
+  font-size: 0.84rem;
+  color: var(--mt);
+  line-height: 1.4;
+}
+
+.dlg-warning {
+  background: rgba(229, 52, 42, 0.15);
+  border: 1px solid rgba(229, 52, 42, 0.3);
+  color: #ff6b63;
+  padding: 8px 12px;
+  border-radius: 7px;
+  font-size: 0.76rem;
+  text-align: left;
+}
+
+.dlg-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+/* LIGHTBOX MODAL */
+.lb-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 150;
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+  padding: 20px;
+}
+
+.lb-overlay[hidden] {
+  display: none;
+}
+
+.lb-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.lb-box {
+  background: var(--sf2);
+  border: 1px solid var(--bd2);
+  border-radius: 14px;
+  max-width: 800px;
+  width: 100%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7);
+}
+
+.lb-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--bd);
+}
+
+.lb-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--tx);
+}
+
+.lb-close {
+  background: transparent;
+  border: none;
+  font-size: 1.6rem;
+  line-height: 1;
+  color: var(--mt);
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+.lb-close:hover {
+  color: var(--tx);
+}
+
+.lb-media-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: #000;
+  min-height: 300px;
+  max-height: 60vh;
+  overflow: hidden;
+}
+
+.lb-media {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.lb-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  border-top: 1px solid var(--bd);
+  background: var(--sf);
+}
+
+.lb-path {
+  font-size: 0.76rem;
+  color: var(--mt);
+  font-family: monospace;
+}
+
+/* TOAST */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 200;
+  padding: 10px 16px;
+  border-radius: 9px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  transform: translateY(12px);
+  opacity: 0;
+  transition: all 0.3s;
+  pointer-events: none;
+  max-width: 360px;
+}
+
+.t-on {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.toast-success {
+  background: #052e16;
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.35);
+}
+
+.toast-error {
+  background: #2d0a0a;
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.35);
+}
+
+.toast-info {
+  background: #1e1b2e;
+  color: #a78bfa;
+  border: 1px solid rgba(139, 92, 246, 0.35);
+}
 </style>
+</body>
+</html>
