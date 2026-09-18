@@ -1,9 +1,10 @@
-addressLine1: No 9, Park Avenue
-addressLine2: Colombo 8
-country: Sri Lanka
-primaryPhone: +94 11 234 5679
-primaryEmail: powernet@powernet.lk
-mapsEmbedUrl: >-
-  https://www.google.com/maps?q=No+9%2C+Park+Avenue%2C+Colombo+8%2C+Sri+Lanka&output=embed
-mapsSearchUrl: >-
-  https://www.google.com/maps/search/?api=1&query=No+9%2C+Park+Avenue%2C+Colombo+8%2C+Sri+Lanka
+addressLine1: "No 9, Park Avenue"
+addressLine2: "Colombo 8"
+country: "Sri Lanka"
+warehouseAddressLine1: "Thelengapatha Road"
+warehouseAddressLine2: "Wattala"
+primaryPhone: "011 4 736 151 / 171"
+fax: "011 4 795 110"
+primaryEmail: "powernet@powernet.lk"
+mapsEmbedUrl: "https://www.google.com/maps?q=No+9%2C+Park+Avenue%2C+Colombo+8%2C+Sri+Lanka&output=embed"
+mapsSearchUrl: "https://www.google.com/maps/search/?api=1&query=No+9%2C+Park+Avenue%2C+Colombo+8%2C+Sri+Lanka"

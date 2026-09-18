@@ -1,5 +1,15 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import { getEntry, getCollection } from "astro:content";
+
+const aboutEntry = await getEntry("aboutPage", "company");
+const about = aboutEntry.data;
+
+const statsEntry = await getEntry("stats", "company");
+const stats = statsEntry.data;
+
+const clientEntries = await getCollection("clients");
+clientEntries.sort((a, b) => a.data.order - b.data.order);
 ---
 
 <BaseLayout title="About Us | Powernet (Pvt) Ltd">
@@ -8,25 +18,25 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       <div class="section-header fade-in">
         <span class="text-label">About Us</span>
       </div>
-      
+
       <div class="grid-12" style="margin-top: var(--space-2xl);">
         <div class="about-content fade-in stagger-1" style="grid-column: span 7;">
-          <h1 class="text-display">100% Sri Lankan Owned Company</h1>
+          <h1 class="text-display">{about.heroTitle}</h1>
           <p class="text-body-large" style="margin-top: var(--space-md); color: var(--color-muted);">
-            Powernet is a fully Sri Lankan owned enterprise delivering integrated engineering and technology solutions. We specialize in comprehensive infrastructures catering to a diverse spectrum of businesses.
+            {about.heroBody}
           </p>
           <div class="stats-row" style="display: flex; gap: var(--space-xl); margin-top: var(--space-2xl); flex-wrap: wrap;">
             <div>
-              <span class="text-display" style="display: block; color: var(--color-brand);">Rs. 120M</span>
+              <span class="text-display" style="display: block; color: var(--color-brand);">{stats.annualTurnover}</span>
               <span class="text-label">Annual Turnover</span>
             </div>
             <div>
-              <span class="text-display" style="display: block; color: var(--color-brand);">150</span>
-              <span class="text-label">Permanent Staff</span>
+              <span class="text-display" style="display: block; color: var(--color-brand);">{stats.permanentStaffValue}</span>
+              <span class="text-label">{stats.permanentStaffLabel}</span>
             </div>
             <div>
-              <span class="text-display" style="display: block; color: var(--color-brand);">200</span>
-              <span class="text-label">Contractual Staff</span>
+              <span class="text-display" style="display: block; color: var(--color-brand);">{stats.contractualStaffValue}</span>
+              <span class="text-label">{stats.contractualStaffLabel}</span>
             </div>
           </div>
         </div>
@@ -34,8 +44,9 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         <div class="about-board fade-in stagger-2" style="grid-column: 9 / -1; background-color: var(--color-surface); padding: var(--space-xl); border: 1px solid var(--color-border); align-self: start;">
           <h3 class="text-h1" style="margin-bottom: var(--space-lg);">Board of Directors</h3>
           <ul style="list-style: none; display: flex; flex-direction: column; gap: var(--space-md); padding: 0;">
-            <li class="text-body-large">Mr. M. A. W. P. Silva</li>
-            <li class="text-body-large">Mr. M. A. C. P. Silva</li>
+            {about.boardMembers.map((member) => (
+              <li class="text-body-large">{member}</li>
+            ))}
           </ul>
         </div>
       </div>
@@ -47,26 +58,13 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       <div class="section-header">
         <span class="text-label">Top Corporate Clients</span>
       </div>
-      
-      <div class="clients-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: var(--space-xl); margin-top: var(--space-2xl);">
-        <div class="client-card" style="padding: var(--space-md); border-bottom: 1px solid var(--color-border);">
-          <h4 class="text-h4">Hemas Holdings</h4>
-        </div>
-        <div class="client-card" style="padding: var(--space-md); border-bottom: 1px solid var(--color-border);">
-          <h4 class="text-h4">Securities and Exchange Commission (SEC)</h4>
-        </div>
-        <div class="client-card" style="padding: var(--space-md); border-bottom: 1px solid var(--color-border);">
-          <h4 class="text-h4">National Savings Bank</h4>
-        </div>
-        <div class="client-card" style="padding: var(--space-md); border-bottom: 1px solid var(--color-border);">
-          <h4 class="text-h4">Commercial Bank</h4>
-        </div>
-        <div class="client-card" style="padding: var(--space-md); border-bottom: 1px solid var(--color-border);">
-          <h4 class="text-h4">Bank of Ceylon</h4>
-        </div>
-        <div class="client-card" style="padding: var(--space-md); border-bottom: 1px solid var(--color-border);">
-          <h4 class="text-h4">Dialog Axiata</h4>
-        </div>
+
+      <div class="clients-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--space-lg); margin-top: var(--space-2xl);">
+        {clientEntries.map((entry) => (
+          <div class="client-card" style="display: flex; align-items: center; justify-content: center; height: 90px; padding: var(--space-md); border: 1px solid var(--color-border); border-radius: 12px; background: #ffffff;">
+            <img src={entry.data.logo} alt={entry.data.name} loading="lazy" style="max-width: 100%; max-height: 100%; object-fit: contain;" />
+          </div>
+        ))}
       </div>
     </div>
   </section>
