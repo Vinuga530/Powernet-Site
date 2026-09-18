@@ -1,5 +1,8 @@
-headlineLine1: "INFRASTRUCTURE,"
-headlineLine2: "CONNECTED."
-subtitle: "Integrated engineering and technology solutions for Sri Lanka's critical operations."
-primaryButtonLabel: "Get a Quote"
-secondaryButtonLabel: "Explore Services"
+headlineLine1: INFRASTRUCTURE,
+headlineLine2: CONNECTED.
+subtitle: >-
+  Integrated engineering and technology solutions for Sri Lanka's critical
+  operations.
+primaryButtonLabel: Get a Quote
+secondaryButtonLabel: Explore Services
+backgroundVideo: /videos/hero/backgroundVideo.mp4
