@@ -32,9 +32,11 @@ export default config({
           description: 'e.g. "Electrical & UPS", "Network Infrastructure"',
         }),
         year: fields.integer({ label: 'Year', defaultValue: new Date().getFullYear() }),
-        image: fields.url({
-          label: 'Project Photo URL',
-          description: 'A direct image URL (e.g. from Unsplash or your hosting). Must start with https://',
+        image: fields.image({
+          label: 'Project Photo',
+          description: 'Upload a project photo directly from your device (JPG, PNG, WebP)',
+          directory: 'public/images/projects',
+          publicPath: '/images/projects/',
         }),
         summary: fields.text({
           label: 'Summary',
