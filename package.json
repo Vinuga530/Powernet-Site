@@ -9,7 +9,9 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "cleanup": "node scripts/cleanup-media.mjs",
+    "cleanup:dry": "node scripts/cleanup-media.mjs --dry-run"
   },
   "dependencies": {
     "@astrojs/markdoc": "^2.0.9",

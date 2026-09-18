@@ -1,0 +1,677 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import fs from 'node:fs';
+import path from 'node:path';
+
+export const prerender = false;
+
+const rootDir = process.cwd();
+const publicDir = path.join(rootDir, 'public');
+const srcDir = path.join(rootDir, 'src');
+
+const managedDirs = [
+  { category: 'Projects', dir: path.join(publicDir, 'images', 'projects') },
+  { category: 'Logos', dir: path.join(publicDir, 'images', 'logos') },
+  { category: 'Hero Images', dir: path.join(publicDir, 'images', 'hero') },
+  { category: 'Hero Videos', dir: path.join(publicDir, 'videos', 'hero') },
+];
+
+const PROTECTED_FILES = new Set([
+  '.gitkeep',
+  'favicon.ico',
+  'favicon.svg',
+  'site.webmanifest',
+  'powernet-logo-coloured.png',
+]);
+
+function getAllFiles(dirPath: string, arrayOfFiles: string[] = []): string[] {
+  if (!fs.existsSync(dirPath)) return arrayOfFiles;
+  const entries = fs.readdirSync(dirPath, { withFileTypes: true });
+
+  for (const entry of entries) {
+    const fullPath = path.join(dirPath, entry.name);
+    if (entry.isDirectory()) {
+      getAllFiles(fullPath, arrayOfFiles);
+    } else {
+      arrayOfFiles.push(fullPath);
+    }
+  }
+  return arrayOfFiles;
+}
+
+function collectReferencedAssets(srcDir: string): Map<string, string[]> {
+  const usageMap = new Map<string, string[]>();
+  const textFiles = getAllFiles(srcDir).filter((file) => {
+    const ext = path.extname(file).toLowerCase();
+    return ['.yaml', '.yml', '.astro', '.ts', '.js', '.jsx', '.tsx', '.json', '.md', '.mdx', '.css'].includes(ext);
+  });
+
+  for (const file of textFiles) {
+    try {
+      const content = fs.readFileSync(file, 'utf-8');
+      const relativeFile = path.relative(srcDir, file).replace(/\\/g, '/');
+
+      const matches = content.match(/["']?(\/(images|videos)\/[^"'\s\n\r]+)/g);
+      if (matches) {
+        for (const rawMatch of matches) {
+          const cleaned = rawMatch.replace(/^['"]/, '').replace(/['",;]$/, '').trim();
+          const normSlash = cleaned.replace(/\\/g, '/');
+          const fileName = path.basename(cleaned).toLowerCase();
+
+          const existing = usageMap.get(normSlash) || [];
+          if (!existing.includes(relativeFile)) existing.push(relativeFile);
+          usageMap.set(normSlash, existing);
+
+          const existingByFn = usageMap.get(fileName) || [];
+          if (!existingByFn.includes(relativeFile)) existingByFn.push(relativeFile);
+          usageMap.set(fileName, existingByFn);
+        }
+      }
+
+      const fnMatches = content.match(/[\w\-.]+\.(png|jpe?g|webp|svg|mp4|webm|gif|avif)/gi);
+      if (fnMatches) {
+        for (const fn of fnMatches) {
+          const fnLower = fn.toLowerCase();
+          const existing = usageMap.get(fnLower) || [];
+          if (!existing.includes(relativeFile)) existing.push(relativeFile);
+          usageMap.set(fnLower, existing);
+        }
+      }
+    } catch {}
+  }
+
+  return usageMap;
+}
+
+const usageMap = collectReferencedAssets(srcDir);
+const mediaItems: any[] = [];
+
+for (const group of managedDirs) {
+  if (!fs.existsSync(group.dir)) continue;
+  const files = getAllFiles(group.dir);
+
+  for (const filePath of files) {
+    const fileName = path.basename(filePath);
+    if (PROTECTED_FILES.has(fileName.toLowerCase())) continue;
+
+    const relPathSlash = '/' + path.relative(publicDir, filePath).replace(/\\/g, '/');
+    const relPathNoSlash = relPathSlash.slice(1);
+    const isVideo = ['.mp4', '.webm', '.mov', '.ogg'].includes(path.extname(filePath).toLowerCase());
+
+    const usedIn = usageMap.get(relPathSlash) || usageMap.get(relPathNoSlash) || usageMap.get(fileName.toLowerCase()) || [];
+    const stats = fs.statSync(filePath);
+
+    mediaItems.push({
+      name: fileName,
+      path: relPathSlash,
+      category: group.category,
+      size: stats.size,
+      isVideo,
+      inUse: usedIn.length > 0,
+      usedIn: usedIn,
+    });
+  }
+}
+
+const totalCount = mediaItems.length;
+const unusedCount = mediaItems.filter(m => !m.inUse).length;
+const totalBytes = mediaItems.reduce((acc, m) => acc + m.size, 0);
+const unusedBytes = mediaItems.filter(m => !m.inUse).reduce((acc, m) => acc + m.size, 0);
+
+function formatBytes(bytes: number) {
+  if (bytes === 0) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return `${(bytes / Math.pow(k, i)).toFixed(2)} ${sizes[i]}`;
+}
+---
+
+<BaseLayout title="Media Manager & Cleanup | Powernet">
+  <main class="media-admin-page">
+    <div class="admin-container">
+      <!-- top nav bar -->
+      <header class="admin-header">
+        <div class="header-left">
+          <a href="/keystatic" class="btn-back">&larr; Back to CMS</a>
+          <h1 class="admin-title">Media Library &amp; Clean Up</h1>
+          <p class="admin-subtitle">Inspect uploaded photos and videos, select files, and clean up unreferenced media.</p>
+        </div>
+        <div class="header-actions">
+          <a href="/" class="btn-secondary" target="_blank">View Site &nearr;</a>
+          <button id="btnAutoCleanup" class="btn-danger" disabled={unusedCount === 0}>
+            🧹 Clean All Unused ({unusedCount})
+          </button>
+        </div>
+      </header>
+
+      <!-- metrics cards -->
+      <section class="metrics-row">
+        <div class="metric-box">
+          <span class="metric-label">Total Uploads</span>
+          <span class="metric-val">{totalCount} <small>files</small></span>
+          <span class="metric-sub">{formatBytes(totalBytes)}</span>
+        </div>
+        <div class="metric-box">
+          <span class="metric-label">In-Use Assets</span>
+          <span class="metric-val status-green">{totalCount - unusedCount}</span>
+          <span class="metric-sub">Actively linked on site</span>
+        </div>
+        <div class="metric-box">
+          <span class="metric-label">Unused / Orphaned</span>
+          <span class="metric-val status-warn">{unusedCount}</span>
+          <span class="metric-sub">{formatBytes(unusedBytes)} reclaimable</span>
+        </div>
+      </section>
+
+      <!-- controls and toolbar -->
+      <section class="toolbar">
+        <div class="filter-tabs">
+          <button class="tab-btn active" data-filter="all">All ({totalCount})</button>
+          <button class="tab-btn" data-filter="unused">Unused ({unusedCount})</button>
+          <button class="tab-btn" data-filter="projects">Projects</button>
+          <button class="tab-btn" data-filter="logos">Logos</button>
+          <button class="tab-btn" data-filter="hero">Hero Media</button>
+        </div>
+
+        <div class="selection-actions">
+          <button id="btnSelectUnused" class="btn-outline">Select All Unused</button>
+          <button id="btnDeselectAll" class="btn-outline">Deselect All</button>
+          <button id="btnDeleteSelected" class="btn-danger-outline" disabled>
+            Delete Selected (<span id="selectedCount">0</span>)
+          </button>
+        </div>
+      </section>
+
+      <!-- media grid -->
+      <section class="media-grid" id="mediaGrid">
+        {mediaItems.length === 0 ? (
+          <div class="empty-state">
+            <span class="empty-icon">📁</span>
+            <h3>No managed media files found</h3>
+            <p>Upload photos and videos in Keystatic to see them here.</p>
+          </div>
+        ) : (
+          mediaItems.map((item) => (
+            <article
+              class={`media-card ${!item.inUse ? 'is-unused' : 'is-in-use'}`}
+              data-path={item.path}
+              data-category={item.category.toLowerCase()}
+              data-inuse={item.inUse ? 'true' : 'false'}
+            >
+              <div class="card-thumb-wrap">
+                <label class="card-checkbox-label">
+                  <input type="checkbox" class="file-checkbox" value={item.path} />
+                  <span class="checkbox-custom"></span>
+                </label>
+
+                {item.isVideo ? (
+                  <video src={item.path} muted loop playsinline class="card-preview-video" preload="metadata" />
+                ) : (
+                  <img src={item.path} alt={item.name} loading="lazy" class="card-preview-img" />
+                )}
+
+                <span class={`status-badge ${item.inUse ? 'badge-in-use' : 'badge-unused'}`}>
+                  {item.inUse ? 'In Use' : 'Unused'}
+                </span>
+              </div>
+
+              <div class="card-body">
+                <h4 class="card-filename" title={item.name}>{item.name}</h4>
+                <div class="card-meta">
+                  <span class="meta-size">{formatBytes(item.size)}</span>
+                  <span class="meta-cat">{item.category}</span>
+                </div>
+
+                <div class="card-usage">
+                  {item.inUse ? (
+                    <span class="usage-text" title={item.usedIn.join(', ')}>
+                      Used in: {item.usedIn.map((f: string) => f.split('/').pop()).join(', ')}
+                    </span>
+                  ) : (
+                    <span class="unused-text">⚠️ Not linked to any content</span>
+                  )}
+                </div>
+
+                <button type="button" class="btn-single-delete" data-delete-path={item.path} title="Delete this file">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                  </svg>
+                  Delete
+                </button>
+              </div>
+            </article>
+          ))
+        )}
+      </section>
+    </div>
+
+    <!-- toast notification -->
+    <div id="toast" class="toast"></div>
+  </main>
+</BaseLayout>
+
+<script>
+  const checkboxes = document.querySelectorAll<HTMLInputElement>('.file-checkbox');
+  const selectedCountEl = document.getElementById('selectedCount');
+  const btnDeleteSelected = document.getElementById('btnDeleteSelected') as HTMLButtonElement;
+  const btnSelectUnused = document.getElementById('btnSelectUnused');
+  const btnDeselectAll = document.getElementById('btnDeselectAll');
+  const btnAutoCleanup = document.getElementById('btnAutoCleanup');
+  const tabButtons = document.querySelectorAll('.tab-btn');
+  const mediaCards = document.querySelectorAll<HTMLElement>('.media-card');
+  const singleDeleteBtns = document.querySelectorAll('[data-delete-path]');
+  const toastEl = document.getElementById('toast');
+
+  function showToast(msg: string, isError = false) {
+    if (!toastEl) return;
+    toastEl.textContent = msg;
+    toastEl.className = `toast is-visible ${isError ? 'toast-error' : 'toast-success'}`;
+    setTimeout(() => {
+      toastEl.className = 'toast';
+    }, 4000);
+  }
+
+  function updateSelection() {
+    const selected = document.querySelectorAll<HTMLInputElement>('.file-checkbox:checked');
+    const count = selected.length;
+    if (selectedCountEl) selectedCountEl.textContent = String(count);
+    if (btnDeleteSelected) btnDeleteSelected.disabled = count === 0;
+  }
+
+  checkboxes.forEach(cb => cb.addEventListener('change', updateSelection));
+
+  btnSelectUnused?.addEventListener('click', () => {
+    checkboxes.forEach(cb => {
+      const card = cb.closest('.media-card') as HTMLElement;
+      cb.checked = card?.dataset.inuse === 'false';
+    });
+    updateSelection();
+  });
+
+  btnDeselectAll?.addEventListener('click', () => {
+    checkboxes.forEach(cb => cb.checked = false);
+    updateSelection();
+  });
+
+  // Filter tabs
+  tabButtons.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabButtons.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const filter = tab.getAttribute('data-filter');
+
+      mediaCards.forEach(card => {
+        if (filter === 'all') {
+          card.style.display = '';
+        } else if (filter === 'unused') {
+          card.style.display = card.dataset.inuse === 'false' ? '' : 'none';
+        } else if (filter === 'projects') {
+          card.style.display = card.dataset.category === 'projects' ? '' : 'none';
+        } else if (filter === 'logos') {
+          card.style.display = card.dataset.category === 'logos' ? '' : 'none';
+        } else if (filter === 'hero') {
+          card.style.display = (card.dataset.category?.includes('hero')) ? '' : 'none';
+        }
+      });
+    });
+  });
+
+  async function executeDelete(paths: string[]) {
+    if (paths.length === 0) return;
+    const confirmMsg = `Are you sure you want to permanently delete ${paths.length} file(s)?`;
+    if (!window.confirm(confirmMsg)) return;
+
+    showToast(`Deleting ${paths.length} file(s)...`);
+
+    try {
+      const res = await fetch('/api/admin/media', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paths }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Delete failed');
+      }
+
+      showToast(`Successfully deleted ${data.deleted?.length || paths.length} file(s)! Reloading...`);
+      setTimeout(() => {
+        window.location.reload();
+      }, 1200);
+    } catch (err: any) {
+      showToast(`Error: ${err.message}`, true);
+    }
+  }
+
+  btnDeleteSelected?.addEventListener('click', () => {
+    const selected = Array.from(document.querySelectorAll<HTMLInputElement>('.file-checkbox:checked'))
+      .map(cb => cb.value);
+    executeDelete(selected);
+  });
+
+  btnAutoCleanup?.addEventListener('click', () => {
+    const unused = Array.from(document.querySelectorAll<HTMLElement>('.media-card[data-inuse="false"]'))
+      .map(card => card.dataset.path)
+      .filter(Boolean) as string[];
+    executeDelete(unused);
+  });
+
+  singleDeleteBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const path = btn.getAttribute('data-delete-path');
+      if (path) executeDelete([path]);
+    });
+  });
+</script>
+
+<style>
+  .media-admin-page {
+    background-color: #0d0f12;
+    color: #e5e7eb;
+    min-height: 100vh;
+    padding: 40px 5% 80px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  .admin-container {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-bottom: 28px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .btn-back {
+    display: inline-block;
+    color: #9ca3af;
+    text-decoration: none;
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+    transition: color 0.2s;
+  }
+  .btn-back:hover { color: #ffffff; }
+
+  .admin-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0 0 6px 0;
+  }
+
+  .admin-subtitle {
+    color: #9ca3af;
+    font-size: 0.95rem;
+    margin: 0;
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .btn-secondary,
+  .btn-danger,
+  .btn-outline,
+  .btn-danger-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    padding: 0 18px;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: none;
+  }
+
+  .btn-secondary {
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+  }
+  .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
+
+  .btn-danger {
+    background: #d62828;
+    color: #ffffff;
+  }
+  .btn-danger:hover:not(:disabled) { background: #b91d1d; }
+  .btn-danger:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .btn-outline {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #e5e7eb;
+  }
+  .btn-outline:hover { background: rgba(255, 255, 255, 0.08); }
+
+  .btn-danger-outline {
+    background: transparent;
+    border: 1px solid rgba(214, 40, 40, 0.5);
+    color: #ef4444;
+  }
+  .btn-danger-outline:hover:not(:disabled) {
+    background: rgba(214, 40, 40, 0.15);
+  }
+  .btn-danger-outline:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* Metrics */
+  .metrics-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .metric-box {
+    background: #161920;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .metric-label { font-size: 0.8rem; text-transform: uppercase; color: #9ca3af; letter-spacing: 0.05em; }
+  .metric-val { font-size: 1.8rem; font-weight: 700; color: #ffffff; }
+  .metric-val small { font-size: 0.9rem; font-weight: 400; color: #9ca3af; }
+  .metric-sub { font-size: 0.82rem; color: #6b7280; }
+  .status-green { color: #10b981; }
+  .status-warn { color: #f59e0b; }
+
+  /* Toolbar */
+  .toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 24px;
+    background: #161920;
+    padding: 12px 16px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .filter-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tab-btn {
+    background: transparent;
+    border: none;
+    color: #9ca3af;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+  .tab-btn:hover { color: #ffffff; background: rgba(255, 255, 255, 0.05); }
+  .tab-btn.active { color: #ffffff; background: rgba(255, 255, 255, 0.14); }
+
+  .selection-actions { display: flex; gap: 10px; align-items: center; }
+
+  /* Grid */
+  .media-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 20px;
+  }
+
+  .media-card {
+    background: #161920;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s, border-color 0.2s;
+    position: relative;
+  }
+  .media-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+  .media-card.is-unused {
+    border-color: rgba(245, 158, 11, 0.3);
+  }
+
+  .card-thumb-wrap {
+    height: 170px;
+    background: #0a0c10;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .card-preview-img,
+  .card-preview-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .card-checkbox-label {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 5;
+    cursor: pointer;
+  }
+
+  .file-checkbox {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: #d62828;
+  }
+
+  .status-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 3px 8px;
+    border-radius: 6px;
+    z-index: 5;
+  }
+  .badge-in-use { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+  .badge-unused { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
+
+  .card-body {
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    gap: 8px;
+  }
+
+  .card-filename {
+    font-size: 0.88rem;
+    font-weight: 600;
+    margin: 0;
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .card-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.78rem;
+    color: #9ca3af;
+  }
+
+  .card-usage {
+    font-size: 0.75rem;
+    min-height: 28px;
+  }
+  .usage-text { color: #9ca3af; }
+  .unused-text { color: #f87171; font-weight: 500; }
+
+  .btn-single-delete {
+    margin-top: auto;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #9ca3af;
+    border-radius: 6px;
+    height: 32px;
+    font-size: 0.78rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-single-delete:hover {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: rgba(239, 68, 68, 0.4);
+    color: #f87171;
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    padding: 12px 20px;
+    border-radius: 8px;
+    background: #1f2937;
+    color: #ffffff;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    font-size: 0.9rem;
+    z-index: 1000;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+    pointer-events: none;
+  }
+  .toast.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .toast-success { background: #065f46; border: 1px solid #10b981; }
+  .toast-error { background: #7f1d1d; border: 1px solid #ef4444; }
+</style>

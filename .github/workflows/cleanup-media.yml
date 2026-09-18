@@ -1,0 +1,53 @@
+name: Clean Up Unused Media
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/content/**'
+      - 'public/images/**'
+      - 'public/videos/**'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run only (preview without deleting)?'
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Run media cleanup
+        run: |
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            node scripts/cleanup-media.mjs --dry-run
+          else
+            node scripts/cleanup-media.mjs
+          fi
+
+      - name: Commit and push changes
+        if: ${{ inputs.dry_run != true }}
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --staged --quiet; then
+            echo "No orphaned media found to delete."
+          else
+            git commit -m "chore: remove unused media and empty folders [skip ci]"
+            git push origin main
+          fi
