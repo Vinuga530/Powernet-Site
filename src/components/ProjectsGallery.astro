@@ -10,7 +10,7 @@ const projects = entries.map((entry, index) => ({
   title: entry.data.title,
   category: entry.data.category,
   year: String(entry.data.year),
-  image: entry.data.image,
+  image: entry.data.image ?? '',
   summary: entry.data.summary,
   specs: entry.data.specs,
 }));
