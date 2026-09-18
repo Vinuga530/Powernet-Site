@@ -219,6 +219,22 @@ export default config({
         subtitle: fields.text({ label: 'Subtitle', multiline: true }),
         primaryButtonLabel: fields.text({ label: 'Primary Button Text', description: 'e.g. "Get a Quote"' }),
         secondaryButtonLabel: fields.text({ label: 'Secondary Button Text', description: 'e.g. "Explore Services"' }),
+        backgroundImage: fields.image({
+          label: 'Background Image',
+          description: 'Upload a custom background photo (JPG, PNG, WebP). Leave blank to keep the default background.',
+          directory: 'public/images/hero',
+          publicPath: '/images/hero/',
+        }),
+        backgroundVideo: fields.file({
+          label: 'Background Video File (.mp4 / .webm)',
+          description: 'Upload a background video file to play on loop. (Leave blank if using an image)',
+          directory: 'public/videos/hero',
+          publicPath: '/videos/hero/',
+        }),
+        backgroundVideoUrl: fields.url({
+          label: 'Or Background Video URL (External)',
+          description: 'Optional direct link to an MP4 video (e.g. CDN or cloud storage). Overrides video file if provided.',
+        }),
       },
     }),
 

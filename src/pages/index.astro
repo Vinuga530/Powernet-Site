@@ -15,6 +15,8 @@ const company = companyEntry.data;
 
 const heroEntry = await getEntry("hero", "company");
 const hero = heroEntry.data;
+const heroVideo = hero.backgroundVideoUrl || hero.backgroundVideo;
+const heroCustomImage = hero.backgroundImage;
 
 const statsEntry = await getEntry("stats", "company");
 const stats = statsEntry.data;
@@ -33,17 +35,39 @@ const clientEntriesReversed = [...clientEntries].reverse();
 <BaseLayout title="Powernet (Pvt) Ltd | Power and Infrastructure Solutions">
   <section class="hero-section hero-dark-overlay">
     <div class="hero-bg image-reveal-wrapper is-revealed">
-      <Picture
-        src={heroImg}
-        alt="Powernet Infrastructure"
-        class="image-reveal-inner bg-img"
-        formats={["avif", "webp"]}
-        quality={75}
-        widths={[640, 1024, 1600, 1920]}
-        sizes="100vw"
-        loading="eager"
-        fetchpriority="high"
-      />
+      {heroVideo ? (
+        <video
+          src={heroVideo}
+          autoplay
+          muted
+          loop
+          playsinline
+          poster={heroCustomImage || heroImg.src}
+          class="image-reveal-inner bg-img"
+        >
+          <source src={heroVideo} />
+        </video>
+      ) : heroCustomImage ? (
+        <img
+          src={heroCustomImage}
+          alt="Powernet Infrastructure"
+          class="image-reveal-inner bg-img"
+          loading="eager"
+          fetchpriority="high"
+        />
+      ) : (
+        <Picture
+          src={heroImg}
+          alt="Powernet Infrastructure"
+          class="image-reveal-inner bg-img"
+          formats={["avif", "webp"]}
+          quality={75}
+          widths={[640, 1024, 1600, 1920]}
+          sizes="100vw"
+          loading="eager"
+          fetchpriority="high"
+        />
+      )}
       <div class="bg-overlay"></div>
     </div>
 

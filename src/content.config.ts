@@ -92,6 +92,9 @@ const heroCollection = defineCollection({
     subtitle: z.string(),
     primaryButtonLabel: z.string(),
     secondaryButtonLabel: z.string(),
+    backgroundImage: z.string().nullable().optional(),
+    backgroundVideo: z.string().nullable().optional(),
+    backgroundVideoUrl: z.string().nullable().optional(),
   }),
 });
 
