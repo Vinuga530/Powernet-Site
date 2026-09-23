@@ -237,7 +237,7 @@ const clientEntriesReversed = [...clientEntries].reverse();
   </section>
 
   <section id="services" class="editorial-capabilities">
-    <header class="capabilities-intro">
+    <header class="capabilities-intro scroll-reveal reveal-up">
       <p class="intro-eyebrow">Services</p>
       <h2 class="intro-heading">Engineering built for continuous operation.</h2>
       <p class="intro-summary">
@@ -246,15 +246,17 @@ const clientEntriesReversed = [...clientEntries].reverse();
     </header>
 
     <div class="capabilities-list">
-      {serviceEntries.map((service) => (
-        <article class="capability-entry" id={service.data.anchorId || undefined}>
+      {serviceEntries.map((service, idx) => (
+        <article class="capability-entry scroll-reveal reveal-up" id={service.data.anchorId || undefined} style={`--entry-delay: ${idx * 80}ms`}>
           <div class="entry-title">
+            <span class="entry-index">{String(idx + 1).padStart(2, '0')}</span>
             <h3>{service.data.title}</h3>
           </div>
           <div class="entry-content">
             <p>{service.data.summary}</p>
             <p class="entry-scope">{service.data.scope.join(" · ")}</p>
           </div>
+          <div class="entry-accent-bar" aria-hidden="true"></div>
         </article>
       ))}
     </div>
@@ -440,9 +442,10 @@ const clientEntriesReversed = [...clientEntries].reverse();
 
   .hero-bg {
     position: absolute;
-    inset: 0;
+    inset: -8% 0;          /* extra vertical room so parallax travel doesn't expose gaps */
     z-index: -1;
     background-color: #111;
+    will-change: transform;
   }
 
   .bg-img {
@@ -896,6 +899,7 @@ const clientEntriesReversed = [...clientEntries].reverse();
   .capabilities-intro {
     max-width: 760px;
     margin-bottom: 96px;
+    transition-delay: 0ms;
   }
 
   .intro-eyebrow {
@@ -930,25 +934,72 @@ const clientEntriesReversed = [...clientEntries].reverse();
   }
 
   .capability-entry {
+    position: relative;
     display: grid;
     grid-template-columns: 340px 1fr;
     gap: 64px;
-    padding: 44px 0;
+    padding: 44px 0 44px 24px;
     border-top: 1px solid rgba(0, 0, 0, 0.1);
     align-items: baseline;
+    transition-delay: var(--entry-delay, 0ms);
+    overflow: hidden;
   }
 
   .capability-entry:last-child {
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   }
 
+  /* left accent bar */
+  .entry-accent-bar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: #d62828;
+    transform: scaleY(0);
+    transform-origin: top;
+    transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .capability-entry.is-revealed .entry-accent-bar,
+  .capability-entry.is-visible .entry-accent-bar {
+    transform: scaleY(1);
+  }
+
+  .capability-entry:hover .entry-accent-bar {
+    transform: scaleY(1);
+  }
+
+  /* numbered index */
+  .entry-index {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #d62828;
+    margin-bottom: 10px;
+    opacity: 0.9;
+  }
+
   /* title column */
+  .entry-title {
+    display: flex;
+    flex-direction: column;
+  }
+
   .entry-title h3 {
     font-size: 1.4rem;
     font-weight: 600;
     color: #111216;
     line-height: 1.3;
     letter-spacing: -0.01em;
+    transition: color 0.25s ease;
+  }
+
+  .capability-entry:hover .entry-title h3 {
+    color: #d62828;
   }
 
   /* narrative column */
@@ -972,11 +1023,23 @@ const clientEntriesReversed = [...clientEntries].reverse();
     .capability-entry {
       grid-template-columns: 1fr;
       gap: 16px;
-      padding: 32px 0;
+      padding: 32px 0 32px 20px;
     }
 
     .capabilities-intro {
       margin-bottom: 56px;
+    }
+  }
+
+  /* reduced-motion: instant accent bar, no transitions */
+  @media (prefers-reduced-motion: reduce) {
+    .entry-accent-bar {
+      transition: none !important;
+      transform: scaleY(1) !important;
+    }
+
+    .entry-title h3 {
+      transition: none !important;
     }
   }
 
@@ -1180,6 +1243,7 @@ const clientEntriesReversed = [...clientEntries].reverse();
     overflow: hidden;
     -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
     mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+    will-change: transform;
   }
 
   .trusted-marquee-row {
@@ -1618,3 +1682,116 @@ const clientEntriesReversed = [...clientEntries].reverse();
 
   document.addEventListener('astro:page-load', initPage);
 </script>
+
+<script>
+  /* =====================================================================
+     PARALLAX ENGINE
+     - Hero bg: 30% scroll speed offset (background moves slower)
+     - CTA section bg / trusted-by: 15% offset on contained decorative layers
+     - Disabled when: prefers-reduced-motion OR viewport ≤ 768px (mobile)
+     - Lifecycle-safe: cleans up and re-inits on astro:page-load
+     ===================================================================== */
+  let parallaxRAF: number | null = null;
+  let parallaxScrollY = 0;
+  let parallaxTicking = false;
+  let parallaxEnabled = false;
+  let parallaxCleanup: (() => void) | null = null;
+
+  const initParallax = () => {
+    /* tear down previous instance */
+    if (parallaxCleanup) { parallaxCleanup(); parallaxCleanup = null; }
+    if (parallaxRAF) { cancelAnimationFrame(parallaxRAF); parallaxRAF = null; }
+
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
+
+    parallaxEnabled = !prefersReduced && !isMobile;
+
+    if (!parallaxEnabled) return;
+
+    /* targets */
+    const heroBg = document.querySelector<HTMLElement>('.hero-bg');
+    const ctaSection = document.querySelector<HTMLElement>('.section-cta');
+    const trustedSection = document.querySelector<HTMLElement>('.section-trusted');
+
+    if (!heroBg) return;
+
+    const applyParallax = () => {
+      const sy = parallaxScrollY;
+
+      /* hero bg — moves at 30% of scroll speed, so background lags behind */
+      heroBg.style.transform = `translate3d(0, ${sy * 0.30}px, 0)`;
+
+      /* CTA band — subtle content rise (moves 15% relative to section top) */
+      if (ctaSection) {
+        const rect = ctaSection.getBoundingClientRect();
+        const sectionMid = rect.top + rect.height / 2 - window.innerHeight / 2;
+        const offset = Math.max(-30, Math.min(30, sectionMid * 0.12));
+        ctaSection.style.backgroundPosition = `center ${50 + offset * 0.5}%`;
+      }
+
+      /* trusted-by marquee — very gentle depth push */
+      if (trustedSection) {
+        const rect = trustedSection.getBoundingClientRect();
+        const vis = Math.max(-20, Math.min(20, (window.innerHeight / 2 - rect.top - rect.height / 2) * 0.08));
+        const track = trustedSection.querySelector<HTMLElement>('.trusted-marquee');
+        if (track) track.style.transform = `translate3d(0, ${vis}px, 0)`;
+      }
+
+      parallaxTicking = false;
+    };
+
+    const onScroll = () => {
+      parallaxScrollY = window.scrollY;
+      if (!parallaxTicking) {
+        parallaxRAF = requestAnimationFrame(applyParallax);
+        parallaxTicking = true;
+      }
+    };
+
+    /* run once immediately to set initial state */
+    parallaxScrollY = window.scrollY;
+    applyParallax();
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+
+    /* handle resize — disable on mobile if resized down */
+    const onResize = () => {
+      const nowMobile = window.matchMedia('(max-width: 768px)').matches;
+      if (nowMobile && parallaxEnabled) {
+        parallaxEnabled = false;
+        /* reset transforms */
+        heroBg.style.transform = '';
+        if (trustedSection) {
+          const track = trustedSection.querySelector<HTMLElement>('.trusted-marquee');
+          if (track) track.style.transform = '';
+        }
+        window.removeEventListener('scroll', onScroll);
+      } else if (!nowMobile && !parallaxEnabled && !prefersReduced) {
+        parallaxEnabled = true;
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+      }
+    };
+
+    window.addEventListener('resize', onResize, { passive: true });
+
+    parallaxCleanup = () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onResize);
+      if (heroBg) heroBg.style.transform = '';
+      if (trustedSection) {
+        const track = trustedSection.querySelector<HTMLElement>('.trusted-marquee');
+        if (track) track.style.transform = '';
+      }
+    };
+  };
+
+  document.addEventListener('astro:page-load', initParallax);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initParallax, { once: true });
+  } else {
+    initParallax();
+  }
+</script>
+
