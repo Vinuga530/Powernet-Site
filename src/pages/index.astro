@@ -251,6 +251,57 @@ const clientEntriesReversed = [...clientEntries].reverse();
           <div class="entry-title">
             <span class="entry-index">{String(idx + 1).padStart(2, '0')}</span>
             <h3>{service.data.title}</h3>
+            {/* Inline SVG illustration — one per service, keyed by order */}
+            {idx === 0 && (
+              <svg class="entry-icon" viewBox="0 0 56 56" fill="none" aria-hidden="true">
+                <rect x="6" y="16" width="38" height="26" rx="3" stroke="#111216" stroke-width="1.6" class="svc-path"/>
+                <rect x="44" y="24" width="6" height="10" rx="2" stroke="#111216" stroke-width="1.4" class="svc-path"/>
+                <path d="M31 16V10h-6v6" stroke="#111216" stroke-width="1.6" stroke-linecap="round" class="svc-path"/>
+                <path d="M30 28l-5 8h6l-5 8" stroke="#d62828" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="svc-path"/>
+              </svg>
+            )}
+            {idx === 1 && (
+              /* Structured Cabling & Fiber Optics — patch panel + signal lines */
+              <svg class="entry-icon" viewBox="0 0 56 56" fill="none" aria-hidden="true">
+                <rect x="8" y="18" width="40" height="22" rx="3" stroke="#111216" stroke-width="1.6" class="svc-path"/>
+                <circle cx="16" cy="29" r="3" stroke="#111216" stroke-width="1.4" class="svc-path"/>
+                <circle cx="28" cy="29" r="3" stroke="#111216" stroke-width="1.4" class="svc-path"/>
+                <circle cx="40" cy="29" r="3" stroke="#111216" stroke-width="1.4" class="svc-path"/>
+                <path d="M16 40v6M28 40v6M40 40v6" stroke="#d62828" stroke-width="1.6" stroke-linecap="round" class="svc-path"/>
+                <path d="M16 46h24" stroke="#111216" stroke-width="1.4" stroke-linecap="round" class="svc-path"/>
+              </svg>
+            )}
+            {idx === 2 && (
+              /* Switchgear & Panel Automation — circuit breaker grid */
+              <svg class="entry-icon" viewBox="0 0 56 56" fill="none" aria-hidden="true">
+                <rect x="6" y="8" width="44" height="42" rx="3" stroke="#111216" stroke-width="1.6" class="svc-path"/>
+                <line x1="6" y1="18" x2="50" y2="18" stroke="#111216" stroke-width="1.2" class="svc-path"/>
+                <rect x="13" y="24" width="8" height="12" rx="1.5" stroke="#111216" stroke-width="1.4" class="svc-path"/>
+                <rect x="24" y="24" width="8" height="12" rx="1.5" stroke="#d62828" stroke-width="1.4" class="svc-path"/>
+                <rect x="35" y="24" width="8" height="12" rx="1.5" stroke="#111216" stroke-width="1.4" class="svc-path"/>
+                <path d="M15 13h3M22 13h3M29 13h3M36 13h3M43 13h3" stroke="#111216" stroke-width="1.4" stroke-linecap="round" class="svc-path"/>
+              </svg>
+            )}
+            {idx === 3 && (
+              /* Physical Access & Surveillance — camera + shield */
+              <svg class="entry-icon" viewBox="0 0 56 56" fill="none" aria-hidden="true">
+                <path d="M28 6 L44 12 L44 26 C44 36 28 50 28 50 C28 50 12 36 12 26 L12 12 Z" stroke="#111216" stroke-width="1.6" stroke-linejoin="round" class="svc-path"/>
+                <circle cx="28" cy="26" r="7" stroke="#111216" stroke-width="1.4" class="svc-path"/>
+                <circle cx="28" cy="26" r="2.5" stroke="#d62828" stroke-width="1.4" class="svc-path"/>
+                <path d="M28 10v4M28 38v4" stroke="#111216" stroke-width="1.2" stroke-linecap="round" class="svc-path"/>
+              </svg>
+            )}
+            {idx === 4 && (
+              <svg class="entry-icon" viewBox="0 0 56 56" fill="none" aria-hidden="true">
+                <rect x="10" y="8" width="24" height="36" rx="2" stroke="#111216" stroke-width="1.6" class="svc-path"/>
+                <line x1="10" y1="20" x2="34" y2="20" stroke="#111216" stroke-width="1.2" class="svc-path"/>
+                <line x1="10" y1="30" x2="34" y2="30" stroke="#111216" stroke-width="1.2" class="svc-path"/>
+                <circle cx="27" cy="14" r="1.8" stroke="#111216" stroke-width="1.2" class="svc-path"/>
+                <circle cx="27" cy="24" r="1.8" stroke="#111216" stroke-width="1.2" class="svc-path"/>
+                <path d="M34 22 H42 L46 18" stroke="#111216" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="svc-path"/>
+                <path d="M46 18 C48 15 50 12 48 10 C46 8 44 10 46 12" stroke="#d62828" stroke-width="1.5" stroke-linecap="round" class="svc-path"/>
+              </svg>
+            )}
           </div>
           <div class="entry-content">
             <p>{service.data.summary}</p>
@@ -1031,7 +1082,43 @@ const clientEntriesReversed = [...clientEntries].reverse();
     }
   }
 
-  /* reduced-motion: instant accent bar, no transitions */
+  /* ---- service icon illustration ---- */
+  .entry-icon {
+    display: block;
+    width: 48px;
+    height: 48px;
+    margin-top: 20px;
+    flex-shrink: 0;
+    overflow: visible;
+  }
+
+  /* all stroke paths start hidden, drawn in on reveal */
+  .entry-icon .svc-path {
+    stroke-dasharray: 300;
+    stroke-dashoffset: 300;
+    transition:
+      stroke-dashoffset 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.4s ease;
+    opacity: 0;
+  }
+
+  /* stagger each path within an icon by its sibling index */
+  .entry-icon .svc-path:nth-child(1) { transition-delay: 0ms; }
+  .entry-icon .svc-path:nth-child(2) { transition-delay: 80ms; }
+  .entry-icon .svc-path:nth-child(3) { transition-delay: 160ms; }
+  .entry-icon .svc-path:nth-child(4) { transition-delay: 240ms; }
+  .entry-icon .svc-path:nth-child(5) { transition-delay: 320ms; }
+  .entry-icon .svc-path:nth-child(6) { transition-delay: 400ms; }
+  .entry-icon .svc-path:nth-child(7) { transition-delay: 480ms; }
+
+  /* trigger: parent entry receives .is-revealed from the existing IntersectionObserver */
+  .capability-entry.is-revealed .entry-icon .svc-path,
+  .capability-entry.is-visible  .entry-icon .svc-path {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+
+  /* reduced-motion: instant, no animation */
   @media (prefers-reduced-motion: reduce) {
     .entry-accent-bar {
       transition: none !important;
@@ -1040,6 +1127,12 @@ const clientEntriesReversed = [...clientEntries].reverse();
 
     .entry-title h3 {
       transition: none !important;
+    }
+
+    .entry-icon .svc-path {
+      transition: none !important;
+      stroke-dashoffset: 0 !important;
+      opacity: 1 !important;
     }
   }
 
