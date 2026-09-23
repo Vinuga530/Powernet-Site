@@ -59,7 +59,7 @@ clientEntries.sort((a, b) => a.data.order - b.data.order);
         <span class="text-label">Top Corporate Clients</span>
       </div>
 
-      <div class="clients-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--space-lg); margin-top: var(--space-2xl);">
+      <div class="clients-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(150px, 100%), 1fr)); gap: var(--space-lg); margin-top: var(--space-2xl);">
         {clientEntries.map((entry) => (
           <div class="client-card" style="display: flex; align-items: center; justify-content: center; height: 90px; padding: var(--space-md); border: 1px solid var(--color-border); border-radius: 12px; background: #ffffff;">
             <img src={entry.data.logo} alt={entry.data.name} loading="lazy" style="max-width: 100%; max-height: 100%; object-fit: contain;" />
@@ -69,3 +69,21 @@ clientEntries.sort((a, b) => a.data.order - b.data.order);
     </div>
   </section>
 </BaseLayout>
+
+<style>
+  /* Mobile: override inline grid-column spans that break at narrow widths */
+  @media (max-width: 768px) {
+    .about-content {
+      grid-column: 1 / -1 !important;
+    }
+    .about-board {
+      grid-column: 1 / -1 !important;
+    }
+  }
+
+  /* Ensure images inside client cards stay contained */
+  .client-card img {
+    max-width: 100%;
+    height: auto;
+  }
+</style>

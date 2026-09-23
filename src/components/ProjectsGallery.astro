@@ -486,6 +486,54 @@ const projects = entries.map((entry, index) => ({
       height: 320px;
     }
   }
+
+  @media (max-width: 768px) {
+    .projects-focal-section {
+      padding: 80px 4%;
+    }
+
+    .projects-header {
+      margin-bottom: 40px;
+    }
+
+    .center-focus-unit {
+      padding: 20px;
+      gap: 20px;
+    }
+
+    .focus-image-card {
+      height: 260px;
+    }
+
+    .focus-client {
+      font-size: clamp(1.3rem, 5vw, 1.7rem);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .projects-focal-section {
+      padding: 60px 4%;
+    }
+
+    .center-focus-unit {
+      padding: 16px;
+      border-radius: 18px;
+    }
+
+    .focus-image-card {
+      height: 220px;
+      border-radius: 14px;
+    }
+
+    .focal-controls {
+      margin-top: 28px;
+      gap: 16px;
+    }
+
+    .popout-container {
+      padding: 0 4px;
+    }
+  }
 </style>
 
 <script define:vars={{ projects }}>

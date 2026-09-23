@@ -46,6 +46,24 @@ a {
   }
 }
 
+@media (max-width: 480px) {
+  .grid-12 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Prevent images from overflowing their containers site-wide */
+img,
+video {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Ensure video elements behave like block-level media */
+video {
+  display: block;
+}
+
 /* ========================================
    UNIVERSAL ROLLING BUTTON SYSTEM
    ======================================== */
