@@ -2023,16 +2023,17 @@ const clientEntriesReversed = [...clientEntries].reverse();
   /* reveal transitions */
   .reveal-up {
     opacity: 0;
-    transform: translateY(24px);
+    transform: translateY(32px) scale(0.985);
     transition:
-      opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
-      transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
     will-change: transform, opacity;
   }
 
-  .reveal-up.is-visible {
+  .reveal-up.is-visible,
+  .reveal-up.is-revealed {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 
   /* responsive breakpoints */
@@ -2177,12 +2178,12 @@ const clientEntriesReversed = [...clientEntries].reverse();
           }
         });
       },
-      { threshold: 0.05, rootMargin: "30px 0px" },
+      { threshold: 0.1, rootMargin: "0px 0px -12% 0px" },
     );
 
     targets.forEach((target) => {
       const rect = target.getBoundingClientRect();
-      if (rect.top < window.innerHeight) {
+      if (rect.top < window.innerHeight * 0.75 && rect.bottom > 0) {
         target.classList.add("is-visible");
         target.classList.add("is-revealed");
       } else {
@@ -2314,7 +2315,7 @@ const clientEntriesReversed = [...clientEntries].reverse();
               }
             });
           },
-          { threshold: 0.35 },
+          { threshold: 0.2, rootMargin: "0px 0px -10% 0px" },
         );
 
         statsObserverInstance.observe(credibilityStrip);
@@ -2505,7 +2506,7 @@ const clientEntriesReversed = [...clientEntries].reverse();
           });
         });
       },
-      { threshold: 0.4 },
+      { threshold: 0.2, rootMargin: "0px 0px -10% 0px" },
     );
 
     obs.observe(strip);
