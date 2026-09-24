@@ -1,19 +1,75 @@
 ---
 import { getCollection } from "astro:content";
 
-const entries = await getCollection("projects");
-entries.sort((a, b) => a.data.order - b.data.order);
+let entries = [];
+try {
+  entries = await getCollection("projects");
+  entries.sort((a, b) => (a.data?.order ?? 99) - (b.data?.order ?? 99));
+} catch (e) {
+  entries = [];
+}
 
-const projects = entries.map((entry, index) => ({
+const defaultProjects = [
+  {
+    id: "Project 01",
+    client: "The World Bank Sri Lanka",
+    title: "Server Room Power & UPS Installation",
+    category: "Electrical & UPS",
+    year: "2024",
+    image: "/images/projects/server-room.jpg",
+    summary: "Installed dedicated distribution panels, redundant UPS systems, and structured network drops across the main office.",
+    specs: [
+      "Redundant UPS power backup",
+      "Automatic transfer switches",
+      "Server rack layout & cabling",
+      "Zero-downtime cutover"
+    ]
+  },
+  {
+    id: "Project 02",
+    client: "Commercial Bank Center",
+    title: "Fiber Backbone & Access Setup",
+    category: "Network Infrastructure",
+    year: "2023",
+    image: "/images/projects/fiber-setup.jpg",
+    summary: "Ran multi-floor fiber cables, installed patch panels, and configured card access for secure server rooms.",
+    specs: [
+      "Multi-strand fiber lines",
+      "Keycard door controllers",
+      "Centralized equipment racks"
+    ]
+  },
+  {
+    id: "Project 03",
+    client: "Factory Electrical Distribution",
+    title: "Factory Electrical Distribution",
+    category: "Power Systems",
+    year: "2023",
+    image: "/images/projects/factory-electrical-distribution/image.jpg",
+    summary: "Installed heavy industrial breaker panels, motor power lines, and surge suppression gear.",
+    specs: [
+      "Main distribution board assembly",
+      "Surge protection devices",
+      "Weatherproof conduit runs"
+    ]
+  }
+];
+
+const projects = entries.length > 0 ? entries.map((entry, index) => ({
   id: `Project ${String(index + 1).padStart(2, "0")}`,
-  client: entry.data.client,
-  title: entry.data.title,
-  category: entry.data.category,
-  year: String(entry.data.year),
-  image: entry.data.image ?? '',
-  summary: entry.data.summary,
-  specs: entry.data.specs,
-}));
+  client: entry.data?.client ?? "Powernet Installation",
+  title: entry.data?.title ?? "",
+  category: entry.data?.category ?? "Infrastructure",
+  year: String(entry.data?.year ?? new Date().getFullYear()),
+  image: entry.data?.image || "",
+  summary: entry.data?.summary ?? "",
+  specs: Array.isArray(entry.data?.specs) ? entry.data.specs : [],
+})) : defaultProjects;
+
+const total = projects.length;
+const current = projects[0];
+const prevProject = total > 1 ? projects[total - 1] : current;
+const nextProject = total > 1 ? projects[1] : current;
 ---
 
 <section id="projects" class="projects-focal-section">
@@ -28,44 +84,46 @@ const projects = entries.map((entry, index) => ({
       <!-- left offset preview (floated high) -->
       <div class="flank-card flank-left" id="flankLeft" role="button" tabindex="0" aria-label="View previous project">
         <div class="flank-img-wrap">
-          <img src="" alt="" id="flankLeftImg" />
+          <img src={prevProject?.image || ""} alt={prevProject?.title || ""} id="flankLeftImg" />
         </div>
         <div class="flank-meta">
-          <span class="flank-index" id="flankLeftIndex"></span>
-          <span class="flank-title" id="flankLeftTitle"></span>
+          <span class="flank-index" id="flankLeftIndex">{prevProject?.id || ""}</span>
+          <span class="flank-title" id="flankLeftTitle">{prevProject?.client || ""}</span>
         </div>
       </div>
 
       <!-- main center focus unit -->
       <div class="center-focus-unit">
         <div class="focus-image-card" id="focusCard" role="button" tabindex="0" aria-label="Inspect project image">
-          <img src="" alt="" id="focusImage" />
+          <img src={current?.image || ""} alt={current?.title || ""} id="focusImage" />
           <span class="inspect-tag">Inspect Image</span>
         </div>
 
         <div class="focus-details">
           <div class="focus-meta-row">
-            <span class="focus-index" id="focusIndex"></span>
+            <span class="focus-index" id="focusIndex">{current?.id || ""}</span>
             <span class="meta-separator">·</span>
-            <span class="focus-category" id="focusCategory"></span>
+            <span class="focus-category" id="focusCategory">{current?.category || ""}</span>
             <span class="meta-separator">·</span>
-            <span class="focus-year" id="focusYear"></span>
+            <span class="focus-year" id="focusYear">{current?.year || ""}</span>
           </div>
-          <h3 class="focus-client" id="focusClient"></h3>
-          <h4 class="focus-title" id="focusTitle"></h4>
-          <p class="focus-summary" id="focusSummary"></p>
-          <ul class="focus-specs" id="focusSpecs"></ul>
+          <h3 class="focus-client" id="focusClient">{current?.client || ""}</h3>
+          <h4 class="focus-title" id="focusTitle">{current?.title || ""}</h4>
+          <p class="focus-summary" id="focusSummary">{current?.summary || ""}</p>
+          <ul class="focus-specs" id="focusSpecs">
+            {current?.specs?.map((s: string) => <li>{s}</li>)}
+          </ul>
         </div>
       </div>
 
       <!-- right offset preview (floated low) -->
       <div class="flank-card flank-right" id="flankRight" role="button" tabindex="0" aria-label="View next project">
         <div class="flank-img-wrap">
-          <img src="" alt="" id="flankRightImg" />
+          <img src={nextProject?.image || ""} alt={nextProject?.title || ""} id="flankRightImg" />
         </div>
         <div class="flank-meta">
-          <span class="flank-index" id="flankRightIndex"></span>
-          <span class="flank-title" id="flankRightTitle"></span>
+          <span class="flank-index" id="flankRightIndex">{nextProject?.id || ""}</span>
+          <span class="flank-title" id="flankRightTitle">{nextProject?.client || ""}</span>
         </div>
       </div>
     </div>
@@ -73,7 +131,7 @@ const projects = entries.map((entry, index) => ({
     <!-- navigation arrows -->
     <div class="focal-controls">
       <button type="button" class="ctrl-btn" id="ctrlPrev" aria-label="Previous installation">&larr;</button>
-      <span class="ctrl-counter" id="ctrlCounter">1 / 3</span>
+      <span class="ctrl-counter" id="ctrlCounter">{total > 0 ? `1 / ${total}` : "0 / 0"}</span>
       <button type="button" class="ctrl-btn" id="ctrlNext" aria-label="Next installation">&rarr;</button>
     </div>
   </div>
@@ -570,6 +628,7 @@ const projects = entries.map((entry, index) => ({
 
 <script define:vars={{ projects }}>
   const initFocalGallery = () => {
+    if (!projects || !projects.length) return;
     let currentIndex = 0;
     const total = projects.length;
 
@@ -608,34 +667,35 @@ const projects = entries.map((entry, index) => ({
 
     const render = () => {
       const current = projects[currentIndex];
+      if (!current) return;
       const prevIndex = (currentIndex - 1 + total) % total;
       const nextIndex = (currentIndex + 1) % total;
-      const prev = projects[prevIndex];
-      const next = projects[nextIndex];
+      const prev = projects[prevIndex] || current;
+      const next = projects[nextIndex] || current;
 
       /* update center card */
       if (focusImage) {
-        focusImage.src = current.image;
-        focusImage.alt = current.title;
+        focusImage.src = current.image || "";
+        focusImage.alt = current.title || "";
       }
-      if (focusIndex) focusIndex.textContent = current.id;
-      if (focusCategory) focusCategory.textContent = current.category;
-      if (focusYear) focusYear.textContent = current.year;
-      if (focusClient) focusClient.textContent = current.client;
-      if (focusTitle) focusTitle.textContent = current.title;
-      if (focusSummary) focusSummary.textContent = current.summary;
+      if (focusIndex) focusIndex.textContent = current.id || "";
+      if (focusCategory) focusCategory.textContent = current.category || "";
+      if (focusYear) focusYear.textContent = current.year || "";
+      if (focusClient) focusClient.textContent = current.client || "";
+      if (focusTitle) focusTitle.textContent = current.title || "";
+      if (focusSummary) focusSummary.textContent = current.summary || "";
       if (focusSpecs) {
-        focusSpecs.innerHTML = current.specs.map(s => `<li>${s}</li>`).join("");
+        focusSpecs.innerHTML = (current.specs || []).map(s => `<li>${s}</li>`).join("");
       }
 
       /* update flanks */
-      if (flankLeftImg) flankLeftImg.src = prev.image;
-      if (flankLeftIndex) flankLeftIndex.textContent = prev.id;
-      if (flankLeftTitle) flankLeftTitle.textContent = prev.client;
+      if (flankLeftImg) flankLeftImg.src = prev.image || "";
+      if (flankLeftIndex) flankLeftIndex.textContent = prev.id || "";
+      if (flankLeftTitle) flankLeftTitle.textContent = prev.client || "";
 
-      if (flankRightImg) flankRightImg.src = next.image;
-      if (flankRightIndex) flankRightIndex.textContent = next.id;
-      if (flankRightTitle) flankRightTitle.textContent = next.client;
+      if (flankRightImg) flankRightImg.src = next.image || "";
+      if (flankRightIndex) flankRightIndex.textContent = next.id || "";
+      if (flankRightTitle) flankRightTitle.textContent = next.client || "";
 
       /* update counter */
       if (ctrlCounter) ctrlCounter.textContent = `${currentIndex + 1} / ${total}`;
@@ -764,6 +824,10 @@ const projects = entries.map((entry, index) => ({
     render();
   };
 
-  document.addEventListener("DOMContentLoaded", initFocalGallery);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initFocalGallery, { once: true });
+  } else {
+    initFocalGallery();
+  }
   document.addEventListener("astro:page-load", initFocalGallery);
 </script>
