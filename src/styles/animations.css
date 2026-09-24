@@ -109,6 +109,7 @@ button:focus-visible .char-clone {
 
 /* reduced motion safety */
 @media (prefers-reduced-motion: reduce) {
+  /* entrance transitions */
   .text-reveal-inner,
   .image-reveal-inner,
   .fade-in,
@@ -119,5 +120,21 @@ button:focus-visible .char-clone {
     transition: none !important;
     transform: none !important;
     opacity: 1 !important;
+  }
+
+  /* scroll-reveal: skip straight to revealed state — no animation */
+  .scroll-reveal,
+  .scroll-reveal.reveal-up {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  /* stagger delays: collapse to zero so nothing staggers */
+  .stagger-1,
+  .stagger-2,
+  .stagger-3,
+  .stagger-4 {
+    transition-delay: 0ms !important;
   }
 }

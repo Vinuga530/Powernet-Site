@@ -52,6 +52,19 @@ a {
   }
 }
 
+/*
+  .grid-safe — overflow-safe auto-fill grid.
+  Uses min(Npx, 100%) inside minmax() so fixed min-track widths
+  never exceed the viewport on narrow phones.
+  Usage: class="grid-safe" plus --grid-min custom property as needed.
+  Default min column: 150px.
+*/
+.grid-safe {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(var(--grid-min, 150px), 100%), 1fr));
+  gap: var(--space-lg);
+}
+
 /* Prevent images from overflowing their containers site-wide */
 img,
 video {
@@ -331,3 +344,34 @@ a.button:active {
   }
 }
 
+/* ========================================
+   UNIVERSAL 44px TOUCH TARGETS
+   Applies to all tappable elements beyond the nav toggle.
+   44px is Apple HIG / WCAG 2.5.5 minimum interactive size.
+   ======================================== */
+@media (max-width: 768px) {
+  /* pill buttons */
+  .btn-pill {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* footer social icon links */
+  .social-icon {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  /* client logo cards */
+  .client-card {
+    min-height: 44px;
+  }
+
+  /* footer nav links — easier tap area */
+  .footer-nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding-block: 8px;
+  }
+}

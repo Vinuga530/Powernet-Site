@@ -39,7 +39,7 @@ const clientEntriesReversed = [...clientEntries].reverse();
         <video
           src={heroVideo}
           autoplay
-          muted
+          muted={true}
           loop
           playsinline
           poster={heroCustomImage || heroImg.src}
@@ -251,55 +251,65 @@ const clientEntriesReversed = [...clientEntries].reverse();
           <div class="entry-title">
             <span class="entry-index">{String(idx + 1).padStart(2, '0')}</span>
             <h3>{service.data.title}</h3>
-            {/* Inline SVG illustration — one per service, keyed by order */}
+            {/* Inline SVG illustrations — keyed by sort order (idx).
+                Colors use CSS variables via svc-stroke/svc-accent classes
+                so any future rebrand or dark-mode propagates automatically. */}
             {idx === 0 && (
+              /* Backup Power & Industrial UPS — battery body + lightning bolt */
               <svg class="entry-icon" viewBox="0 0 56 56" fill="none" aria-hidden="true">
-                <rect x="6" y="16" width="38" height="26" rx="3" stroke="#111216" stroke-width="1.6" class="svc-path"/>
-                <rect x="44" y="24" width="6" height="10" rx="2" stroke="#111216" stroke-width="1.4" class="svc-path"/>
-                <path d="M31 16V10h-6v6" stroke="#111216" stroke-width="1.6" stroke-linecap="round" class="svc-path"/>
-                <path d="M30 28l-5 8h6l-5 8" stroke="#d62828" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="svc-path"/>
+                <rect x="6" y="16" width="38" height="26" rx="3" class="svc-path svc-stroke" stroke-width="1.6"/>
+                <rect x="44" y="24" width="6" height="10" rx="2" class="svc-path svc-stroke" stroke-width="1.4"/>
+                <path d="M31 16V10h-6v6" class="svc-path svc-stroke" stroke-width="1.6" stroke-linecap="round"/>
+                <path d="M30 28l-5 8h6l-5 8" class="svc-path svc-accent" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             )}
             {idx === 1 && (
               /* Structured Cabling & Fiber Optics — patch panel + signal lines */
               <svg class="entry-icon" viewBox="0 0 56 56" fill="none" aria-hidden="true">
-                <rect x="8" y="18" width="40" height="22" rx="3" stroke="#111216" stroke-width="1.6" class="svc-path"/>
-                <circle cx="16" cy="29" r="3" stroke="#111216" stroke-width="1.4" class="svc-path"/>
-                <circle cx="28" cy="29" r="3" stroke="#111216" stroke-width="1.4" class="svc-path"/>
-                <circle cx="40" cy="29" r="3" stroke="#111216" stroke-width="1.4" class="svc-path"/>
-                <path d="M16 40v6M28 40v6M40 40v6" stroke="#d62828" stroke-width="1.6" stroke-linecap="round" class="svc-path"/>
-                <path d="M16 46h24" stroke="#111216" stroke-width="1.4" stroke-linecap="round" class="svc-path"/>
+                <rect x="8" y="18" width="40" height="22" rx="3" class="svc-path svc-stroke" stroke-width="1.6"/>
+                <circle cx="16" cy="29" r="3" class="svc-path svc-stroke" stroke-width="1.4"/>
+                <circle cx="28" cy="29" r="3" class="svc-path svc-stroke" stroke-width="1.4"/>
+                <circle cx="40" cy="29" r="3" class="svc-path svc-stroke" stroke-width="1.4"/>
+                <path d="M16 40v6M28 40v6M40 40v6" class="svc-path svc-accent" stroke-width="1.6" stroke-linecap="round"/>
+                <path d="M16 46h24" class="svc-path svc-stroke" stroke-width="1.4" stroke-linecap="round"/>
               </svg>
             )}
             {idx === 2 && (
               /* Switchgear & Panel Automation — circuit breaker grid */
               <svg class="entry-icon" viewBox="0 0 56 56" fill="none" aria-hidden="true">
-                <rect x="6" y="8" width="44" height="42" rx="3" stroke="#111216" stroke-width="1.6" class="svc-path"/>
-                <line x1="6" y1="18" x2="50" y2="18" stroke="#111216" stroke-width="1.2" class="svc-path"/>
-                <rect x="13" y="24" width="8" height="12" rx="1.5" stroke="#111216" stroke-width="1.4" class="svc-path"/>
-                <rect x="24" y="24" width="8" height="12" rx="1.5" stroke="#d62828" stroke-width="1.4" class="svc-path"/>
-                <rect x="35" y="24" width="8" height="12" rx="1.5" stroke="#111216" stroke-width="1.4" class="svc-path"/>
-                <path d="M15 13h3M22 13h3M29 13h3M36 13h3M43 13h3" stroke="#111216" stroke-width="1.4" stroke-linecap="round" class="svc-path"/>
+                <rect x="6" y="8" width="44" height="42" rx="3" class="svc-path svc-stroke" stroke-width="1.6"/>
+                <line x1="6" y1="18" x2="50" y2="18" class="svc-path svc-stroke" stroke-width="1.2"/>
+                <rect x="13" y="24" width="8" height="12" rx="1.5" class="svc-path svc-stroke" stroke-width="1.4"/>
+                <rect x="24" y="24" width="8" height="12" rx="1.5" class="svc-path svc-accent" stroke-width="1.4"/>
+                <rect x="35" y="24" width="8" height="12" rx="1.5" class="svc-path svc-stroke" stroke-width="1.4"/>
+                <path d="M15 13h3M22 13h3M29 13h3M36 13h3M43 13h3" class="svc-path svc-stroke" stroke-width="1.4" stroke-linecap="round"/>
               </svg>
             )}
             {idx === 3 && (
-              /* Physical Access & Surveillance — camera + shield */
+              /* Server Room Fire Protection — suppression nozzle + FM-200 flask + sensor */
               <svg class="entry-icon" viewBox="0 0 56 56" fill="none" aria-hidden="true">
-                <path d="M28 6 L44 12 L44 26 C44 36 28 50 28 50 C28 50 12 36 12 26 L12 12 Z" stroke="#111216" stroke-width="1.6" stroke-linejoin="round" class="svc-path"/>
-                <circle cx="28" cy="26" r="7" stroke="#111216" stroke-width="1.4" class="svc-path"/>
-                <circle cx="28" cy="26" r="2.5" stroke="#d62828" stroke-width="1.4" class="svc-path"/>
-                <path d="M28 10v4M28 38v4" stroke="#111216" stroke-width="1.2" stroke-linecap="round" class="svc-path"/>
+                {/* suppression nozzle head */}
+                <path d="M20 10 H36 L38 16 H18 Z" class="svc-path svc-stroke" stroke-width="1.5" stroke-linejoin="round"/>
+                {/* cylinder body */}
+                <rect x="22" y="16" width="12" height="22" rx="2" class="svc-path svc-stroke" stroke-width="1.5"/>
+                {/* valve handle */}
+                <path d="M28 16 V12 M24 12 H32" class="svc-path svc-stroke" stroke-width="1.4" stroke-linecap="round"/>
+                {/* discharge pipe */}
+                <path d="M34 24 H42 Q46 24 46 28 L46 38" class="svc-path svc-stroke" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                {/* spray head */}
+                <circle cx="46" cy="40" r="3" class="svc-path svc-accent" stroke-width="1.4"/>
+                {/* early-smoke sensor dot */}
+                <circle cx="14" cy="40" r="4" class="svc-path svc-stroke" stroke-width="1.3"/>
+                <circle cx="14" cy="40" r="1.5" class="svc-path svc-accent" stroke-width="1.2"/>
               </svg>
             )}
             {idx === 4 && (
+              /* Physical Access & Surveillance — shield + camera lens */
               <svg class="entry-icon" viewBox="0 0 56 56" fill="none" aria-hidden="true">
-                <rect x="10" y="8" width="24" height="36" rx="2" stroke="#111216" stroke-width="1.6" class="svc-path"/>
-                <line x1="10" y1="20" x2="34" y2="20" stroke="#111216" stroke-width="1.2" class="svc-path"/>
-                <line x1="10" y1="30" x2="34" y2="30" stroke="#111216" stroke-width="1.2" class="svc-path"/>
-                <circle cx="27" cy="14" r="1.8" stroke="#111216" stroke-width="1.2" class="svc-path"/>
-                <circle cx="27" cy="24" r="1.8" stroke="#111216" stroke-width="1.2" class="svc-path"/>
-                <path d="M34 22 H42 L46 18" stroke="#111216" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="svc-path"/>
-                <path d="M46 18 C48 15 50 12 48 10 C46 8 44 10 46 12" stroke="#d62828" stroke-width="1.5" stroke-linecap="round" class="svc-path"/>
+                <path d="M28 6 L44 12 L44 26 C44 36 28 50 28 50 C28 50 12 36 12 26 L12 12 Z" class="svc-path svc-stroke" stroke-width="1.6" stroke-linejoin="round"/>
+                <circle cx="28" cy="26" r="7" class="svc-path svc-stroke" stroke-width="1.4"/>
+                <circle cx="28" cy="26" r="2.5" class="svc-path svc-accent" stroke-width="1.4"/>
+                <path d="M28 10v4M28 38v4" class="svc-path svc-stroke" stroke-width="1.2" stroke-linecap="round"/>
               </svg>
             )}
           </div>
@@ -1022,16 +1032,30 @@ const clientEntriesReversed = [...clientEntries].reverse();
     transform: scaleY(1);
   }
 
-  /* numbered index */
+  /* numbered index — editorial device, magazine table-of-contents style */
   .entry-index {
-    display: block;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     font-family: var(--font-mono);
-    font-size: 0.78rem;
+    font-size: 0.72rem;
     font-weight: 700;
-    letter-spacing: 0.08em;
-    color: #d62828;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-accent);
     margin-bottom: 10px;
-    opacity: 0.9;
+    opacity: 1;
+    /* subtle separator line after the numeral */
+  }
+
+  .entry-index::after {
+    content: '';
+    display: inline-block;
+    width: 20px;
+    height: 1px;
+    background-color: var(--color-accent);
+    opacity: 0.45;
+    vertical-align: middle;
   }
 
   /* title column */
@@ -1091,6 +1115,15 @@ const clientEntriesReversed = [...clientEntries].reverse();
     flex-shrink: 0;
     overflow: visible;
   }
+
+  /*
+    Token-driven stroke colors for SVG paths.
+    .svc-stroke → var(--color-text)  (maps to --color-foreground / #09090b)
+    .svc-accent  → var(--color-accent) (maps to --color-brand / #d32f2f)
+    Hardcoded hex is intentionally absent from the SVG markup.
+  */
+  .entry-icon .svc-stroke { stroke: var(--color-text); }
+  .entry-icon .svc-accent { stroke: var(--color-accent); }
 
   /* all stroke paths start hidden, drawn in on reveal */
   .entry-icon .svc-path {
