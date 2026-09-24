@@ -49,25 +49,52 @@
   transform: translateY(0);
 }
 
-/* reveal transitions */
+/* reveal transitions — spring lift (6% overshoot settle) */
 .reveal-up {
   opacity: 0;
-  transform: translateY(24px);
-  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateY(28px) scale(0.98);
+  transition:
+    opacity  0.55s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
   will-change: transform, opacity;
 }
 
 .reveal-up.is-visible,
 .reveal-up.is-revealed {
   opacity: 1 !important;
-  transform: translateY(0) !important;
+  transform: translateY(0) scale(1) !important;
 }
 
-/* stagger utilities */
-.stagger-1 { transition-delay: 0.1s; }
-.stagger-2 { transition-delay: 0.2s; }
-.stagger-3 { transition-delay: 0.3s; }
-.stagger-4 { transition-delay: 0.4s; }
+/* batched-stagger helper — JS sets --stagger-i on each card */
+.reveal-batch {
+  opacity: 0;
+  transform: translateY(24px) scale(0.98);
+  transition:
+    opacity  0.5s cubic-bezier(0.16, 1, 0.3, 1) var(--stagger-delay, 0ms),
+    transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) var(--stagger-delay, 0ms);
+  will-change: transform, opacity;
+}
+.reveal-batch.is-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* process step line: grows from left after section enters */
+.process-line {
+  transform-origin: left center;
+  transform: scaleX(0);
+  transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1) var(--line-delay, 200ms);
+}
+.is-revealed .process-line,
+.is-visible .process-line {
+  transform: scaleX(1);
+}
+
+/* stagger utilities — kept for existing usage */
+.stagger-1 { transition-delay: 0.08s; }
+.stagger-2 { transition-delay: 0.16s; }
+.stagger-3 { transition-delay: 0.24s; }
+.stagger-4 { transition-delay: 0.32s; }
 
 /* kinetic character roll */
 .btn-roll-wrapper {
@@ -107,22 +134,61 @@ button:focus-visible .char-clone {
   transform: translateY(-100%);
 }
 
-/* reduced motion safety */
+/* ─── hero letter stagger ───────────────────────────────────
+   Used by JS hero-letter-split. Each .hl-char gets
+   --char-i set inline; the parent .hl-word triggers on .is-split-visible.
+*/
+.hl-word {
+  display: inline-block;
+  overflow: visible;
+  white-space: nowrap;
+}
+.hl-char {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity  0.4s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--char-i, 0) * 28ms),
+    transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) calc(var(--char-i, 0) * 28ms);
+  will-change: transform, opacity;
+}
+.hl-char.is-char-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ─── stat count-up overshoot ───────────────────────────────
+   JS animates the number; this keyframe handles the spring
+   land feel on the wrapping element when it enters.
+*/
+@keyframes stat-land {
+  0%   { transform: scale(0.88) translateY(6px); opacity: 0; }
+  60%  { transform: scale(1.05) translateY(-2px); opacity: 1; }
+  80%  { transform: scale(0.98) translateY(1px); }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+.stat-land-enter {
+  animation: stat-land 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* ─── reduced motion safety ─────────────────────────────────  */
 @media (prefers-reduced-motion: reduce) {
-  /* entrance transitions */
   .text-reveal-inner,
   .image-reveal-inner,
   .fade-in,
   .transition-all,
   .reveal-up,
+  .reveal-batch,
   .char-main,
-  .char-clone {
+  .char-clone,
+  .hl-char,
+  .process-line {
     transition: none !important;
     transform: none !important;
     opacity: 1 !important;
+    animation: none !important;
   }
 
-  /* scroll-reveal: skip straight to revealed state — no animation */
   .scroll-reveal,
   .scroll-reveal.reveal-up {
     opacity: 1 !important;
@@ -130,7 +196,6 @@ button:focus-visible .char-clone {
     transition: none !important;
   }
 
-  /* stagger delays: collapse to zero so nothing staggers */
   .stagger-1,
   .stagger-2,
   .stagger-3,

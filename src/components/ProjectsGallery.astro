@@ -286,17 +286,27 @@ const projects = entries.map((entry, index) => ({
     padding: 16px;
     cursor: pointer;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
-    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    transition:
+      transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+      opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+      border-color 0.25s ease,
+      box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     opacity: 0.78;
     user-select: none;
     display: flex;
     flex-direction: column;
+    will-change: transform, opacity;
   }
 
   .flank-card:hover {
     opacity: 1;
     border-color: rgba(0, 0, 0, 0.25);
-    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.11);
+  }
+
+  .flank-card:active {
+    transform: scale(0.94);
+    transition-duration: 0ms;
   }
 
   .flank-left {
@@ -304,7 +314,7 @@ const projects = entries.map((entry, index) => ({
   }
 
   .flank-left:hover {
-    transform: translateY(-32px) scale(0.97);
+    transform: translateY(-32px) scale(0.98);
   }
 
   .flank-right {
@@ -312,7 +322,7 @@ const projects = entries.map((entry, index) => ({
   }
 
   .flank-right:hover {
-    transform: translateY(24px) scale(0.97);
+    transform: translateY(24px) scale(0.98);
   }
 
   .flank-img-wrap {
@@ -364,28 +374,36 @@ const projects = entries.map((entry, index) => ({
   }
 
   .ctrl-btn {
-    width: 44px;
-    height: 44px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
     background: #ffffff;
     border: 1px solid rgba(0, 0, 0, 0.16);
     color: #090a0c;
-    font-size: 1.1rem;
+    font-size: 1.15rem;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
-    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
+    transition:
+      background-color 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+      border-color 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+      box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform;
   }
 
   .ctrl-btn:hover {
-    background: #dfddd6;
-    border-color: rgba(0, 0, 0, 0.35);
+    background: #f4f3ef;
+    border-color: rgba(0, 0, 0, 0.3);
+    transform: scale(1.08);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
   }
 
   .ctrl-btn:active {
-    transform: scale(0.95);
+    transform: scale(0.92);
+    transition-duration: 0ms;
   }
 
   .ctrl-counter {
@@ -393,6 +411,9 @@ const projects = entries.map((entry, index) => ({
     font-weight: 700;
     letter-spacing: 0.05em;
     color: #555964;
+    min-width: 60px;
+    text-align: center;
+    font-family: var(--font-mono, monospace);
   }
 
   /* image popout modal */
@@ -400,16 +421,16 @@ const projects = entries.map((entry, index) => ({
     position: fixed;
     inset: 0;
     z-index: 99999;
-    background: rgba(17, 18, 22, 0.85);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    background: rgba(17, 18, 22, 0.82);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 24px;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.25s ease;
+    transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .image-popout-overlay.is-active {
@@ -423,6 +444,17 @@ const projects = entries.map((entry, index) => ({
     display: flex;
     flex-direction: column;
     gap: 12px;
+    transform: scale(0.92) translateY(20px);
+    opacity: 0;
+    transition:
+      transform 0.38s cubic-bezier(0.34, 1.56, 0.64, 1),
+      opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform, opacity;
+  }
+
+  .image-popout-overlay.is-active .popout-container {
+    transform: scale(1) translateY(0);
+    opacity: 1;
   }
 
   .popout-header {
@@ -609,14 +641,89 @@ const projects = entries.map((entry, index) => ({
       if (ctrlCounter) ctrlCounter.textContent = `${currentIndex + 1} / ${total}`;
     };
 
+    let isTransitioning = false;
+
+    const transitionTo = (newIndex: number, direction: number = 1) => {
+      if (isTransitioning || newIndex === currentIndex) return;
+      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (prefersReduced) {
+        currentIndex = newIndex;
+        render();
+        return;
+      }
+
+      isTransitioning = true;
+      const detailsEl = document.querySelector<HTMLElement>('.focus-details');
+      const shiftX = direction * 28;
+
+      // Phase 1: fast exit with directional slip (emphasized exit)
+      const exitAnimations: Promise<unknown>[] = [];
+
+      if (focusImage) {
+        const a = focusImage.animate([
+          { opacity: '1', transform: 'scale(1) translateX(0)' },
+          { opacity: '0.15', transform: `scale(0.96) translateX(${-shiftX}px)` }
+        ], {
+          duration: 150,
+          easing: 'cubic-bezier(0.4, 0, 1, 1)',
+          fill: 'forwards'
+        });
+        exitAnimations.push(a.finished.catch(() => {}));
+      }
+
+      if (detailsEl) {
+        const a = detailsEl.animate([
+          { opacity: '1', transform: 'translateY(0)' },
+          { opacity: '0.15', transform: `translateY(${-direction * 6}px)` }
+        ], {
+          duration: 130,
+          easing: 'cubic-bezier(0.4, 0, 1, 1)',
+          fill: 'forwards'
+        });
+        exitAnimations.push(a.finished.catch(() => {}));
+      }
+
+      Promise.all(exitAnimations).then(() => {
+        currentIndex = newIndex;
+        render();
+
+        // Phase 2: spring entrance from incoming position (Pixel / iOS spring feel)
+        if (focusImage) {
+          focusImage.animate([
+            { opacity: '0.15', transform: `scale(1.04) translateX(${shiftX * 1.1}px)` },
+            { opacity: '1', transform: 'scale(1) translateX(0)' }
+          ], {
+            duration: 360,
+            easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
+            fill: 'forwards'
+          });
+        }
+
+        if (detailsEl) {
+          detailsEl.animate([
+            { opacity: '0.15', transform: 'translateY(12px)' },
+            { opacity: '1', transform: 'translateY(0)' }
+          ], {
+            duration: 320,
+            easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
+            fill: 'forwards'
+          });
+        }
+
+        setTimeout(() => {
+          isTransitioning = false;
+        }, 360);
+      });
+    };
+
     const prev = () => {
-      currentIndex = (currentIndex - 1 + total) % total;
-      render();
+      const targetIndex = (currentIndex - 1 + total) % total;
+      transitionTo(targetIndex, -1);
     };
 
     const next = () => {
-      currentIndex = (currentIndex + 1) % total;
-      render();
+      const targetIndex = (currentIndex + 1) % total;
+      transitionTo(targetIndex, 1);
     };
 
     ctrlPrev?.addEventListener("click", prev);
