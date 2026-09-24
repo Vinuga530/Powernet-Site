@@ -1,4 +1,13 @@
 ---
 export const prerender = false;
+
+const ghToken =
+  Astro.cookies.get('keystatic-gh-access-token')?.value ||
+  Astro.request.headers.get('cookie')?.match(/keystatic-gh-access-token=([^;]+)/)?.[1];
+
+if (!import.meta.env.DEV && !ghToken) {
+  return Astro.redirect('/keystatic', 302);
+}
+
 return Astro.redirect('/admin/media');
 ---

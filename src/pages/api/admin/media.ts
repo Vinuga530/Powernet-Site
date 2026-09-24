@@ -82,6 +82,23 @@ function collectReferencedAssets(srcDir: string): Map<string, string[]> {
 }
 
 export const GET: APIRoute = async ({ request, cookies }) => {
+  // ── AUTH GATE ──────────────────────────────────────────────────────────────
+  const ghToken =
+    cookies.get('keystatic-gh-access-token')?.value ||
+    request.headers.get('cookie')?.match(/keystatic-gh-access-token=([^;]+)/)?.[1] ||
+    request.headers.get('x-github-token') ||
+    process.env.KEYSTATIC_GITHUB_TOKEN ||
+    process.env.GITHUB_TOKEN ||
+    process.env.GH_TOKEN;
+
+  if (!import.meta.env.DEV && !ghToken) {
+    return new Response(JSON.stringify({ error: 'Unauthorized. Please log in via /keystatic.' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json', 'WWW-Authenticate': 'Cookie realm="Keystatic"' },
+    });
+  }
+  // ──────────────────────────────────────────────────────────────────────────
+
   const rootDir = process.cwd();
   const publicDir = path.join(rootDir, 'public');
   const srcDir = path.join(rootDir, 'src');
@@ -210,6 +227,24 @@ export const GET: APIRoute = async ({ request, cookies }) => {
 };
 
 export const POST: APIRoute = async ({ request, cookies }) => {
+  // ── AUTH GATE ──────────────────────────────────────────────────────────────
+  // POST deletes files — always require auth, even in dev.
+  const ghToken =
+    cookies.get('keystatic-gh-access-token')?.value ||
+    request.headers.get('cookie')?.match(/keystatic-gh-access-token=([^;]+)/)?.[1] ||
+    request.headers.get('x-github-token') ||
+    process.env.KEYSTATIC_GITHUB_TOKEN ||
+    process.env.GITHUB_TOKEN ||
+    process.env.GH_TOKEN;
+
+  if (!ghToken) {
+    return new Response(JSON.stringify({ error: 'Unauthorized. Please log in via /keystatic first.' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json', 'WWW-Authenticate': 'Cookie realm="Keystatic"' },
+    });
+  }
+  // ──────────────────────────────────────────────────────────────────────────
+
   try {
     const body = await request.json();
     const { paths = [] } = body;
@@ -227,15 +262,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     const deleted: string[] = [];
     const errors: string[] = [];
 
-    // Check for Keystatic GitHub auth token
-    const ghToken =
-      cookies.get('keystatic-gh-access-token')?.value ||
-      request.headers.get('cookie')?.match(/keystatic-gh-access-token=([^;]+)/)?.[1] ||
-      request.headers.get('x-github-token') ||
-      process.env.KEYSTATIC_GITHUB_TOKEN ||
-      process.env.GITHUB_TOKEN ||
-      process.env.GH_TOKEN;
-
+    // ghToken is already validated in the auth gate above
     for (const relPath of paths) {
       const cleanRel = relPath.replace(/^[\/\\]+/, '');
       const fullPath = path.resolve(publicDir, cleanRel);

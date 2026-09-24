@@ -4,6 +4,23 @@ import path from 'node:path';
 
 export const prerender = false;
 
+// ─── AUTH GATE ────────────────────────────────────────────────────────────────
+// Require the Keystatic GitHub OAuth cookie that is set by Keystatic after
+// the user authenticates via GitHub. Without it, redirect to the Keystatic
+// login flow. This prevents unauthenticated access to the media manager.
+const ghToken =
+  Astro.cookies.get('keystatic-gh-access-token')?.value ||
+  Astro.request.headers.get('cookie')?.match(/keystatic-gh-access-token=([^;]+)/)?.[1];
+
+const isDev = import.meta.env.DEV;
+
+// In production: require the GitHub OAuth token from Keystatic.
+// In dev: allow through (local-only, not exposed to internet).
+if (!isDev && !ghToken) {
+  return Astro.redirect('/keystatic', 302);
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 const GITHUB_REPO = 'Vinuga530/Powernet-Site';
 const rootDir = process.cwd();
 const publicDir = path.join(rootDir, 'public');
