@@ -643,7 +643,7 @@ const projects = entries.map((entry, index) => ({
 
     let isTransitioning = false;
 
-    const transitionTo = (newIndex: number, direction: number = 1) => {
+    const transitionTo = (newIndex, direction = 1) => {
       if (isTransitioning || newIndex === currentIndex) return;
       const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       if (prefersReduced) {
@@ -653,11 +653,11 @@ const projects = entries.map((entry, index) => ({
       }
 
       isTransitioning = true;
-      const detailsEl = document.querySelector<HTMLElement>('.focus-details');
+      const detailsEl = document.querySelector('.focus-details');
       const shiftX = direction * 28;
 
       // Phase 1: fast exit with directional slip (emphasized exit)
-      const exitAnimations: Promise<unknown>[] = [];
+      const exitAnimations = [];
 
       if (focusImage) {
         const a = focusImage.animate([
