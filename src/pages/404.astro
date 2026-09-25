@@ -1,0 +1,655 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const pageTitle = "404 — Page Not Found | Powernet (Pvt) Ltd";
+const pageDescription = "The page you're looking for doesn't exist or has been moved. Explore Powernet's infrastructure solutions, projects, and services.";
+---
+
+<BaseLayout title={pageTitle} description={pageDescription}>
+  <section class="section-404" id="section-404" aria-label="Page Not Found">
+    <!-- Subtle ambient backdrop glow -->
+    <div class="ambient-glow" aria-hidden="true"></div>
+
+    <div class="container not-found-container">
+      <!-- 404 Display Area with Interactive UFO -->
+      <div class="stage-404" id="stage-404">
+        <!-- SVG Graphic 404 matching modern minimalist aesthetic -->
+        <svg
+          class="graphic-404"
+          viewBox="0 0 900 460"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
+        >
+          <!-- Left "4": Solid silhouette glyph -->
+          <path
+            class="digit-solid"
+            fill-rule="evenodd"
+            clip-rule="evenodd"
+            d="M 250,50 L 90,340 L 90,360 L 250,360 L 250,430 L 310,430 L 310,360 L 350,360 L 350,300 L 310,300 L 310,50 Z M 250,140 L 145,300 L 250,300 Z"
+          />
+
+          <!-- Middle "0": Slender outlined ellipse -->
+          <ellipse
+            class="digit-outline digit-zero"
+            cx="450"
+            cy="240"
+            rx="110"
+            ry="190"
+          />
+
+          <!-- Right "4": Geometric wireframe contour -->
+          <path
+            class="digit-outline digit-four-right"
+            d="M 690,50 L 530,340 L 530,360 L 690,360 L 690,430 L 750,430 L 750,360 L 790,360 L 790,300 L 750,300 L 750,50 Z"
+          />
+          <path
+            class="digit-outline digit-four-right-counter"
+            d="M 690,140 L 585,300 L 690,300 Z"
+          />
+        </svg>
+
+        <!-- Interactive Flying Saucer / UFO -->
+        <div id="ufo-craft" class="ufo-craft" aria-hidden="true">
+          <!-- Downward Tractor Beam -->
+          <div class="ufo-beam" id="ufo-beam"></div>
+
+          <!-- Flying Saucer Vector -->
+          <svg
+            class="ufo-svg"
+            viewBox="0 0 120 80"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <!-- Cockpit Dome -->
+            <path
+              d="M 40 38 C 40 16, 48 10, 60 10 C 72 10, 80 16, 80 38 Z"
+              fill="#18181b"
+            />
+            <!-- Glass Specular Highlight -->
+            <path
+              d="M 47 22 C 51 15, 59 13, 65 15 C 61 18, 55 22, 50 26 Z"
+              fill="rgba(255, 255, 255, 0.45)"
+            />
+
+            <!-- Main Saucer Body -->
+            <ellipse cx="60" cy="42" rx="54" ry="14" fill="#18181b" />
+            <!-- Rim Shadow/Layer -->
+            <ellipse cx="60" cy="43" rx="44" ry="9" fill="#09090b" />
+
+            <!-- Portholes / Windows with pulse animations -->
+            <circle cx="24" cy="42" r="3" fill="#ffffff" class="porthole" />
+            <circle cx="42" cy="46" r="3" fill="#ffffff" class="porthole" />
+            <circle cx="60" cy="47" r="3.2" fill="#ffffff" class="porthole" />
+            <circle cx="78" cy="46" r="3" fill="#ffffff" class="porthole" />
+            <circle cx="96" cy="42" r="3" fill="#ffffff" class="porthole" />
+
+            <!-- 3 Landing Struts / Thrusters -->
+            <line
+              x1="38"
+              y1="52"
+              x2="30"
+              y2="68"
+              stroke="#18181b"
+              stroke-width="3.5"
+              stroke-linecap="round"
+            />
+            <line
+              x1="60"
+              y1="55"
+              x2="60"
+              y2="72"
+              stroke="#18181b"
+              stroke-width="3.5"
+              stroke-linecap="round"
+            />
+            <line
+              x1="82"
+              y1="52"
+              x2="90"
+              y2="68"
+              stroke="#18181b"
+              stroke-width="3.5"
+              stroke-linecap="round"
+            />
+
+            <!-- Red Energy Thruster Nodes (Powernet Brand Red #ee1c25) -->
+            <circle cx="30" cy="68" r="2.5" fill="#ee1c25" class="thruster-dot" />
+            <circle cx="60" cy="72" r="2.5" fill="#ee1c25" class="thruster-dot" />
+            <circle cx="90" cy="68" r="2.5" fill="#ee1c25" class="thruster-dot" />
+          </svg>
+        </div>
+      </div>
+
+      <!-- Text and Call to Action -->
+      <div class="content-404">
+        <h1 class="title-404">Page not found...</h1>
+        <p class="desc-404">
+          The page you are looking for might have been moved, had its name changed,
+          or is temporarily unavailable.
+        </p>
+
+        <!-- Primary Action: Go Home -->
+        <div class="actions-404">
+          <a href="/" class="btn-go-home" id="btn-go-home" aria-label="Go Home">
+            <span class="btn-go-home-text">Go Home</span>
+          </a>
+        </div>
+
+        <!-- Helpful Quick Navigation Links -->
+        <div class="quick-nav-section" aria-label="Quick links">
+          <span class="quick-nav-label">Or explore key sections:</span>
+          <div class="quick-nav-links">
+            <a href="/#services" class="quick-chip">Services</a>
+            <a href="/#projects" class="quick-chip">Projects</a>
+            <a href="/about" class="quick-chip">About Us</a>
+            <a href="/contact" class="quick-chip">Contact</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* ─── 404 Section Wrapper ────────────────────────────────────── */
+  .section-404 {
+    position: relative;
+    min-height: calc(100vh - 80px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: clamp(90px, 12vh, 130px);
+    padding-bottom: clamp(60px, 8vh, 100px);
+    background-color: var(--color-background, #ffffff);
+    color: var(--color-foreground, #09090b);
+    overflow: hidden;
+    user-select: none;
+  }
+
+  /* Ambient radial background glow */
+  .ambient-glow {
+    position: absolute;
+    top: 35%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: clamp(300px, 60vw, 850px);
+    height: clamp(300px, 50vw, 650px);
+    background: radial-gradient(
+      ellipse at center,
+      rgba(238, 28, 37, 0.04) 0%,
+      rgba(0, 0, 0, 0.02) 40%,
+      transparent 75%
+    );
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .not-found-container {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    max-width: 960px;
+    width: 100%;
+  }
+
+  /* ─── 404 Graphic Stage ─────────────────────────────────────── */
+  .stage-404 {
+    position: relative;
+    width: 100%;
+    max-width: 780px;
+    height: clamp(200px, 32vw, 360px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: clamp(16px, 3vw, 28px);
+  }
+
+  .graphic-404 {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+  }
+
+  /* Solid left "4" */
+  .digit-solid {
+    fill: #ebebeb;
+    transition: fill 0.3s ease;
+  }
+
+  /* Outlined middle "0" and right "4" */
+  .digit-outline {
+    stroke: #ebebeb;
+    stroke-width: 10px;
+    fill: none;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    transition: stroke 0.3s ease;
+  }
+
+  /* Hovering subtle glow on the 404 numerals */
+  .stage-404:hover .digit-solid {
+    fill: #e2e2e2;
+  }
+  .stage-404:hover .digit-outline {
+    stroke: #e2e2e2;
+  }
+
+  /* ─── Interactive Flying Saucer (UFO) ────────────────────────── */
+  .ufo-craft {
+    position: absolute;
+    top: 52%;
+    left: 24%;
+    width: 76px;
+    height: 52px;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 10;
+    will-change: transform, left, top;
+    filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.14));
+    transition: filter 0.3s ease;
+  }
+
+  .ufo-svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  /* Downward tractor beam */
+  .ufo-beam {
+    position: absolute;
+    top: 80%;
+    left: 50%;
+    width: 90px;
+    height: 150px;
+    transform: translateX(-50%);
+    background: linear-gradient(
+      180deg,
+      rgba(238, 28, 37, 0.28) 0%,
+      rgba(238, 28, 37, 0.08) 55%,
+      transparent 100%
+    );
+    clip-path: polygon(40% 0%, 60% 0%, 100% 100%, 0% 100%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s ease, height 0.35s ease;
+  }
+
+  .ufo-craft.beam-active .ufo-beam {
+    opacity: 1;
+    height: 180px;
+  }
+
+  /* Pulsing portholes */
+  .porthole {
+    animation: porthole-blink 2.4s ease-in-out infinite alternate;
+  }
+  .porthole:nth-child(2) {
+    animation-delay: 0.4s;
+  }
+  .porthole:nth-child(3) {
+    animation-delay: 0.8s;
+  }
+  .porthole:nth-child(4) {
+    animation-delay: 1.2s;
+  }
+  .porthole:nth-child(5) {
+    animation-delay: 1.6s;
+  }
+
+  @keyframes porthole-blink {
+    0% {
+      opacity: 0.45;
+    }
+    100% {
+      opacity: 1;
+      filter: drop-shadow(0 0 3px #ffffff);
+    }
+  }
+
+  /* Thruster red pulse */
+  .thruster-dot {
+    animation: thruster-pulse 1.2s ease-in-out infinite alternate;
+  }
+  @keyframes thruster-pulse {
+    0% {
+      opacity: 0.6;
+      transform: scale(0.9);
+      transform-origin: center;
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1.15);
+      transform-origin: center;
+      filter: drop-shadow(0 0 4px #ee1c25);
+    }
+  }
+
+  /* ─── Content Section ───────────────────────────────────────── */
+  .content-404 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 600px;
+    width: 100%;
+  }
+
+  .title-404 {
+    font-family: var(--font-sans);
+    font-size: clamp(2.4rem, 5.5vw, 4rem);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.035em;
+    color: var(--color-foreground, #09090b);
+    margin: 0 0 clamp(10px, 1.8vw, 16px) 0;
+  }
+
+  .desc-404 {
+    font-family: var(--font-sans);
+    font-size: clamp(0.95rem, 1.6vw, 1.125rem);
+    line-height: 1.6;
+    color: var(--color-muted, #71717a);
+    max-width: 520px;
+    margin: 0 0 clamp(24px, 3.5vw, 36px) 0;
+  }
+
+  /* ─── Go Home Link (Styled matching Framer + Powernet) ─────── */
+  .actions-404 {
+    display: flex;
+    justify-content: center;
+    margin-bottom: clamp(32px, 4vw, 48px);
+  }
+
+  .btn-go-home {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-sans);
+    font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    color: #6c707a;
+    text-decoration: none;
+    padding: 4px 12px;
+    transition:
+      color 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    cursor: pointer;
+  }
+
+  .btn-go-home::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 12px;
+    right: 12px;
+    height: 2px;
+    background-color: var(--color-foreground, #09090b);
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .btn-go-home:hover {
+    color: var(--color-foreground, #09090b);
+    transform: translateY(-2px);
+  }
+
+  .btn-go-home:hover::after {
+    transform: scaleX(1);
+  }
+
+  .btn-go-home:active {
+    transform: scale(0.98);
+  }
+
+  /* ─── Quick Navigation Chips ────────────────────────────────── */
+  .quick-nav-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding-top: 18px;
+    border-top: 1px solid var(--color-border, #e4e4e7);
+    width: 100%;
+    max-width: 460px;
+  }
+
+  .quick-nav-label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--color-muted, #71717a);
+  }
+
+  .quick-nav-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .quick-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 7px 16px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-foreground, #18181b);
+    background-color: var(--color-surface, #f4f4f5);
+    border: 1px solid var(--color-border, #e4e4e7);
+    border-radius: 9999px;
+    text-decoration: none;
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease,
+      transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+      color 0.2s ease;
+  }
+
+  .quick-chip:hover {
+    background-color: #ffffff;
+    border-color: #d1d5db;
+    color: var(--color-brand, #d32f2f);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
+
+  .quick-chip:active {
+    transform: scale(0.96);
+  }
+
+  /* ─── Responsive Adjustments ────────────────────────────────── */
+  @media (max-width: 768px) {
+    .section-404 {
+      min-height: calc(100vh - 70px);
+      padding-top: 80px;
+    }
+
+    .ufo-craft {
+      width: 58px;
+      height: 40px;
+    }
+
+    .digit-outline {
+      stroke-width: 8px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .porthole,
+    .thruster-dot {
+      animation: none !important;
+    }
+    .ufo-craft {
+      transition: none !important;
+    }
+  }
+</style>
+
+<script>
+  /* ─── Interactive Flying Saucer Controller ──────────────────────────
+     Features:
+     - Smooth spring/lerp tracking towards mouse cursor across the stage.
+     - Natural banking/tilt physics when traversing horizontally.
+     - Idle sinusoidal floating oscillation when cursor is still.
+     - Autonomous patrol mode on touch devices / mobile.
+     - Tractor beam activation when hovering over Go Home or chips.
+  ──────────────────────────────────────────────────────────────────── */
+
+  const initUfoInteraction = () => {
+    const stage = document.getElementById("stage-404");
+    const ufo = document.getElementById("ufo-craft");
+    const goHomeBtn = document.getElementById("btn-go-home");
+    const section = document.getElementById("section-404");
+
+    if (!stage || !ufo || !section) return;
+
+    // Boundary & Position state
+    let targetX = 0;
+    let targetY = 0;
+    let currentX = 0;
+    let currentY = 0;
+    let currentTilt = 0;
+    let isMouseActive = false;
+    let idleTime = 0;
+    let animFrameId: number | null = null;
+
+    // Reset default initial position (at left "4" crossbar like Framer)
+    const resetToHomePosition = () => {
+      const rect = stage.getBoundingClientRect();
+      targetX = rect.width * 0.24;
+      targetY = rect.height * 0.52;
+      currentX = targetX;
+      currentY = targetY;
+    };
+
+    resetToHomePosition();
+
+    // Mouse movement inside section
+    const onMouseMove = (e: MouseEvent) => {
+      isMouseActive = true;
+      const rect = stage.getBoundingClientRect();
+
+      // Constrain UFO within a generous stage boundary
+      const relativeX = e.clientX - rect.left;
+      const relativeY = e.clientY - rect.top;
+
+      const padding = 20;
+      targetX = Math.max(padding, Math.min(rect.width - padding, relativeX));
+      targetY = Math.max(padding, Math.min(rect.height + 60, relativeY));
+    };
+
+    const onMouseLeave = () => {
+      isMouseActive = false;
+    };
+
+    // Touch support for mobile devices
+    const onTouchMove = (e: TouchEvent) => {
+      if (e.touches.length > 0) {
+        isMouseActive = true;
+        const touch = e.touches[0];
+        const rect = stage.getBoundingClientRect();
+        targetX = Math.max(20, Math.min(rect.width - 20, touch.clientX - rect.left));
+        targetY = Math.max(20, Math.min(rect.height + 40, touch.clientY - rect.top));
+      }
+    };
+
+    // Tractor beam triggers
+    if (goHomeBtn) {
+      goHomeBtn.addEventListener("mouseenter", () => {
+        ufo.classList.add("beam-active");
+      });
+      goHomeBtn.addEventListener("mouseleave", () => {
+        ufo.classList.remove("beam-active");
+      });
+    }
+
+    // Interactive quick chips trigger slight beam
+    document.querySelectorAll(".quick-chip").forEach((chip) => {
+      chip.addEventListener("mouseenter", () => {
+        ufo.classList.add("beam-active");
+      });
+      chip.addEventListener("mouseleave", () => {
+        ufo.classList.remove("beam-active");
+      });
+    });
+
+    // Window resize recalculation
+    window.addEventListener("resize", () => {
+      if (!isMouseActive) {
+        resetToHomePosition();
+      }
+    });
+
+    section.addEventListener("mousemove", onMouseMove);
+    section.addEventListener("mouseleave", onMouseLeave);
+    section.addEventListener("touchmove", onTouchMove, { passive: true });
+
+    // Physics Animation Loop
+    const lerpSpeed = 0.075;
+    const updateLoop = () => {
+      idleTime += 0.035;
+
+      if (!isMouseActive) {
+        // Subtle figure-8 floating hover when idle
+        const rect = stage.getBoundingClientRect();
+        const baseX = rect.width * 0.24;
+        const baseY = rect.height * 0.52;
+
+        targetX = baseX + Math.sin(idleTime * 0.8) * 18;
+        targetY = baseY + Math.cos(idleTime * 1.6) * 10;
+      }
+
+      // Smooth position interpolation
+      const dx = targetX - currentX;
+      const dy = targetY - currentY;
+
+      currentX += dx * lerpSpeed;
+      currentY += dy * lerpSpeed;
+
+      // Realistic flight banking tilt: angle into the horizontal movement
+      const targetTilt = Math.max(-22, Math.min(22, dx * 0.3));
+      currentTilt += (targetTilt - currentTilt) * 0.1;
+
+      // Apply transform and position
+      ufo.style.left = `${currentX}px`;
+      ufo.style.top = `${currentY}px`;
+      ufo.style.transform = `translate(-50%, -50%) rotate(${currentTilt}deg)`;
+
+      animFrameId = requestAnimationFrame(updateLoop);
+    };
+
+    // Check prefers-reduced-motion
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (!mediaQuery.matches) {
+      animFrameId = requestAnimationFrame(updateLoop);
+    }
+
+    // Cleanup on page transitions
+    const cleanup = () => {
+      if (animFrameId) cancelAnimationFrame(animFrameId);
+      section.removeEventListener("mousemove", onMouseMove);
+      section.removeEventListener("mouseleave", onMouseLeave);
+      section.removeEventListener("touchmove", onTouchMove);
+    };
+
+    document.addEventListener("astro:before-swap", cleanup, { once: true });
+  };
+
+  // Run on first load and Astro view transitions
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initUfoInteraction, { once: true });
+  } else {
+    initUfoInteraction();
+  }
+  document.addEventListener("astro:page-load", initUfoInteraction);
+</script>
