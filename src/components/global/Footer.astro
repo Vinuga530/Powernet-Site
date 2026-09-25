@@ -99,7 +99,7 @@ const navLinks = [
     <a href="#" class="footer-legal-link">Privacy Policy</a>
   </div>
 
-  <div class="footer-watermark" aria-hidden="true">POWERNET</div>
+  <div class="footer-watermark" aria-hidden="true">POWERNET<canvas class="footer-watermark-canvas" aria-hidden="true"></canvas></div>
 </footer>
 
 <style>
@@ -257,6 +257,7 @@ const navLinks = [
 
   /* ===== watermark band ===== */
   .footer-watermark {
+    position: relative;
     background-color: #0d0e12;
     color: rgba(255, 255, 255, 0.06);
     font-family: var(--font-sans);
@@ -268,6 +269,14 @@ const navLinks = [
     padding-top: 0.15em;
     user-select: none;
     white-space: nowrap;
+  }
+
+  .footer-watermark-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
   }
 
   /* ===== responsive ===== */
@@ -327,3 +336,335 @@ const navLinks = [
     }
   }
 </style>
+
+<script>
+  /* =====================================================================
+     FOOTER WATERMARK REVEAL ENGINE
+     - Cursor / touch drag creates a soft fading trail across the text
+     - Inside the trail, text reveals in an energized brand-red metallic style
+     - Outside the trail, base watermark remains visually untouched
+     - Lifecycle-safe: cleans up and re-inits on astro:page-load
+     - Disabled when: prefers-reduced-motion: reduce
+     - RAF loop strictly halts when trail is empty (zero idle CPU usage)
+     ===================================================================== */
+  interface WatermarkTrailPoint {
+    x: number;
+    y: number;
+    born: number;
+  }
+
+  let watermarkRAF: number | null = null;
+  let watermarkCleanup: (() => void) | null = null;
+
+  const initWatermarkReveal = () => {
+    /* tear down previous instance */
+    if (watermarkCleanup) {
+      watermarkCleanup();
+      watermarkCleanup = null;
+    }
+    if (watermarkRAF) {
+      cancelAnimationFrame(watermarkRAF);
+      watermarkRAF = null;
+    }
+
+    const prefersReduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    if (prefersReduced) return;
+
+    const watermarkEl = document.querySelector<HTMLElement>(".footer-watermark");
+    const canvas = watermarkEl?.querySelector<HTMLCanvasElement>(".footer-watermark-canvas");
+    if (!watermarkEl || !canvas) return;
+
+    const visibleCtx = canvas.getContext("2d");
+    if (!visibleCtx) return;
+
+    /* Offscreen canvas layers for compositing */
+    const textureCanvas = document.createElement("canvas");
+    const maskCanvas = document.createElement("canvas");
+    const scratchCanvas = document.createElement("canvas");
+
+    const maskCtx = maskCanvas.getContext("2d");
+    const scratchCtx = scratchCanvas.getContext("2d");
+    if (!maskCtx || !scratchCtx) return;
+
+    let trail: WatermarkTrailPoint[] = [];
+    let isAnimating = false;
+    let dpr = Math.min(window.devicePixelRatio || 1, 2);
+    let clientW = 0;
+    let clientH = 0;
+    let brandColor = "#d32f2f";
+    let brandDarkColor = "#b71c1c";
+    let lastX = -1;
+    let lastY = -1;
+
+    /* Pixel-aligned text rendering matching live computed style */
+    const drawWatermarkText = (
+      targetCtx: CanvasRenderingContext2D,
+      width: number,
+      height: number,
+      style: CSSStyleDeclaration,
+    ) => {
+      const fontSize = style.fontSize;
+      const fontWeight = style.fontWeight || "800";
+      const fontFamily = style.fontFamily;
+      const letterSpacing = style.letterSpacing;
+
+      targetCtx.font = `${fontWeight} ${fontSize} ${fontFamily}`;
+      targetCtx.textAlign = "center";
+      targetCtx.textBaseline = "middle";
+
+      if ("letterSpacing" in targetCtx) {
+        if (letterSpacing && letterSpacing !== "normal") {
+          (targetCtx as any).letterSpacing = letterSpacing;
+        } else {
+          (targetCtx as any).letterSpacing = "0px";
+        }
+      }
+
+      let textX = width / 2;
+      let textY = height / 2;
+
+      /* Read exact layout rect of text node to stay pixel-aligned with DOM text */
+      const textNode = watermarkEl.firstChild;
+      if (textNode && textNode.nodeType === Node.TEXT_NODE) {
+        try {
+          const range = document.createRange();
+          range.selectNodeContents(textNode);
+          const r = range.getBoundingClientRect();
+          const pr = watermarkEl.getBoundingClientRect();
+          if (r.height > 0 && r.width > 0) {
+            textX = r.left - pr.left + r.width / 2;
+            textY = r.top - pr.top + r.height / 2;
+          }
+        } catch {
+          /* fallback to center */
+        }
+      }
+
+      targetCtx.fillText("POWERNET", textX, textY);
+    };
+
+    /* Procedural offscreen texture layer (redrawn only on resize) */
+    const updateTextureCanvas = (
+      w: number,
+      h: number,
+      width: number,
+      height: number,
+      style: CSSStyleDeclaration,
+    ) => {
+      textureCanvas.width = w;
+      textureCanvas.height = h;
+      const tCtx = textureCanvas.getContext("2d");
+      if (!tCtx) return;
+
+      tCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      tCtx.clearRect(0, 0, width, height);
+
+      brandColor = style.getPropertyValue("--color-brand").trim() || "#d32f2f";
+      brandDarkColor =
+        style.getPropertyValue("--color-brand-dark").trim() || "#b71c1c";
+
+      /* Base vertical energized gradient */
+      const baseGrad = tCtx.createLinearGradient(0, 0, 0, height);
+      baseGrad.addColorStop(0, "#ff4242");
+      baseGrad.addColorStop(0.35, brandColor);
+      baseGrad.addColorStop(0.75, brandDarkColor);
+      baseGrad.addColorStop(1, "#8a1010");
+      tCtx.fillStyle = baseGrad;
+      tCtx.fillRect(0, 0, width, height);
+
+      /* Diagonal white sheen band across watermark (matching .btn-liquid-glass highlight) */
+      const sheen = tCtx.createLinearGradient(0, 0, width * 0.75, height);
+      sheen.addColorStop(0, "rgba(255, 255, 255, 0)");
+      sheen.addColorStop(0.38, "rgba(255, 255, 255, 0.08)");
+      sheen.addColorStop(0.5, "rgba(255, 255, 255, 0.45)");
+      sheen.addColorStop(0.56, "rgba(255, 255, 255, 0.2)");
+      sheen.addColorStop(0.7, "rgba(255, 255, 255, 0)");
+      tCtx.fillStyle = sheen;
+      tCtx.fillRect(0, 0, width, height);
+
+      /* Top specular highlight band */
+      const topHighlight = tCtx.createLinearGradient(0, 0, 0, height * 0.4);
+      topHighlight.addColorStop(0, "rgba(255, 255, 255, 0.35)");
+      topHighlight.addColorStop(1, "rgba(255, 255, 255, 0)");
+      tCtx.fillStyle = topHighlight;
+      tCtx.fillRect(0, 0, width, height * 0.4);
+    };
+
+    /* Animation frame render pass */
+    const renderFrame = () => {
+      const now = performance.now();
+      const MAX_AGE = 900;
+
+      /* 1. Prune points older than ~900ms */
+      while (trail.length > 0 && now - trail[0].born >= MAX_AGE) {
+        trail.shift();
+      }
+
+      /* 2. If trail is empty, clear canvas and STOP requesting further frames */
+      if (trail.length === 0) {
+        visibleCtx.clearRect(0, 0, canvas.width, canvas.height);
+        isAnimating = false;
+        watermarkRAF = null;
+        return;
+      }
+
+      /* 3. Build mask, clip to glyphs, composite against texture */
+      const w = canvas.width;
+      const h = canvas.height;
+      const width = clientW;
+      const height = clientH;
+      const style = window.getComputedStyle(watermarkEl);
+
+      /* A) Draw fading radial blobs on maskCanvas */
+      maskCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      maskCtx.clearRect(0, 0, width, height);
+      maskCtx.globalCompositeOperation = "source-over";
+
+      const radius = Math.min(width, height) * 0.18;
+
+      for (let i = 0; i < trail.length; i++) {
+        const p = trail[i];
+        const age = now - p.born;
+        if (age >= MAX_AGE) continue;
+        const progress = age / MAX_AGE;
+        const alpha = (1 - progress) * (1 - progress);
+        if (alpha <= 0.005) continue;
+
+        const grad = maskCtx.createRadialGradient(p.x, p.y, 0, p.x, p.y, radius);
+        grad.addColorStop(0, `rgba(255, 255, 255, ${alpha})`);
+        grad.addColorStop(0.45, `rgba(255, 255, 255, ${alpha * 0.65})`);
+        grad.addColorStop(1, "rgba(255, 255, 255, 0)");
+
+        maskCtx.fillStyle = grad;
+        maskCtx.beginPath();
+        maskCtx.arc(p.x, p.y, radius, 0, Math.PI * 2);
+        maskCtx.fill();
+      }
+
+      /* B) Clip mask to exact glyph shapes of "POWERNET" with source-in */
+      maskCtx.globalCompositeOperation = "source-in";
+      maskCtx.fillStyle = "#ffffff";
+      drawWatermarkText(maskCtx, width, height, style);
+
+      /* C) Composite clipped mask against texture layer with destination-in on scratchCanvas */
+      scratchCtx.setTransform(1, 0, 0, 1, 0, 0);
+      scratchCtx.clearRect(0, 0, w, h);
+      scratchCtx.globalCompositeOperation = "source-over";
+      scratchCtx.drawImage(textureCanvas, 0, 0);
+      scratchCtx.globalCompositeOperation = "destination-in";
+      scratchCtx.drawImage(maskCanvas, 0, 0);
+
+      /* D) Draw result onto visible canvas with soft glow */
+      visibleCtx.setTransform(1, 0, 0, 1, 0, 0);
+      visibleCtx.clearRect(0, 0, w, h);
+
+      visibleCtx.save();
+      visibleCtx.shadowColor = brandColor;
+      visibleCtx.shadowBlur = Math.round(24 * dpr);
+      visibleCtx.drawImage(scratchCanvas, 0, 0);
+      visibleCtx.restore();
+
+      /* Crisp layer on top so energized text stays sharp */
+      visibleCtx.drawImage(scratchCanvas, 0, 0);
+
+      watermarkRAF = requestAnimationFrame(renderFrame);
+    };
+
+    /* Pointermove / pointerleave scoped to .footer-watermark only */
+    const onPointerMove = (e: PointerEvent) => {
+      const rect = watermarkEl.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const now = performance.now();
+
+      const radius = Math.min(clientW, clientH) * 0.18;
+      const step = Math.max(8, radius * 0.35);
+
+      /* Interpolate between fast cursor movements to prevent gaps */
+      if (lastX >= 0 && lastY >= 0) {
+        const dx = x - lastX;
+        const dy = y - lastY;
+        const dist = Math.hypot(dx, dy);
+        if (dist > step && dist < 500) {
+          const count = Math.min(10, Math.floor(dist / step));
+          for (let i = 1; i <= count; i++) {
+            const t = i / (count + 1);
+            trail.push({
+              x: lastX + dx * t,
+              y: lastY + dy * t,
+              born: now,
+            });
+          }
+        }
+      }
+
+      lastX = x;
+      lastY = y;
+      trail.push({ x, y, born: now });
+
+      if (!isAnimating) {
+        isAnimating = true;
+        watermarkRAF = requestAnimationFrame(renderFrame);
+      }
+    };
+
+    const onPointerLeave = () => {
+      lastX = -1;
+      lastY = -1;
+    };
+
+    watermarkEl.addEventListener("pointermove", onPointerMove, { passive: true });
+    watermarkEl.addEventListener("pointerleave", onPointerLeave, { passive: true });
+
+    /* ResizeObserver to keep canvas resolution in sync with element size and DPR */
+    const onResize = () => {
+      clientW = watermarkEl.clientWidth;
+      clientH = watermarkEl.clientHeight;
+      if (clientW === 0 || clientH === 0) return;
+
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const w = Math.round(clientW * dpr);
+      const h = Math.round(clientH * dpr);
+
+      canvas.width = w;
+      canvas.height = h;
+      maskCanvas.width = w;
+      maskCanvas.height = h;
+      scratchCanvas.width = w;
+      scratchCanvas.height = h;
+
+      const style = window.getComputedStyle(watermarkEl);
+      updateTextureCanvas(w, h, clientW, clientH, style);
+
+      if (trail.length > 0) {
+        renderFrame();
+      }
+    };
+
+    const resizeObserver = new ResizeObserver(onResize);
+    resizeObserver.observe(watermarkEl);
+
+    /* Store cleanup for lifecycle management */
+    watermarkCleanup = () => {
+      if (watermarkRAF) {
+        cancelAnimationFrame(watermarkRAF);
+        watermarkRAF = null;
+      }
+      resizeObserver.disconnect();
+      watermarkEl.removeEventListener("pointermove", onPointerMove);
+      watermarkEl.removeEventListener("pointerleave", onPointerLeave);
+      trail = [];
+      isAnimating = false;
+      visibleCtx.clearRect(0, 0, canvas.width, canvas.height);
+    };
+  };
+
+  document.addEventListener("astro:page-load", initWatermarkReveal);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initWatermarkReveal, { once: true });
+  } else {
+    initWatermarkReveal();
+  }
+</script>
