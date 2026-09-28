@@ -382,11 +382,8 @@ const clientEntriesReversed = [...clientEntries].reverse();
                 {String(idx + 1).padStart(2, "0")}
               </span>
               <h3>{service.data.title}</h3>
-              {/* Inline SVG illustrations — keyed by sort order (idx).
-                Colors use CSS variables via svc-stroke/svc-accent classes
-                so any future rebrand or dark-mode propagates automatically. */}
               {idx === 0 && (
-                /* Backup Power & Industrial UPS — battery-charge icon */
+                /* Backup Power & UPS */
                 <svg
                   class="entry-icon"
                   viewBox="0 0 24 24"
@@ -417,7 +414,7 @@ const clientEntriesReversed = [...clientEntries].reverse();
                 </svg>
               )}
               {idx === 1 && (
-                /* Structured Cabling & Fiber Optics — cable-usb icon */
+                /* Structured Cabling & Fiber Optics */
                 <svg
                   class="entry-icon"
                   viewBox="0 0 24 24"
@@ -451,7 +448,7 @@ const clientEntriesReversed = [...clientEntries].reverse();
                 </svg>
               )}
               {idx === 2 && (
-                /* Switchgear & Panel Automation — network-wired icon */
+                /* Switchgear & Panel Automation */
                 <svg
                   class="entry-icon"
                   viewBox="0 0 24 24"
@@ -469,7 +466,7 @@ const clientEntriesReversed = [...clientEntries].reverse();
                 </svg>
               )}
               {idx === 3 && (
-                /* Server Room & Data Infrastructure — server-square-cloud icon */
+                /* Server Room & Data Infrastructure */
                 <svg
                   class="entry-icon"
                   viewBox="0 0 24 24"
@@ -527,7 +524,7 @@ const clientEntriesReversed = [...clientEntries].reverse();
                 </svg>
               )}
               {idx === 4 && (
-                /* Physical Access & Surveillance — security-safe icon */
+                /* Physical Access & Surveillance */
                 <svg
                   class="entry-icon"
                   viewBox="0 0 24 24"
@@ -1428,7 +1425,7 @@ const clientEntriesReversed = [...clientEntries].reverse();
     }
   }
 
-  /* ---- service icon illustration ---- */
+  /* service icons */
   .entry-icon {
     display: block;
     width: 48px;
@@ -1438,12 +1435,7 @@ const clientEntriesReversed = [...clientEntries].reverse();
     overflow: visible;
   }
 
-  /*
-    Token-driven stroke colors for SVG paths.
-    .svc-stroke → var(--color-text)  (maps to --color-foreground / #09090b)
-    .svc-accent  → var(--color-accent) (maps to --color-brand / #d32f2f)
-    Hardcoded hex is intentionally absent from the SVG markup.
-  */
+  /* stroke colors driven by CSS tokens — no hardcoded hex in SVG */
   .entry-icon .svc-stroke {
     stroke: var(--color-text);
   }
@@ -1451,7 +1443,7 @@ const clientEntriesReversed = [...clientEntries].reverse();
     stroke: var(--color-accent);
   }
 
-  /* All stroke paths start with a subtle blueprint watermark, drawn in live on reveal */
+  /* paths start hidden; draw-on animation fires when the card enters view */
   .entry-icon .svc-path {
     stroke-dasharray: 100;
     stroke-dashoffset: 100;
@@ -1465,7 +1457,7 @@ const clientEntriesReversed = [...clientEntries].reverse();
     will-change: stroke-dashoffset, opacity;
   }
 
-  /* Stagger each stroke with unhurried drafting cadence — outline first, internal details, accent last */
+  /* staggered delays — outer shape first, details last */
   .entry-icon .svc-path:nth-child(1) {
     transition-delay: 80ms;
   }
@@ -1488,26 +1480,22 @@ const clientEntriesReversed = [...clientEntries].reverse();
     transition-delay: 1260ms;
   }
 
-  /* Trigger: parent entry receives .is-revealed from the existing IntersectionObserver */
   .capability-entry.is-revealed .entry-icon .svc-path,
   .capability-entry.is-visible .entry-icon .svc-path {
     stroke-dashoffset: 0;
     opacity: 1;
   }
 
-  /* Subtle accent bloom when the live draw completes */
   .capability-entry.is-revealed .entry-icon .svc-accent,
   .capability-entry.is-visible .entry-icon .svc-accent {
     filter: drop-shadow(0 0 3px rgba(214, 40, 40, 0.35));
   }
 
-  /* Micro-interaction on card hover */
   .capability-entry:hover .entry-icon .svc-accent {
     filter: drop-shadow(0 0 6px rgba(214, 40, 40, 0.6));
     transition: filter 0.25s ease;
   }
 
-  /* reduced-motion: instant, no animation */
   @media (prefers-reduced-motion: reduce) {
     .entry-accent-bar {
       transition: none !important;
@@ -1622,6 +1610,31 @@ const clientEntriesReversed = [...clientEntries].reverse();
   /* ===== process timeline ===== */
   .section-process {
     padding: var(--space-3xl) 0;
+    position: relative;
+    isolation: isolate;
+    overflow: clip;
+  }
+
+  /* watermark behind the process steps */
+  .section-process::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url("/images/icons/handshake-deal-svgrepo-com.svg");
+    background-repeat: no-repeat;
+    background-size: 52%;
+    background-position: right 0% center;
+    opacity: 0.06;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  @media (max-width: 900px) {
+    .section-process::before {
+      background-size: 80%;
+      background-position: center bottom;
+      opacity: 0.04;
+    }
   }
 
   .process-header {
