@@ -386,282 +386,178 @@ const clientEntriesReversed = [...clientEntries].reverse();
                 Colors use CSS variables via svc-stroke/svc-accent classes
                 so any future rebrand or dark-mode propagates automatically. */}
               {idx === 0 && (
-                /* Backup Power & Industrial UPS — battery body + lightning bolt */
+                /* Backup Power & Industrial UPS — battery-charge icon */
                 <svg
                   class="entry-icon"
-                  viewBox="0 0 56 56"
+                  viewBox="0 0 24 24"
                   fill="none"
                   aria-hidden="true"
                 >
-                  <rect
-                    x="6"
-                    y="16"
-                    width="38"
-                    height="26"
-                    rx="3"
+                  <path
+                    d="M20 10C20.9428 10 21.4142 10 21.7071 10.2929C22 10.5858 22 11.0572 22 12C22 12.9428 22 13.4142 21.7071 13.7071C21.4142 14 20.9428 14 20 14V10Z"
                     class="svc-path svc-stroke"
-                    stroke-width="1.6"
-                    pathLength="100"
-                  />
-                  <rect
-                    x="44"
-                    y="24"
-                    width="6"
-                    height="10"
-                    rx="2"
-                    class="svc-path svc-stroke"
-                    stroke-width="1.4"
+                    stroke-width="1.5"
                     pathLength="100"
                   />
                   <path
-                    d="M31 16V10h-6v6"
-                    class="svc-path svc-stroke"
-                    stroke-width="1.6"
-                    stroke-linecap="round"
-                    pathLength="100"
-                  />
-                  <path
-                    d="M30 28l-5 8h6l-5 8"
+                    d="M11.5 9L9 12H12.5L10 15"
                     class="svc-path svc-accent"
-                    stroke-width="1.8"
+                    stroke-width="1.5"
                     stroke-linecap="round"
                     stroke-linejoin="round"
+                    pathLength="100"
+                  />
+                  <path
+                    d="M2 12C2 8.22876 2 6.34315 3.17157 5.17157C4.34315 4 6.22876 4 10 4H11.5C15.2712 4 17.1569 4 18.3284 5.17157C19.5 6.34315 19.5 8.22876 19.5 12C19.5 15.7712 19.5 17.6569 18.3284 18.8284C17.1569 20 15.2712 20 11.5 20H10C6.22876 20 4.34315 20 3.17157 18.8284C2.51839 18.1752 2.22937 17.3001 2.10149 16"
+                    class="svc-path svc-stroke"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
                     pathLength="100"
                   />
                 </svg>
               )}
               {idx === 1 && (
-                /* Structured Cabling & Fiber Optics — patch panel + signal lines */
+                /* Structured Cabling & Fiber Optics — cable-usb icon */
                 <svg
                   class="entry-icon"
-                  viewBox="0 0 56 56"
+                  viewBox="0 0 24 24"
                   fill="none"
                   aria-hidden="true"
                 >
+                  <path
+                    d="M9.14,12h5.73a0,0,0,0,1,0,0v2.86A1.91,1.91,0,0,1,13,16.77H11a1.91,1.91,0,0,1-1.91-1.91V12A0,0,0,0,1,9.14,12Z"
+                    class="svc-path svc-stroke"
+                    stroke-width="1.91"
+                    stroke-miterlimit="10"
+                    pathLength="100"
+                  />
                   <rect
-                    x="8"
-                    y="18"
-                    width="40"
-                    height="22"
-                    rx="3"
+                    x="10.09"
+                    y="8.18"
+                    width="3.82"
+                    height="3.82"
                     class="svc-path svc-stroke"
-                    stroke-width="1.6"
-                    pathLength="100"
-                  />
-                  <circle
-                    cx="16"
-                    cy="29"
-                    r="3"
-                    class="svc-path svc-stroke"
-                    stroke-width="1.4"
-                    pathLength="100"
-                  />
-                  <circle
-                    cx="28"
-                    cy="29"
-                    r="3"
-                    class="svc-path svc-stroke"
-                    stroke-width="1.4"
-                    pathLength="100"
-                  />
-                  <circle
-                    cx="40"
-                    cy="29"
-                    r="3"
-                    class="svc-path svc-stroke"
-                    stroke-width="1.4"
+                    stroke-width="1.91"
+                    stroke-miterlimit="10"
                     pathLength="100"
                   />
                   <path
-                    d="M16 40v6M28 40v6M40 40v6"
+                    d="M12,16.77v3.61a1.88,1.88,0,0,0,2.25,1.87,10.49,10.49,0,1,0-9.68-2.83"
                     class="svc-path svc-accent"
-                    stroke-width="1.6"
-                    stroke-linecap="round"
-                    pathLength="100"
-                  />
-                  <path
-                    d="M16 46h24"
-                    class="svc-path svc-stroke"
-                    stroke-width="1.4"
-                    stroke-linecap="round"
+                    stroke-width="1.91"
+                    stroke-miterlimit="10"
                     pathLength="100"
                   />
                 </svg>
               )}
               {idx === 2 && (
-                /* Switchgear & Panel Automation — circuit breaker grid */
+                /* Switchgear & Panel Automation — network-wired icon */
                 <svg
                   class="entry-icon"
-                  viewBox="0 0 56 56"
+                  viewBox="0 0 24 24"
                   fill="none"
                   aria-hidden="true"
                 >
-                  <rect
-                    x="6"
-                    y="8"
-                    width="44"
-                    height="42"
-                    rx="3"
-                    class="svc-path svc-stroke"
-                    stroke-width="1.6"
-                    pathLength="100"
-                  />
-                  <line
-                    x1="6"
-                    y1="18"
-                    x2="50"
-                    y2="18"
-                    class="svc-path svc-stroke"
-                    stroke-width="1.2"
-                    pathLength="100"
-                  />
-                  <rect
-                    x="13"
-                    y="24"
-                    width="8"
-                    height="12"
-                    rx="1.5"
-                    class="svc-path svc-stroke"
-                    stroke-width="1.4"
-                    pathLength="100"
-                  />
-                  <rect
-                    x="24"
-                    y="24"
-                    width="8"
-                    height="12"
-                    rx="1.5"
-                    class="svc-path svc-accent"
-                    stroke-width="1.4"
-                    pathLength="100"
-                  />
-                  <rect
-                    x="35"
-                    y="24"
-                    width="8"
-                    height="12"
-                    rx="1.5"
-                    class="svc-path svc-stroke"
-                    stroke-width="1.4"
-                    pathLength="100"
-                  />
                   <path
-                    d="M15 13h3M22 13h3M29 13h3M36 13h3M43 13h3"
+                    d="M3 12H21M12 8V12M6.5 12V16M17.5 12V16M10.1 8H13.9C14.4601 8 14.7401 8 14.954 7.89101C15.1422 7.79513 15.2951 7.64215 15.391 7.45399C15.5 7.24008 15.5 6.96005 15.5 6.4V4.6C15.5 4.03995 15.5 3.75992 15.391 3.54601C15.2951 3.35785 15.1422 3.20487 14.954 3.10899C14.7401 3 14.4601 3 13.9 3H10.1C9.53995 3 9.25992 3 9.04601 3.10899C8.85785 3.20487 8.70487 3.35785 8.60899 3.54601C8.5 3.75992 8.5 4.03995 8.5 4.6V6.4C8.5 6.96005 8.5 7.24008 8.60899 7.45399C8.70487 7.64215 8.85785 7.79513 9.04601 7.89101C9.25992 8 9.53995 8 10.1 8ZM15.6 21H19.4C19.9601 21 20.2401 21 20.454 20.891C20.6422 20.7951 20.7951 20.6422 20.891 20.454C21 20.2401 21 19.9601 21 19.4V17.6C21 17.0399 21 16.7599 20.891 16.546C20.7951 16.3578 20.6422 16.2049 20.454 16.109C20.2401 16 19.9601 16 19.4 16H15.6C15.0399 16 14.7599 16 14.546 16.109C14.3578 16.2049 14.2049 16.3578 14.109 16.546C14 16.7599 14 17.0399 14 17.6V19.4C14 19.9601 14 20.2401 14.109 20.454C14.2049 20.6422 14.3578 20.7951 14.546 20.891C14.7599 21 15.0399 21 15.6 21ZM4.6 21H8.4C8.96005 21 9.24008 21 9.45399 20.891C9.64215 20.7951 9.79513 20.6422 9.89101 20.454C10 20.2401 10 19.9601 10 19.4V17.6C10 17.0399 10 16.7599 9.89101 16.546C9.79513 16.3578 9.64215 16.2049 9.45399 16.109C9.24008 16 8.96005 16 8.4 16H4.6C4.03995 16 3.75992 16 3.54601 16.109C3.35785 16.2049 3.20487 16.3578 3.10899 16.546C3 16.7599 3 17.0399 3 17.6V19.4C3 19.9601 3 20.2401 3.10899 20.454C3.20487 20.6422 3.35785 20.7951 3.54601 20.891C3.75992 21 4.03995 21 4.6 21Z"
                     class="svc-path svc-stroke"
-                    stroke-width="1.4"
+                    stroke-width="2"
                     stroke-linecap="round"
+                    stroke-linejoin="round"
                     pathLength="100"
                   />
                 </svg>
               )}
               {idx === 3 && (
-                /* Server Room Fire Protection — suppression nozzle + FM-200 flask + sensor */
+                /* Server Room & Data Infrastructure — server-square-cloud icon */
                 <svg
                   class="entry-icon"
-                  viewBox="0 0 56 56"
+                  viewBox="0 0 24 24"
                   fill="none"
                   aria-hidden="true"
                 >
-                  {/* suppression nozzle head */}
                   <path
-                    d="M20 10 H36 L38 16 H18 Z"
-                    class="svc-path svc-stroke"
-                    stroke-width="1.5"
-                    stroke-linejoin="round"
-                    pathLength="100"
-                  />
-                  {/* cylinder body */}
-                  <rect
-                    x="22"
-                    y="16"
-                    width="12"
-                    height="22"
-                    rx="2"
+                    d="M10 3.75C10.4142 3.75 10.75 3.41421 10.75 3C10.75 2.58579 10.4142 2.25 10 2.25V3.75ZM14 2.25C13.5858 2.25 13.25 2.58579 13.25 3C13.25 3.41421 13.5858 3.75 14 3.75V2.25ZM13 21.75C13.4142 21.75 13.75 21.4142 13.75 21C13.75 20.5858 13.4142 20.25 13 20.25V21.75ZM3.17157 19.8284L3.7019 19.2981H3.7019L3.17157 19.8284ZM20.8284 4.17157L20.2981 4.7019V4.7019L20.8284 4.17157ZM21.25 13C21.25 13.4142 21.5858 13.75 22 13.75C22.4142 13.75 22.75 13.4142 22.75 13H21.25ZM14 12.75C14.4142 12.75 14.75 12.4142 14.75 12C14.75 11.5858 14.4142 11.25 14 11.25V12.75ZM18 11.25C17.5858 11.25 17.25 11.5858 17.25 12C17.25 12.4142 17.5858 12.75 18 12.75V11.25ZM2.75 13V12H1.25V13H2.75ZM2.75 12V11H1.25V12H2.75ZM13 20.25H10V21.75H13V20.25ZM21.25 11V12H22.75V11H21.25ZM1.25 13C1.25 14.8644 1.24841 16.3382 1.40313 17.489C1.56076 18.6614 1.89288 19.6104 2.64124 20.3588L3.7019 19.2981C3.27869 18.8749 3.02502 18.2952 2.88976 17.2892C2.75159 16.2615 2.75 14.9068 2.75 13H1.25ZM10 20.25C8.09318 20.25 6.73851 20.2484 5.71085 20.1102C4.70476 19.975 4.12511 19.7213 3.7019 19.2981L2.64124 20.3588C3.38961 21.1071 4.33855 21.4392 5.51098 21.5969C6.66182 21.7516 8.13558 21.75 10 21.75V20.25ZM14 3.75C15.9068 3.75 17.2615 3.75159 18.2892 3.88976C19.2952 4.02502 19.8749 4.27869 20.2981 4.7019L21.3588 3.64124C20.6104 2.89288 19.6614 2.56076 18.489 2.40313C17.3382 2.24841 15.8644 2.25 14 2.25V3.75ZM22.75 11C22.75 9.13558 22.7516 7.66182 22.5969 6.51098C22.4392 5.33855 22.1071 4.38961 21.3588 3.64124L20.2981 4.7019C20.7213 5.12511 20.975 5.70476 21.1102 6.71085C21.2484 7.73851 21.25 9.09318 21.25 11H22.75ZM10 2.25C8.13558 2.25 6.66182 2.24841 5.51098 2.40313C4.33856 2.56076 3.38961 2.89288 2.64124 3.64124L3.7019 4.7019C4.12511 4.27869 4.70476 4.02502 5.71085 3.88976C6.73851 3.75159 8.09318 3.75 10 3.75V2.25ZM2.75 11C2.75 9.09318 2.75159 7.73851 2.88976 6.71085C3.02502 5.70476 3.27869 5.12511 3.7019 4.7019L2.64124 3.64124C1.89288 4.38961 1.56076 5.33855 1.40313 6.51098C1.24841 7.66182 1.25 9.13558 1.25 11H2.75ZM21.25 12V13H22.75V12H21.25ZM2 12.75H14V11.25H2V12.75ZM18 12.75H22V11.25H18V12.75Z"
                     class="svc-path svc-stroke"
                     stroke-width="1.5"
                     pathLength="100"
                   />
-                  {/* valve handle */}
                   <path
-                    d="M28 16 V12 M24 12 H32"
+                    d="M13.5 7.5L18 7.5"
                     class="svc-path svc-stroke"
-                    stroke-width="1.4"
+                    stroke-width="1.5"
                     stroke-linecap="round"
                     pathLength="100"
                   />
-                  {/* discharge pipe */}
                   <path
-                    d="M34 24 H42 Q46 24 46 28 L46 38"
+                    d="M6 17.5L6 15.5"
                     class="svc-path svc-stroke"
-                    stroke-width="1.4"
+                    stroke-width="1.5"
                     stroke-linecap="round"
-                    stroke-linejoin="round"
                     pathLength="100"
                   />
-                  {/* spray head */}
-                  <circle
-                    cx="46"
-                    cy="40"
-                    r="3"
-                    class="svc-path svc-accent"
-                    stroke-width="1.4"
-                    pathLength="100"
-                  />
-                  {/* early-smoke sensor dot */}
-                  <circle
-                    cx="14"
-                    cy="40"
-                    r="4"
+                  <path
+                    d="M6 8.5L6 6.5"
                     class="svc-path svc-stroke"
-                    stroke-width="1.3"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
                     pathLength="100"
                   />
-                  <circle
-                    cx="14"
-                    cy="40"
-                    r="1.5"
+                  <path
+                    d="M9 17.5L9 15.5"
+                    class="svc-path svc-stroke"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    pathLength="100"
+                  />
+                  <path
+                    d="M9 8.5L9 6.5"
+                    class="svc-path svc-stroke"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    pathLength="100"
+                  />
+                  <path
+                    d="M19.3333 16.8852C19.5419 16.8072 19.7662 16.7647 20 16.7647C20.2291 16.7647 20.4493 16.8055 20.6543 16.8806M16.7907 17.8533C16.6966 17.8338 16.5994 17.8235 16.5 17.8235C15.6716 17.8235 15 18.5346 15 19.4118C15 20.2889 15.6716 21 16.5 21H20C21.1046 21 22 20.0519 22 18.8824C22 17.9554 21.4375 17.1676 20.6543 16.8806M16.7907 17.8533C16.7105 17.6242 16.6667 17.3763 16.6667 17.1176C16.6667 15.9481 17.5621 15 18.6667 15C19.6956 15 20.543 15.8226 20.6543 16.8806M16.7907 17.8533C16.9882 17.8944 17.1718 17.9765 17.3333 18.091"
                     class="svc-path svc-accent"
-                    stroke-width="1.2"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
                     pathLength="100"
                   />
                 </svg>
               )}
               {idx === 4 && (
-                /* Physical Access & Surveillance — shield + camera lens */
+                /* Physical Access & Surveillance — security-safe icon */
                 <svg
                   class="entry-icon"
-                  viewBox="0 0 56 56"
+                  viewBox="0 0 24 24"
                   fill="none"
                   aria-hidden="true"
                 >
                   <path
-                    d="M28 6 L44 12 L44 26 C44 36 28 50 28 50 C28 50 12 36 12 26 L12 12 Z"
+                    d="M20.9099 11.1198C20.9099 16.0098 17.3599 20.5898 12.5099 21.9298C12.1799 22.0198 11.8198 22.0198 11.4898 21.9298C6.63984 20.5898 3.08984 16.0098 3.08984 11.1198V6.72979C3.08984 5.90979 3.70986 4.97979 4.47986 4.66979L10.0498 2.38982C11.2998 1.87982 12.7098 1.87982 13.9598 2.38982L19.5298 4.66979C20.2898 4.97979 20.9199 5.90979 20.9199 6.72979L20.9099 11.1198Z"
                     class="svc-path svc-stroke"
-                    stroke-width="1.6"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
                     stroke-linejoin="round"
                     pathLength="100"
                   />
-                  <circle
-                    cx="28"
-                    cy="26"
-                    r="7"
+                  <path
+                    d="M12 12.5C13.1046 12.5 14 11.6046 14 10.5C14 9.39543 13.1046 8.5 12 8.5C10.8954 8.5 10 9.39543 10 10.5C10 11.6046 10.8954 12.5 12 12.5Z"
                     class="svc-path svc-stroke"
-                    stroke-width="1.4"
-                    pathLength="100"
-                  />
-                  <circle
-                    cx="28"
-                    cy="26"
-                    r="2.5"
-                    class="svc-path svc-accent"
-                    stroke-width="1.4"
+                    stroke-width="1.5"
+                    stroke-miterlimit="10"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
                     pathLength="100"
                   />
                   <path
-                    d="M28 10v4M28 38v4"
-                    class="svc-path svc-stroke"
-                    stroke-width="1.2"
+                    d="M12 12.5V15.5"
+                    class="svc-path svc-accent"
+                    stroke-width="1.5"
+                    stroke-miterlimit="10"
                     stroke-linecap="round"
+                    stroke-linejoin="round"
                     pathLength="100"
                   />
                 </svg>
