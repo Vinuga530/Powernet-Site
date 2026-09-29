@@ -1,11 +1,13 @@
-client: "Commercial Bank Center"
-title: "Fiber Backbone & Access Setup"
-category: "Network Infrastructure"
+title: Fiber Backbone & Access Setup
+client: Commercial Bank Center
+category: Network Infrastructure
 year: 2023
-image: "/images/projects/fiber-setup.jpg"
-summary: "Ran multi-floor fiber cables, installed patch panels, and configured card access for secure server rooms."
+image: /images/projects/fiber-backbone-and-access-setup/image.jpg
+summary: >-
+  Ran multi-floor fiber cables, installed patch panels, and configured card
+  access for secure server rooms.
 specs:
-  - "Multi-strand fiber lines"
-  - "Keycard door controllers"
-  - "Centralized equipment racks"
+  - Multi-strand fiber lines
+  - Keycard door controllers
+  - Centralized equipment racks
 order: 2
