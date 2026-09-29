@@ -40,7 +40,7 @@ clientEntries.sort((a, b) => a.data.order - b.data.order);
           <video
             src={heroVideo}
             autoplay
-            muted={true}
+            muted
             loop
             playsinline
             class="image-reveal-inner bg-img hero-video"
@@ -2122,7 +2122,10 @@ clientEntries.sort((a, b) => a.data.order - b.data.order);
       "hero-video",
     ) as HTMLVideoElement | null;
     if (heroVideo) {
-      // Attempt autoplay (may be blocked on mobile without prior user interaction)
+      heroVideo.muted = true;
+      heroVideo.defaultMuted = true;
+      heroVideo.volume = 0;
+      // Attempt autoplay
       heroVideo
         .play()
         .then(() => {
@@ -2130,12 +2133,7 @@ clientEntries.sort((a, b) => a.data.order - b.data.order);
           heroVideo.closest(".hero-bg")?.classList.add("video-playing");
         })
         .catch(() => {
-          // Autoplay blocked: show video controls so user can manually start,
-          // or just leave the dark #111 background. Either is better than a
-          // frozen poster frame fighting with the fallback image.
-          heroVideo.setAttribute("controls", "");
-          heroVideo.setAttribute("controlslist", "nodownload nofullscreen");
-          heroVideo.style.opacity = "0.6"; /* dim so controls don't distract */
+          // Keep background dark if autoplay blocked
         });
 
       // Belt-and-suspenders: once the video is actually rendering a frame,
