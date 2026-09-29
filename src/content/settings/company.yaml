@@ -7,8 +7,7 @@ primaryPhone: 011 4 736 151 / 171
 fax: 011 4 795 110
 primaryEmail: powernet@powernet.lk
 mapsEmbedUrl: >-
-  <iframe
-  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15842.574128544458!2d79.8621696!3d6.93313925!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ae2590bb922fe45%3A0xe2b6ea8c7e35a37c!2sPowernet%20Pvt%20Ltd!5e0!3m2!1sen!2slk!4v1790668816859!5m2!1sen!2slk"
+  https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15842.574128544458!2d79.8621696!3d6.93313925!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ae2590bb922fe45%3A0xe2b6ea8c7e35a37c!2sPowernet%20Pvt%20Ltd!5e0!3m2!1sen!2slk!4v1790668816859!5m2!1sen!2slk"
   width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy"
-  referrerpolicy="strict-origin-when-cross-origin"></iframe>
+  referrerpolicy="strict-origin-when-cross-origin"
 mapsSearchUrl: https://maps.app.goo.gl/mL8oDoJQojiHAZ9y8
