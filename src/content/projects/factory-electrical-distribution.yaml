@@ -1,11 +1,11 @@
 title: Factory Electrical Distribution
-client: Testing if the keystatic site works on live update
-category: Power Systems
+client: Central Bank Of Sri Lanka
+category: Fiber Optic Based Switching Network
 year: 2023
 image: /images/projects/factory-electrical-distribution/image.jpg
 summary: >-
-  Installed heavy industrial breaker panels, motor power lines, and surge
-  suppression gear.
+  Fiber-based switching network with multi-segment backbone infrastructure
+  joining the central server pool.
 specs:
   - Main distribution board assembly
   - Surge protection devices
