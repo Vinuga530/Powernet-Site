@@ -2,8 +2,12 @@ title: Branch network implementation and maintenance
 client: National Savings Bank
 category: Cat6
 year: 2023
+image: /images/projects/branch-network-implementation-and-maintenance/image.jpg
 summary: >-
   Branch network implementation and maintenance, including fibre, UTP
   CAT5e/CAT6, active network components, voice and power outlets.
-specs: []
+specs:
+  - CAT6
+  - Voice
+  - Power
 order: 4
