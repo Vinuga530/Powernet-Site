@@ -600,48 +600,51 @@ const pad2 = (n: number) => String(n).padStart(2, "0");
   <!-- projects showcase -->
   <ProjectsGallery />
 
-  <!-- trusted by -->
-  <section class="section-trusted scroll-reveal reveal-up">
-    <div class="trusted-layout container">
-      <!-- left: intro -->
-      <div class="trusted-intro">
-        <div class="trusted-header">
-          <span class="trusted-rule" aria-hidden="true"></span>
-          <span class="trusted-meta">Selected clients</span>
+  <!-- selected clients -->
+  <section class="section-clients scroll-reveal reveal-up" aria-label="Selected Clients">
+    <!-- top marquee bar -->
+    <div class="clients-marquee-bar" aria-hidden="true">
+      <div class="clients-marquee-track">
+        {
+          Array.from({ length: 8 }).map(() => (
+            <span class="clients-marquee-word">Selected Clients&nbsp;&nbsp;—&nbsp;&nbsp;</span>
+          ))
+        }
+      </div>
+    </div>
+
+    <div class="clients-inner container">
+      <!-- header row -->
+      <div class="clients-header">
+        <div class="clients-label-group">
+          <span class="clients-eyebrow">Trusted By</span>
+          <h2 class="clients-headline">
+            <span class="clients-count-display">
+              <span class="clients-count-num">{clientEntries.length}</span>
+            </span>
+            <span class="clients-headline-text">Organisations</span>
+          </h2>
+          <p class="clients-sub">spanning banking, telecom,<br/>education &amp; industry.</p>
         </div>
 
-        <div class="trusted-count">
-          <span>{clientEntries.length}</span>
+        <!-- decorative accent line -->
+        <div class="clients-accent-col" aria-hidden="true">
+          <div class="clients-vert-rule"></div>
+          <svg class="clients-deco-mark" viewBox="0 0 60 60" fill="none">
+            <circle cx="30" cy="30" r="28" stroke="var(--color-brand)" stroke-width="1.5" stroke-dasharray="4 6" stroke-linecap="round"/>
+            <circle cx="30" cy="30" r="4" fill="var(--color-brand)"/>
+          </svg>
         </div>
-
-        <svg
-          class="trusted-underline"
-          viewBox="0 0 160 14"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          aria-hidden="true"
-        >
-          <path
-            class="trusted-underline-path"
-            d="M3 6.5 C 32 10.5, 62 4.5, 92 8.5 C 114 11.5, 136 6, 157 7.5"
-            stroke="var(--color-brand)"
-            stroke-width="2"
-            stroke-linecap="round"
-          />
-        </svg>
-
-        <p class="trusted-desc">
-          organisations across banking, telecom, education and industry.
-        </p>
       </div>
 
-      <!-- right: list -->
-      <ol class="trusted-list">
+      <!-- client grid -->
+      <ol class="clients-grid">
         {
           clientEntries.map((entry, i) => (
-            <li style={`--i:${i}`}>
-              <span class="trusted-index">{pad2(i + 1)}</span>
-              <span class="trusted-name">{entry.data.name}</span>
+            <li class="client-card" style={`--ci:${i}`}>
+              <span class="client-card-index">{pad2(i + 1)}</span>
+              <span class="client-card-name">{entry.data.name}</span>
+              <span class="client-card-arrow" aria-hidden="true">&#8599;</span>
             </li>
           ))
         }
@@ -1720,257 +1723,345 @@ const pad2 = (n: number) => String(n).padStart(2, "0");
     }
   }
 
-  /* ===== trusted by ===== */
-  .section-trusted {
-    padding: var(--space-2xl) 0;
-    border-top: 1px solid var(--color-border);
-    border-bottom: 1px solid var(--color-border);
+  /* ===== selected clients (redesigned) ===== */
+  .section-clients {
+    position: relative;
+    background-color: #0d0d0d;
+    color: #f5f5f5;
+    overflow: hidden;
+    padding-bottom: clamp(4rem, 8vw, 7rem);
   }
 
-  .trusted-layout {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--space-xl);
+  /* --- scrolling marquee bar at top --- */
+  .clients-marquee-bar {
+    width: 100%;
+    overflow: hidden;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    padding: 14px 0;
+    background: rgba(255,255,255,0.03);
+    margin-bottom: clamp(3rem, 6vw, 5.5rem);
   }
 
-  @media (min-width: 900px) {
-    .trusted-layout {
-      grid-template-columns: 4fr 8fr;
-      gap: var(--space-2xl);
-      align-items: start;
-    }
+  .clients-marquee-track {
+    display: flex;
+    width: max-content;
+    animation: marquee-scroll 28s linear infinite;
   }
 
-  /* left: intro */
-  .trusted-intro {
+  .clients-marquee-word {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.28);
+    white-space: nowrap;
+    padding-right: 2rem;
+  }
+
+  @keyframes marquee-scroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+
+  /* --- main inner wrapper --- */
+  .clients-inner {
     display: flex;
     flex-direction: column;
+    gap: clamp(2.5rem, 5vw, 4.5rem);
   }
 
-  @media (min-width: 900px) {
-    .trusted-intro {
-      position: sticky;
-      top: 120px;
-    }
+  /* --- header row --- */
+  .clients-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 2rem;
   }
 
-  .trusted-header {
+  .clients-label-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .clients-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-brand);
+    margin-bottom: 0.75rem;
     display: flex;
     align-items: center;
-    gap: var(--space-sm);
-    margin-bottom: var(--space-md);
+    gap: 10px;
   }
 
-  .trusted-rule {
+  .clients-eyebrow::before {
+    content: '';
     display: inline-block;
-    width: 48px;
-    height: 2px;
+    width: 36px;
+    height: 1.5px;
     background: var(--color-brand);
     flex-shrink: 0;
   }
 
-  .trusted-meta {
-    font-family: var(--font-mono);
-    font-size: var(--text-label);
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--color-muted);
+  .clients-headline {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin: 0 0 1rem 0;
+    line-height: 1;
   }
 
-  .trusted-count {
+  .clients-count-display {
     overflow: hidden;
-    font-size: clamp(6rem, 14vw, 12rem);
+    display: inline-block;
+  }
+
+  .clients-count-num {
+    display: inline-block;
+    font-size: clamp(5rem, 12vw, 10rem);
     font-weight: 700;
     letter-spacing: -0.04em;
-    line-height: 0.9;
-    color: var(--color-foreground);
+    line-height: 1;
+    color: #ffffff;
+    transform: translateY(110%);
+    transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1) 0.1s;
   }
 
-  .trusted-count span {
-    display: inline-block;
-    transform: translateY(100%);
-    transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .section-trusted.is-revealed .trusted-count span {
+  .section-clients.is-revealed .clients-count-num {
     transform: translateY(0);
   }
 
-  .trusted-underline {
-    display: block;
-    width: 140px;
-    height: 14px;
-    margin-top: var(--space-xs);
-    margin-bottom: var(--space-md);
-    overflow: visible;
+  .clients-headline-text {
+    font-size: clamp(1.5rem, 3.2vw, 2.8rem);
+    font-weight: 300;
+    letter-spacing: -0.01em;
+    color: rgba(255,255,255,0.55);
+    line-height: 1;
+    align-self: flex-end;
+    padding-bottom: 0.35em;
   }
 
-  .trusted-underline-path {
-    stroke-dasharray: 180;
-    stroke-dashoffset: 180;
-    transition: stroke-dashoffset 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.5s;
-  }
-
-  .section-trusted.is-revealed .trusted-underline-path {
-    stroke-dashoffset: 0;
-  }
-
-  .trusted-desc {
-    font-family: var(--font-sans);
-    font-size: var(--text-body);
-    color: var(--color-muted);
-    max-width: 26ch;
-    line-height: 1.5;
+  .clients-sub {
+    font-size: clamp(0.9rem, 1.1vw, 1rem);
+    color: rgba(255,255,255,0.38);
+    line-height: 1.6;
     margin: 0;
+    max-width: 28ch;
   }
 
-  /* right: list */
-  .trusted-list {
+  /* decorative right accent */
+  .clients-accent-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+    padding-bottom: 0.5rem;
+  }
+
+  .clients-vert-rule {
+    width: 1px;
+    height: clamp(60px, 8vw, 100px);
+    background: linear-gradient(to bottom, transparent, rgba(214,40,40,0.6), transparent);
+  }
+
+  .clients-deco-mark {
+    width: 48px;
+    height: 48px;
+    opacity: 0.7;
+    animation: spin-slow 18s linear infinite;
+  }
+
+  @keyframes spin-slow {
+    to { transform: rotate(360deg); }
+  }
+
+  @media (max-width: 600px) {
+    .clients-accent-col { display: none; }
+  }
+
+  /* --- client grid --- */
+  .clients-grid {
     list-style: none;
     margin: 0;
     padding: 0;
     display: grid;
     grid-template-columns: 1fr;
-    column-gap: var(--space-xl);
+    border-top: 1px solid rgba(255,255,255,0.1);
   }
 
-  @media (min-width: 700px) {
-    .trusted-list {
+  @media (min-width: 640px) {
+    .clients-grid {
       grid-template-columns: 1fr 1fr;
     }
   }
 
-  .trusted-list li {
-    position: relative;
-    display: grid;
-    grid-template-columns: 3rem 1fr;
-    align-items: baseline;
-    padding: 1.1rem 0;
-    transition: opacity 250ms cubic-bezier(0.16, 1, 0.3, 1);
+  @media (min-width: 1024px) {
+    .clients-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
   }
 
-  .trusted-list li::before {
+  .client-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.4rem 1rem 1.4rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    cursor: default;
+    overflow: hidden;
+    transition: background 0.3s ease;
+  }
+
+  /* column right-borders on wider layouts */
+  @media (min-width: 640px) {
+    .client-card:nth-child(odd) {
+      border-right: 1px solid rgba(255,255,255,0.07);
+      padding-right: 1.5rem;
+    }
+    .client-card:nth-child(even) {
+      padding-left: 1.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .client-card {
+      border-right: 1px solid rgba(255,255,255,0.07);
+      padding: 1.4rem 1.5rem;
+    }
+    .client-card:nth-child(3n) {
+      border-right: none;
+    }
+    .client-card:nth-child(odd) {
+      border-right: 1px solid rgba(255,255,255,0.07);
+      padding-right: 1.5rem;
+    }
+    .client-card:nth-child(even) {
+      padding-left: 1.5rem;
+    }
+  }
+
+  /* red sweep on hover */
+  .client-card::before {
     content: '';
     position: absolute;
-    top: 0;
+    inset: 0;
+    background: linear-gradient(105deg, rgba(214,40,40,0.06) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+  }
+
+  .client-card:hover::before {
+    opacity: 1;
+  }
+
+  /* bottom accent line that scales in on hover */
+  .client-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
     left: 0;
     right: 0;
     height: 1px;
-    background: var(--color-border);
-    transform-origin: left;
+    background: var(--color-brand);
     transform: scaleX(0);
-    transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
-    transition-delay: calc(var(--i) * 30ms);
+    transform-origin: left;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  .section-trusted.is-revealed .trusted-list li::before {
+  .client-card:hover::after {
     transform: scaleX(1);
   }
 
-  .trusted-list li > span {
+  /* entry reveal */
+  .client-card {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(14px);
     transition:
-      opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
-      transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
-    transition-delay: calc(var(--i) * 30ms);
+      opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+      background 0.3s ease;
+    transition-delay: calc(var(--ci, 0) * 40ms);
   }
 
-  .section-trusted.is-revealed .trusted-list li > span {
+  .section-clients.is-revealed .client-card {
     opacity: 1;
     transform: translateY(0);
   }
 
-  .trusted-index {
+  .client-card-index {
     font-family: var(--font-mono);
-    font-size: 0.72rem;
+    font-size: 0.65rem;
     font-weight: 700;
     letter-spacing: 0.12em;
-    color: var(--color-muted);
-    transition: color 250ms cubic-bezier(0.16, 1, 0.3, 1);
+    color: rgba(255,255,255,0.2);
+    flex-shrink: 0;
+    transition: color 0.25s ease;
+    min-width: 2.2rem;
   }
 
-  .trusted-name {
+  .client-card:hover .client-card-index {
+    color: var(--color-brand);
+  }
+
+  .client-card-name {
     font-family: var(--font-sans);
     font-weight: 500;
-    font-size: clamp(1.05rem, 1.4vw, 1.25rem);
-    line-height: 1.3;
-    color: var(--color-foreground);
+    font-size: clamp(0.95rem, 1.3vw, 1.1rem);
+    line-height: 1.35;
+    color: rgba(255,255,255,0.82);
+    flex: 1;
     min-width: 0;
     overflow-wrap: break-word;
-    transition: transform 250ms cubic-bezier(0.16, 1, 0.3, 1);
+    transition:
+      color 0.25s ease,
+      transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  /* hover & focus-within */
-  @media (hover: hover) {
-    .trusted-list:has(li:hover) li:not(:hover) {
-      opacity: 0.35;
-    }
-
-    .trusted-list li:hover .trusted-name {
-      transform: translateX(6px);
-      transition: transform 250ms cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .trusted-list li:hover .trusted-index {
-      color: var(--color-brand);
-      transition: color 250ms cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .trusted-list:hover li > span {
-      transition:
-        opacity 250ms cubic-bezier(0.16, 1, 0.3, 1),
-        transform 250ms cubic-bezier(0.16, 1, 0.3, 1),
-        color 250ms cubic-bezier(0.16, 1, 0.3, 1);
-      transition-delay: 0s;
-    }
+  .client-card:hover .client-card-name {
+    color: #ffffff;
+    transform: translateX(4px);
   }
 
-  .trusted-list:has(li:focus-within) li:not(:focus-within) {
-    opacity: 0.35;
+  .client-card-arrow {
+    font-size: 1rem;
+    color: rgba(255,255,255,0.12);
+    flex-shrink: 0;
+    transition:
+      color 0.25s ease,
+      transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    margin-left: auto;
   }
 
-  .trusted-list li:focus-within .trusted-name {
-    transform: translateX(6px);
-    transition: transform 250ms cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .trusted-list li:focus-within .trusted-index {
+  .client-card:hover .client-card-arrow {
     color: var(--color-brand);
-    transition: color 250ms cubic-bezier(0.16, 1, 0.3, 1);
+    transform: translate(3px, -3px);
+  }
+
+  /* dim non-hovered siblings */
+  @media (hover: hover) {
+    .clients-grid:has(.client-card:hover) .client-card:not(:hover) {
+      opacity: 0.45;
+    }
+    .clients-grid:has(.client-card:hover) .client-card:not(:hover) .client-card-name {
+      color: rgba(255,255,255,0.4);
+    }
   }
 
   /* reduced motion */
   @media (prefers-reduced-motion: reduce) {
-    .trusted-list li::before,
-    .section-trusted.is-revealed .trusted-list li::before {
-      transform: scaleX(1) !important;
-      transition: none !important;
-    }
-
-    .trusted-list li > span,
-    .section-trusted.is-revealed .trusted-list li > span {
+    .clients-marquee-track { animation: none; }
+    .clients-deco-mark { animation: none; }
+    .clients-count-num { transform: none !important; transition: none !important; }
+    .client-card {
       opacity: 1 !important;
       transform: none !important;
-      transition: none !important;
-    }
-
-    .trusted-count span,
-    .section-trusted.is-revealed .trusted-count span {
-      transform: none !important;
-      transition: none !important;
-    }
-
-    .trusted-underline-path,
-    .section-trusted.is-revealed .trusted-underline-path {
-      stroke-dashoffset: 0 !important;
-      transition: none !important;
-    }
-
-    .trusted-list li,
-    .trusted-name,
-    .trusted-index {
       transition: none !important;
     }
   }
