@@ -105,7 +105,6 @@ export const GET: APIRoute = async ({ request, cookies }) => {
 
   const managedDirs = [
     { category: 'Projects', dir: path.join(publicDir, 'images', 'projects'), prefix: 'public/images/projects/' },
-    { category: 'Logos', dir: path.join(publicDir, 'images', 'logos'), prefix: 'public/images/logos/' },
     { category: 'Hero Images', dir: path.join(publicDir, 'images', 'hero'), prefix: 'public/images/hero/' },
     { category: 'Hero Videos', dir: path.join(publicDir, 'videos', 'hero'), prefix: 'public/videos/hero/' },
   ];

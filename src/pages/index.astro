@@ -29,7 +29,7 @@ processStepEntries.sort((a, b) => a.data.order - b.data.order);
 
 const clientEntries = await getCollection("clients");
 clientEntries.sort((a, b) => a.data.order - b.data.order);
-const clientEntriesReversed = [...clientEntries].reverse();
+
 ---
 
 <BaseLayout title="Powernet (Pvt) Ltd | Power and Infrastructure Solutions">
@@ -609,39 +609,13 @@ const clientEntriesReversed = [...clientEntries].reverse();
         <div class="trusted-track">
           {
             clientEntries.map((entry) => (
-              <span class="trusted-card">
-                <img
-                  src={entry.data.logo}
-                  alt={entry.data.name}
-                  loading="lazy"
-                />
-              </span>
+              <span class="trusted-card">{entry.data.name}</span>
             ))
           }
           {
+            /* duplicated copy for seamless loop */
             clientEntries.map((entry) => (
-              <span class="trusted-card" aria-hidden="true">
-                <img src={entry.data.logo} alt="" loading="lazy" />
-              </span>
-            ))
-          }
-        </div>
-      </div>
-
-      <div class="trusted-marquee-row trusted-marquee-row-right">
-        <div class="trusted-track" aria-hidden="true">
-          {
-            clientEntriesReversed.map((entry) => (
-              <span class="trusted-card">
-                <img src={entry.data.logo} alt="" loading="lazy" />
-              </span>
-            ))
-          }
-          {
-            clientEntriesReversed.map((entry) => (
-              <span class="trusted-card">
-                <img src={entry.data.logo} alt="" loading="lazy" />
-              </span>
+              <span class="trusted-card" aria-hidden="true">{entry.data.name}</span>
             ))
           }
         </div>
@@ -1757,24 +1731,16 @@ const clientEntriesReversed = [...clientEntries].reverse();
     overflow: hidden;
   }
 
-  .trusted-marquee-row + .trusted-marquee-row {
-    margin-top: var(--space-md);
-  }
-
   .trusted-track {
     display: flex;
     align-items: center;
-    gap: var(--space-md);
+    gap: var(--space-xl);
     width: max-content;
     will-change: transform;
   }
 
   .trusted-marquee-row-left .trusted-track {
     animation: trusted-scroll-left 140s linear infinite;
-  }
-
-  .trusted-marquee-row-right .trusted-track {
-    animation: trusted-scroll-right 165s linear infinite;
   }
 
   .trusted-marquee-row:hover .trusted-track {
@@ -1790,32 +1756,23 @@ const clientEntriesReversed = [...clientEntries].reverse();
     }
   }
 
-  @keyframes trusted-scroll-right {
-    from {
-      transform: translateX(-50%);
-    }
-    to {
-      transform: translateX(0);
-    }
-  }
-
   .trusted-card {
     flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 180px;
-    height: 96px;
-    padding: var(--space-md) var(--space-lg);
-    border: 1px solid var(--color-border);
-    border-radius: 14px;
-    background: #ffffff;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--color-muted);
+    white-space: nowrap;
+    padding: var(--space-sm) var(--space-lg);
+    border-left: 1px solid var(--color-border);
+    transition: color 0.2s ease;
   }
 
-  .trusted-card img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
+  .trusted-card:hover,
+  .trusted-card:focus {
+    color: #ee1c25;
   }
 
   @media (prefers-reduced-motion: reduce) {

@@ -70,7 +70,6 @@ const clientsCollection = defineCollection({
   loader: glob({ pattern: "*.yaml", base: "./src/content/clients" }),
   schema: z.object({
     name: z.string(),
-    logo: z.string(),
     order: z.number().default(99),
   }),
 });

@@ -59,11 +59,10 @@ clientEntries.sort((a, b) => a.data.order - b.data.order);
         <span class="text-label">Top Corporate Clients</span>
       </div>
 
-      <!-- .grid-safe uses minmax(min(--grid-min, 100%), 1fr) — overflow-safe on all phones -->
       <div class="clients-grid grid-safe" style="--grid-min: 150px; margin-top: var(--space-2xl);">
         {clientEntries.map((entry) => (
-          <div class="client-card" style="display: flex; align-items: center; justify-content: center; height: 90px; padding: var(--space-md); border: 1px solid var(--color-border); border-radius: 12px; background: #ffffff;">
-            <img src={entry.data.logo} alt={entry.data.name} loading="lazy" style="max-width: 100%; max-height: 100%; object-fit: contain;" />
+          <div class="client-card" style="display: flex; align-items: center; justify-content: center; min-height: 72px; padding: var(--space-md) var(--space-lg); border: 1px solid var(--color-border); border-radius: 12px;">
+            <span class="client-name">{entry.data.name}</span>
           </div>
         ))}
       </div>
@@ -115,9 +114,21 @@ clientEntries.sort((a, b) => a.data.order - b.data.order);
     }
   }
 
-  /* Ensure images inside client cards stay contained */
-  .client-card img {
-    max-width: 100%;
-    height: auto;
+  /* Client name wordmarks */
+  .client-name {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 0.65rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--color-muted);
+    text-align: center;
+    text-wrap: balance;
+    transition: color 0.2s ease;
+  }
+
+  .client-card:hover .client-name,
+  .client-card:focus-within .client-name {
+    color: #ee1c25;
   }
 </style>

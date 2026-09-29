@@ -126,12 +126,6 @@ export default config({
         name: fields.slug({
           name: { label: 'Company Name', description: 'e.g. "Hemas Holdings"' },
         }),
-        logo: fields.image({
-          label: 'Logo',
-          description: 'Shown on the homepage scrolling wall and the About page client grid',
-          directory: 'public/images/logos',
-          publicPath: '/images/logos/',
-        }),
         order: fields.integer({
           label: 'Display Order',
           description: 'Lower numbers show first',
