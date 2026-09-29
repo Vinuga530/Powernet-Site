@@ -94,9 +94,7 @@ const navLinks = [
   </div>
 
   <div class="container footer-bottom-bar">
-    <a href="#" class="footer-legal-link">Terms and conditions</a>
     <span class="footer-copyright text-small">&copy; {new Date().getFullYear()} Powernet (Pvt) Ltd. All Rights Reserved.</span>
-    <a href="#" class="footer-legal-link">Privacy Policy</a>
   </div>
 
   <div class="footer-watermark" aria-hidden="true">POWERNET<canvas class="footer-watermark-canvas" aria-hidden="true"></canvas></div>
@@ -239,20 +237,16 @@ const navLinks = [
   .footer-bottom-bar {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
+    text-align: center;
     gap: var(--space-md);
     padding-top: var(--space-lg);
     padding-bottom: var(--space-lg);
     border-top: 1px solid var(--color-border);
   }
 
-  .footer-legal-link,
   .footer-copyright {
     color: var(--color-muted);
-  }
-
-  .footer-legal-link:hover {
-    color: var(--color-brand);
   }
 
   /* ===== watermark band ===== */
