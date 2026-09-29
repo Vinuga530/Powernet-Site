@@ -10,59 +10,376 @@ hotlineEntries.sort((a, b) => a.data.order - b.data.order);
 ---
 
 <BaseLayout title="Contact Us | Powernet (Pvt) Ltd">
-  <section class="section-contact" style="padding-top: var(--space-3xl); min-height: 80vh;">
-    <div class="container">
-      <div class="contact-heading scroll-reveal reveal-up">
-        <h1 class="text-display-xl">Get in Touch</h1>
-        <p class="text-body-large" style="margin-top: var(--space-md); color: var(--color-muted); max-width: 600px;">
-          Reach out to our specialized departments or visit our facilities for more information.
-        </p>
+  <div class="contact-page container">
+    <header class="contact-header scroll-reveal reveal-up">
+      <div class="contact-eyebrow-wrap">
+        <span class="contact-rule" aria-hidden="true"></span>
+        <span class="text-technical-meta">Contact</span>
       </div>
+      <h1 class="text-display-xl">Talk to our engineers.</h1>
+      <p class="contact-subtitle">
+        Tell us about the project and we'll reply within one business day.
+      </p>
+    </header>
 
-      <!-- .grid-safe uses minmax(min(--grid-min, 100%), 1fr) — overflow-safe on all phones -->
-      <div class="contact-grid grid-safe scroll-reveal reveal-up stagger-1" style="--grid-min: 300px; margin-top: var(--space-3xl);">
-        
-        <!-- Department Hotlines -->
-        <div class="contact-card fade-in stagger-1" style="background-color: var(--color-surface); padding: var(--space-xl); border: 1px solid var(--color-border);">
-          <h2 class="text-h1" style="margin-bottom: var(--space-lg);">Department Hotlines</h2>
-          <ul style="list-style: none; display: flex; flex-direction: column; gap: var(--space-md); padding: 0;">
-            {hotlineEntries.map((entry) => (
-              <li>
-                <span class="text-label" style="display: block; color: var(--color-brand); margin-bottom: 4px;">{entry.data.department}</span>
-                <a href={`tel:${entry.data.phone.replace(/\s+/g, '')}`} class="text-h4">{entry.data.phone}</a>
-              </li>
-            ))}
-          </ul>
-        </div>
+    <div class="contact-layout">
+      <!-- Left: Departments -->
+      <section class="contact-col contact-departments scroll-reveal reveal-up">
+        <h2 class="contact-group-title">Departments</h2>
+        <ol class="hotlines-list">
+          {hotlineEntries.map((entry, idx) => (
+            <li class="hotline-item">
+              <span class="hotline-index">{String(idx + 1).padStart(2, '0')}</span>
+              <span class="hotline-name">{entry.data.department}</span>
+              <a href={`tel:${entry.data.phone.replace(/\s+/g, '')}`} class="hotline-phone">
+                {entry.data.phone}
+              </a>
+            </li>
+          ))}
+        </ol>
+      </section>
 
-        <!-- Facilities -->
-        <div class="facilities-wrapper fade-in stagger-2" style="display: flex; flex-direction: column; gap: var(--space-xl);">
-          <div class="contact-card" style="background-color: var(--color-surface); padding: var(--space-xl); border: 1px solid var(--color-border);">
-            <h2 class="text-h1" style="margin-bottom: var(--space-lg);">Head Office</h2>
-            <p class="text-body-large" style="color: var(--color-muted);">
+      <!-- Right: Offices -->
+      <section class="contact-col contact-offices scroll-reveal reveal-up">
+        <h2 class="contact-group-title">Offices</h2>
+        <div class="offices-wrap">
+          <div class="office-block">
+            <span class="office-label text-technical-meta">Head Office</span>
+            <p class="office-address">
               {company.addressLine1}<br />
-              {company.addressLine2}
+              {company.addressLine2}, {company.country}
             </p>
-            <div style="margin-top: var(--space-md);">
-              <p>General Tel: <a href={`tel:${company.primaryPhone.replace(/\s+/g, '')}`}>{company.primaryPhone}</a></p>
-              <p>Fax: {company.fax}</p>
-              <p>Email: <a href={`mailto:${company.primaryEmail}`} style="color: var(--color-brand);">{company.primaryEmail}</a></p>
+            <div class="office-meta">
+              <div class="office-meta-row">
+                <span class="office-meta-label">Tel</span>
+                <a href={`tel:${company.primaryPhone.replace(/\s+/g, '')}`} class="office-meta-value">
+                  {company.primaryPhone}
+                </a>
+              </div>
+              <div class="office-meta-row">
+                <span class="office-meta-label">Fax</span>
+                <span class="office-meta-value">{company.fax}</span>
+              </div>
+              <div class="office-meta-row">
+                <span class="office-meta-label">Email</span>
+                <a href={`mailto:${company.primaryEmail}`} class="office-meta-value">
+                  {company.primaryEmail}
+                </a>
+              </div>
             </div>
           </div>
 
-          <div class="contact-card" style="background-color: var(--color-surface); padding: var(--space-xl); border: 1px solid var(--color-border);">
-            <h2 class="text-h1" style="margin-bottom: var(--space-lg);">Warehouse Facility</h2>
-            <p class="text-body-large" style="color: var(--color-muted);">
+          <div class="office-block">
+            <span class="office-label text-technical-meta">Warehouse Facility</span>
+            <p class="office-address">
               {company.warehouseAddressLine1}<br />
               {company.warehouseAddressLine2}
             </p>
           </div>
         </div>
-
-      </div>
+      </section>
     </div>
-  </section>
+
+    <!-- Map Row -->
+    <section class="contact-map-section scroll-reveal reveal-up">
+      <iframe
+        class="contact-map"
+        src={company.mapsEmbedUrl}
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"
+        title="Powernet Head Office Location"
+      ></iframe>
+      <div class="map-meta-row">
+        <span class="map-address">
+          {company.addressLine1}, {company.addressLine2}
+        </span>
+        <a
+          href={company.mapsSearchUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="map-directions"
+        >
+          Get Directions &rarr;
+        </a>
+      </div>
+    </section>
+  </div>
 </BaseLayout>
+
+<style>
+  .contact-page {
+    padding-top: var(--space-3xl);
+    min-height: 80vh;
+  }
+
+  /* Header */
+  .contact-header {
+    margin-bottom: var(--space-2xl);
+  }
+
+  .contact-eyebrow-wrap {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+  }
+
+  .contact-rule {
+    display: inline-block;
+    width: 48px;
+    height: 2px;
+    background-color: var(--color-brand);
+    flex-shrink: 0;
+  }
+
+  .contact-subtitle {
+    font-size: var(--text-body-large);
+    color: var(--color-muted);
+    max-width: 34rem;
+    line-height: 1.6;
+    margin-top: var(--space-md);
+  }
+
+  /* Layout */
+  .contact-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-2xl);
+  }
+
+  @media (min-width: 900px) {
+    .contact-layout {
+      grid-template-columns: 1.2fr 1fr;
+      gap: var(--space-2xl);
+    }
+  }
+
+  .contact-group-title {
+    font-family: var(--font-mono);
+    font-size: var(--text-technical-meta);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-muted);
+    font-weight: 500;
+    margin: 0 0 var(--space-md) 0;
+  }
+
+  /* Left: Hotlines */
+  .hotlines-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .hotline-item {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: baseline;
+    gap: var(--space-md);
+    padding: 1.5rem 0 1.5rem 1rem;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .hotline-item:last-child {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .hotline-item::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: var(--color-brand);
+    transform: scaleY(0);
+    transform-origin: top;
+    transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .hotline-item:hover::before,
+  .hotline-item:focus-within::before {
+    transform: scaleY(1);
+  }
+
+  .hotline-index {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--color-brand);
+  }
+
+  .hotline-name {
+    font-size: var(--text-h3);
+    font-weight: 600;
+    color: var(--color-foreground);
+    line-height: 1.3;
+  }
+
+  .hotline-phone {
+    font-family: var(--font-mono);
+    font-size: var(--text-body);
+    font-weight: 500;
+    color: var(--color-muted);
+    white-space: nowrap;
+    transition: color 0.2s ease;
+  }
+
+  .hotline-item:hover .hotline-phone,
+  .hotline-item:focus-within .hotline-phone {
+    color: var(--color-brand);
+  }
+
+  .hotline-phone::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+
+  @media (max-width: 600px) {
+    .hotline-item {
+      grid-template-columns: auto 1fr;
+      row-gap: var(--space-xs);
+      column-gap: var(--space-sm);
+    }
+
+    .hotline-phone {
+      grid-column: 2 / -1;
+    }
+  }
+
+  /* Right: Offices */
+  .offices-wrap {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .office-block {
+    padding: 1.5rem 0;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .office-block:last-child {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .office-label {
+    display: block;
+    margin-bottom: var(--space-xs);
+  }
+
+  .office-address {
+    font-size: var(--text-body-large);
+    line-height: 1.5;
+    color: var(--color-foreground);
+    margin: 0;
+  }
+
+  .office-meta {
+    margin-top: var(--space-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+
+  .office-meta-row {
+    display: flex;
+    gap: var(--space-md);
+    font-size: var(--text-body);
+  }
+
+  .office-meta-label {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--color-muted);
+    width: 48px;
+    flex-shrink: 0;
+  }
+
+  .office-meta-value {
+    color: var(--color-foreground);
+    transition: color 0.2s ease;
+  }
+
+  a.office-meta-value:hover {
+    color: var(--color-brand);
+  }
+
+  /* Map Row */
+  .contact-map-section {
+    margin-top: var(--space-3xl);
+    margin-bottom: var(--space-3xl);
+  }
+
+  .contact-map {
+    display: block;
+    width: 100%;
+    height: 360px;
+    border: 1px solid var(--color-border);
+    border-radius: 0;
+    box-shadow: none;
+    filter: grayscale(0.3) contrast(1.05);
+  }
+
+  @media (max-width: 600px) {
+    .contact-map {
+      height: 280px;
+    }
+  }
+
+  .map-meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--space-md);
+    padding-top: var(--space-sm);
+  }
+
+  @media (max-width: 600px) {
+    .map-meta-row {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-xs);
+    }
+  }
+
+  .map-address {
+    font-size: var(--text-body);
+    color: var(--color-muted);
+  }
+
+  .map-directions {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--color-brand);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: color 0.2s ease;
+  }
+
+  .map-directions:hover {
+    color: var(--color-brand-dark);
+  }
+
+  /* Accessibility */
+  @media (prefers-reduced-motion: reduce) {
+    .hotline-item::before,
+    .hotline-phone,
+    .office-meta-value,
+    .map-directions {
+      transition: none !important;
+    }
+
+    .reveal-up {
+      transition: none !important;
+      opacity: 1 !important;
+      transform: none !important;
+    }
+  }
+</style>
 
 <script>
   /* Contact-page scroll reveals — mirrors index.astro's initRevealObserver pattern */
