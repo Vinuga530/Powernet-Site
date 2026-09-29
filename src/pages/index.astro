@@ -689,7 +689,7 @@ clientEntries.sort((a, b) => a.data.order - b.data.order);
       <div class="cta-info-card">
         <div class="cta-info-row">
           <span class="cta-info-label">Call us</span>
-          <a href="tel:0114736151" class="cta-info-value">011 4 736 151</a>
+          <a href={`tel:${company.primaryPhone.replace(/\s+/g, '')}`} class="cta-info-value">{company.primaryPhone}</a>
         </div>
         <div class="cta-info-row">
           <span class="cta-info-label">Email</span>

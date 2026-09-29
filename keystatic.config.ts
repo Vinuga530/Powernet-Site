@@ -3,15 +3,7 @@ import { config, fields, collection, singleton } from '@keystatic/core';
 export default config({
   storage: import.meta.env.DEV
     ? { kind: 'local' }
-    : {
-      kind: 'github',
-      repo: 'Vinuga530/Powernet-Site',
-      githubApp: {
-        name: import.meta.env.PUBLIC_KEYSTATIC_GITHUB_APP_SLUG ?? '',
-        clientId: import.meta.env.KEYSTATIC_GITHUB_CLIENT_ID ?? '',
-        clientSecret: import.meta.env.KEYSTATIC_GITHUB_CLIENT_SECRET ?? '',
-      },
-    },
+    : { kind: 'github', repo: 'Vinuga530/Powernet-Site' },
 
   ui: {
     brand: { name: 'Powernet' },
