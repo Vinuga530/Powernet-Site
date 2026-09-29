@@ -30,6 +30,8 @@ processStepEntries.sort((a, b) => a.data.order - b.data.order);
 const clientEntries = await getCollection("clients");
 clientEntries.sort((a, b) => a.data.order - b.data.order);
 
+const pad2 = (n: number) => String(n).padStart(2, "0");
+
 ---
 
 <BaseLayout title="Powernet (Pvt) Ltd | Power and Infrastructure Solutions">
@@ -600,51 +602,50 @@ clientEntries.sort((a, b) => a.data.order - b.data.order);
 
   <!-- trusted by -->
   <section class="section-trusted scroll-reveal reveal-up">
-    <div class="trusted-inner container">
-
-      <div class="trusted-header">
-        <span class="trusted-rule" aria-hidden="true"></span>
-        <span class="trusted-meta">Selected clients &middot; {clientEntries.length}</span>
-
-        <!-- hand-drawn doodle: arrow + note, desktop only, aria-hidden -->
-        <div class="trusted-doodle" aria-hidden="true">
-          <svg
-            width="72"
-            height="58"
-            viewBox="0 0 72 58"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            aria-hidden="true"
-          >
-            <!-- wobbly arrow shaft curving left-to-right then tip pointing down-right -->
-            <path
-              d="M8 6 C12 14, 28 10, 34 22 C40 34, 30 46, 44 52"
-              stroke="var(--color-muted)"
-              stroke-width="1.5"
-              stroke-linecap="round"
-              fill="none"
-            />
-            <!-- arrowhead -->
-            <path
-              d="M44 52 L36 48 M44 52 L48 44"
-              stroke="var(--color-muted)"
-              stroke-width="1.5"
-              stroke-linecap="round"
-              fill="none"
-            />
-          </svg>
-          <span class="trusted-doodle-note">and counting</span>
+    <div class="trusted-layout container">
+      <!-- left: intro -->
+      <div class="trusted-intro">
+        <div class="trusted-header">
+          <span class="trusted-rule" aria-hidden="true"></span>
+          <span class="trusted-meta">Selected clients</span>
         </div>
+
+        <div class="trusted-count">
+          <span>{clientEntries.length}</span>
+        </div>
+
+        <svg
+          class="trusted-underline"
+          viewBox="0 0 160 14"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
+        >
+          <path
+            class="trusted-underline-path"
+            d="M3 6.5 C 32 10.5, 62 4.5, 92 8.5 C 114 11.5, 136 6, 157 7.5"
+            stroke="var(--color-brand)"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+        </svg>
+
+        <p class="trusted-desc">
+          organisations across banking, telecom, education and industry.
+        </p>
       </div>
 
-      <ul class="trusted-list">
+      <!-- right: list -->
+      <ol class="trusted-list">
         {
-          clientEntries.map((entry) => (
-            <li class="trusted-item">{entry.data.name}</li>
+          clientEntries.map((entry, i) => (
+            <li style={`--i:${i}`}>
+              <span class="trusted-index">{pad2(i + 1)}</span>
+              <span class="trusted-name">{entry.data.name}</span>
+            </li>
           ))
         }
-      </ul>
-
+      </ol>
     </div>
   </section>
 
@@ -1726,11 +1727,33 @@ clientEntries.sort((a, b) => a.data.order - b.data.order);
     border-bottom: 1px solid var(--color-border);
   }
 
-  .trusted-inner {
-    position: relative;
+  .trusted-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-xl);
   }
 
-  /* header: rule + label + doodle */
+  @media (min-width: 900px) {
+    .trusted-layout {
+      grid-template-columns: 4fr 8fr;
+      gap: var(--space-2xl);
+      align-items: start;
+    }
+  }
+
+  /* left: intro */
+  .trusted-intro {
+    display: flex;
+    flex-direction: column;
+  }
+
+  @media (min-width: 900px) {
+    .trusted-intro {
+      position: sticky;
+      top: 120px;
+    }
+  }
+
   .trusted-header {
     display: flex;
     align-items: center;
@@ -1742,7 +1765,7 @@ clientEntries.sort((a, b) => a.data.order - b.data.order);
     display: inline-block;
     width: 48px;
     height: 2px;
-    background: #ee1c25;
+    background: var(--color-brand);
     flex-shrink: 0;
   }
 
@@ -1755,80 +1778,199 @@ clientEntries.sort((a, b) => a.data.order - b.data.order);
     color: var(--color-muted);
   }
 
-  /* doodle — desktop only, points down-right into the list */
-  .trusted-doodle {
-    display: none;
+  .trusted-count {
+    overflow: hidden;
+    font-size: clamp(6rem, 14vw, 12rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 0.9;
+    color: var(--color-foreground);
   }
 
-  @media (min-width: 768px) {
-    .trusted-doodle {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      margin-left: var(--space-sm);
-      pointer-events: none;
-      user-select: none;
-    }
+  .trusted-count span {
+    display: inline-block;
+    transform: translateY(100%);
+    transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  .trusted-doodle-note {
-    font-family: var(--font-mono);
-    font-size: 0.65rem;
+  .section-trusted.is-revealed .trusted-count span {
+    transform: translateY(0);
+  }
+
+  .trusted-underline {
+    display: block;
+    width: 140px;
+    height: 14px;
+    margin-top: var(--space-xs);
+    margin-bottom: var(--space-md);
+    overflow: visible;
+  }
+
+  .trusted-underline-path {
+    stroke-dasharray: 180;
+    stroke-dashoffset: 180;
+    transition: stroke-dashoffset 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.5s;
+  }
+
+  .section-trusted.is-revealed .trusted-underline-path {
+    stroke-dashoffset: 0;
+  }
+
+  .trusted-desc {
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
     color: var(--color-muted);
-    white-space: nowrap;
+    max-width: 26ch;
+    line-height: 1.5;
+    margin: 0;
   }
 
-  /* the list */
+  /* right: list */
   .trusted-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
-    column-gap: var(--space-xl);
     list-style: none;
     margin: 0;
     padding: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    column-gap: var(--space-xl);
   }
 
-  .trusted-item {
+  @media (min-width: 700px) {
+    .trusted-list {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .trusted-list li {
     position: relative;
-    display: block;
-    padding: 0.9rem 0 0.9rem 1rem;
-    border-top: 1px solid var(--color-border);
+    display: grid;
+    grid-template-columns: 3rem 1fr;
+    align-items: baseline;
+    padding: 1.1rem 0;
+    transition: opacity 250ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .trusted-list li::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--color-border);
+    transform-origin: left;
+    transform: scaleX(0);
+    transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+    transition-delay: calc(var(--i) * 30ms);
+  }
+
+  .section-trusted.is-revealed .trusted-list li::before {
+    transform: scaleX(1);
+  }
+
+  .trusted-list li > span {
+    opacity: 0;
+    transform: translateY(10px);
+    transition:
+      opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    transition-delay: calc(var(--i) * 30ms);
+  }
+
+  .section-trusted.is-revealed .trusted-list li > span {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .trusted-index {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--color-muted);
+    transition: color 250ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .trusted-name {
     font-family: var(--font-sans);
     font-weight: 500;
     font-size: clamp(1.05rem, 1.4vw, 1.25rem);
     line-height: 1.3;
     color: var(--color-foreground);
-    transition: opacity 250ms ease-out;
+    min-width: 0;
+    overflow-wrap: break-word;
+    transition: transform 250ms cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  /* 6px red dot in the reserved left padding (no layout shift) */
-  .trusted-item::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: calc(0.9rem + 0.65em);
-    transform: translateY(-50%);
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: #ee1c25;
-    opacity: 0;
-    transition: opacity 250ms ease-out;
-  }
-
-  /* hover interaction — only on pointer devices */
+  /* hover & focus-within */
   @media (hover: hover) {
     .trusted-list:has(li:hover) li:not(:hover) {
       opacity: 0.35;
     }
-    .trusted-item:hover::before {
-      opacity: 1;
+
+    .trusted-list li:hover .trusted-name {
+      transform: translateX(6px);
+      transition: transform 250ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .trusted-list li:hover .trusted-index {
+      color: var(--color-brand);
+      transition: color 250ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .trusted-list:hover li > span {
+      transition:
+        opacity 250ms cubic-bezier(0.16, 1, 0.3, 1),
+        transform 250ms cubic-bezier(0.16, 1, 0.3, 1),
+        color 250ms cubic-bezier(0.16, 1, 0.3, 1);
+      transition-delay: 0s;
     }
   }
 
+  .trusted-list:has(li:focus-within) li:not(:focus-within) {
+    opacity: 0.35;
+  }
+
+  .trusted-list li:focus-within .trusted-name {
+    transform: translateX(6px);
+    transition: transform 250ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .trusted-list li:focus-within .trusted-index {
+    color: var(--color-brand);
+    transition: color 250ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* reduced motion */
   @media (prefers-reduced-motion: reduce) {
-    .trusted-item,
-    .trusted-item::before {
+    .trusted-list li::before,
+    .section-trusted.is-revealed .trusted-list li::before {
+      transform: scaleX(1) !important;
+      transition: none !important;
+    }
+
+    .trusted-list li > span,
+    .section-trusted.is-revealed .trusted-list li > span {
+      opacity: 1 !important;
+      transform: none !important;
+      transition: none !important;
+    }
+
+    .trusted-count span,
+    .section-trusted.is-revealed .trusted-count span {
+      transform: none !important;
+      transition: none !important;
+    }
+
+    .trusted-underline-path,
+    .section-trusted.is-revealed .trusted-underline-path {
+      stroke-dashoffset: 0 !important;
+      transition: none !important;
+    }
+
+    .trusted-list li,
+    .trusted-name,
+    .trusted-index {
       transition: none !important;
     }
   }
