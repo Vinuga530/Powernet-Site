@@ -600,26 +600,51 @@ clientEntries.sort((a, b) => a.data.order - b.data.order);
 
   <!-- trusted by -->
   <section class="section-trusted scroll-reveal reveal-up">
-    <div class="container fade-in">
-      <span class="text-label trusted-label">Trusted By</span>
-    </div>
+    <div class="trusted-inner container">
 
-    <div class="trusted-marquee">
-      <div class="trusted-marquee-row trusted-marquee-row-left">
-        <div class="trusted-track">
-          {
-            clientEntries.map((entry) => (
-              <span class="trusted-card">{entry.data.name}</span>
-            ))
-          }
-          {
-            /* duplicated copy for seamless loop */
-            clientEntries.map((entry) => (
-              <span class="trusted-card" aria-hidden="true">{entry.data.name}</span>
-            ))
-          }
-        </div>
+      <div class="trusted-header">
+        <span class="trusted-rule" aria-hidden="true"></span>
+        <span class="trusted-meta">Selected clients &middot; {clientEntries.length}</span>
       </div>
+
+      <ul class="trusted-list">
+        {
+          clientEntries.map((entry) => (
+            <li class="trusted-item">{entry.data.name}</li>
+          ))
+        }
+      </ul>
+
+      <!-- hand-drawn doodle: arrow + note, desktop only, aria-hidden -->
+      <div class="trusted-doodle" aria-hidden="true">
+        <svg
+          width="72"
+          height="58"
+          viewBox="0 0 72 58"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
+        >
+          <!-- wobbly arrow shaft curving left-to-right then tip pointing down-right -->
+          <path
+            d="M8 6 C12 14, 28 10, 34 22 C40 34, 30 46, 44 52"
+            stroke="var(--color-muted)"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            fill="none"
+          />
+          <!-- arrowhead -->
+          <path
+            d="M44 52 L36 48 M44 52 L48 44"
+            stroke="var(--color-muted)"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            fill="none"
+          />
+        </svg>
+        <span class="trusted-doodle-note">and counting</span>
+      </div>
+
     </div>
   </section>
 
@@ -1701,84 +1726,117 @@ clientEntries.sort((a, b) => a.data.order - b.data.order);
     border-bottom: 1px solid var(--color-border);
   }
 
-  .trusted-label {
-    display: block;
+  .trusted-inner {
+    position: relative;
+    max-width: 60rem;
+  }
+
+  /* header: rule + label */
+  .trusted-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
     margin-bottom: var(--space-lg);
   }
 
-  .trusted-marquee {
-    position: relative;
-    width: 100%;
-    overflow: hidden;
-    -webkit-mask-image: linear-gradient(
-      90deg,
-      transparent,
-      #000 8%,
-      #000 92%,
-      transparent
-    );
-    mask-image: linear-gradient(
-      90deg,
-      transparent,
-      #000 8%,
-      #000 92%,
-      transparent
-    );
-    will-change: transform;
-  }
-
-  .trusted-marquee-row {
-    overflow: hidden;
-  }
-
-  .trusted-track {
-    display: flex;
-    align-items: center;
-    gap: var(--space-xl);
-    width: max-content;
-    will-change: transform;
-  }
-
-  .trusted-marquee-row-left .trusted-track {
-    animation: trusted-scroll-left 140s linear infinite;
-  }
-
-  .trusted-marquee-row:hover .trusted-track {
-    animation-play-state: paused;
-  }
-
-  @keyframes trusted-scroll-left {
-    from {
-      transform: translateX(0);
-    }
-    to {
-      transform: translateX(-50%);
-    }
-  }
-
-  .trusted-card {
+  .trusted-rule {
+    display: inline-block;
+    width: 48px;
+    height: 2px;
+    background: #ee1c25;
     flex-shrink: 0;
-    font-family: 'Roboto Mono', monospace;
-    font-size: 0.7rem;
+  }
+
+  .trusted-meta {
+    font-family: var(--font-mono);
+    font-size: var(--text-label);
     font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.1em;
     color: var(--color-muted);
-    white-space: nowrap;
-    padding: var(--space-sm) var(--space-lg);
-    border-left: 1px solid var(--color-border);
-    transition: color 0.2s ease;
   }
 
-  .trusted-card:hover,
-  .trusted-card:focus {
-    color: #ee1c25;
+  /* the list */
+  .trusted-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    line-height: 1.35;
+  }
+
+  .trusted-item {
+    display: inline;
+    font-family: var(--font-sans);
+    font-size: clamp(1.25rem, 2.6vw, 2.25rem);
+    font-weight: 500;
+    color: var(--color-foreground);
+    transition: opacity 250ms ease-out;
+  }
+
+  /* slash separator — trailing, so wrapped lines never start with a slash */
+  .trusted-item:not(:last-child)::after {
+    content: ' /';
+    display: inline;
+    margin: 0 0.35em;
+    color: var(--color-muted);
+    font-weight: 400;
+  }
+
+  /* red dot injected before the hovered item text */
+  .trusted-item::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #ee1c25;
+    vertical-align: middle;
+    margin-right: 0.3em;
+    opacity: 0;
+    transition: opacity 200ms ease-out;
+  }
+
+  /* hover interaction — only on pointer devices */
+  @media (hover: hover) {
+    .trusted-list:has(li:hover) .trusted-item:not(:hover) {
+      opacity: 0.35;
+    }
+    .trusted-item:hover::before {
+      opacity: 1;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .trusted-track {
-      animation: none !important;
+    .trusted-item,
+    .trusted-item::before {
+      transition: none !important;
     }
+  }
+
+  /* doodle — desktop only */
+  .trusted-doodle {
+    display: none;
+  }
+
+  @media (min-width: 768px) {
+    .trusted-doodle {
+      display: flex;
+      align-items: flex-start;
+      gap: 4px;
+      position: absolute;
+      right: 0;
+      top: 0;
+      pointer-events: none;
+      user-select: none;
+    }
+  }
+
+  .trusted-doodle-note {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--color-muted);
+    margin-top: 10px;
+    white-space: nowrap;
   }
 
   /* ===== location / map ===== */
@@ -2420,8 +2478,6 @@ clientEntries.sort((a, b) => a.data.order - b.data.order);
     /* targets */
     const heroBg = document.querySelector<HTMLElement>(".hero-bg");
     const ctaSection = document.querySelector<HTMLElement>(".section-cta");
-    const trustedSection =
-      document.querySelector<HTMLElement>(".section-trusted");
 
     if (!heroBg) return;
 
@@ -2437,21 +2493,6 @@ clientEntries.sort((a, b) => a.data.order - b.data.order);
         const sectionMid = rect.top + rect.height / 2 - window.innerHeight / 2;
         const offset = Math.max(-30, Math.min(30, sectionMid * 0.12));
         ctaSection.style.backgroundPosition = `center ${50 + offset * 0.5}%`;
-      }
-
-      /* trusted-by marquee — very gentle depth push */
-      if (trustedSection) {
-        const rect = trustedSection.getBoundingClientRect();
-        const vis = Math.max(
-          -20,
-          Math.min(
-            20,
-            (window.innerHeight / 2 - rect.top - rect.height / 2) * 0.08,
-          ),
-        );
-        const track =
-          trustedSection.querySelector<HTMLElement>(".trusted-marquee");
-        if (track) track.style.transform = `translate3d(0, ${vis}px, 0)`;
       }
 
       parallaxTicking = false;
@@ -2478,11 +2519,6 @@ clientEntries.sort((a, b) => a.data.order - b.data.order);
         parallaxEnabled = false;
         /* reset transforms */
         heroBg.style.transform = "";
-        if (trustedSection) {
-          const track =
-            trustedSection.querySelector<HTMLElement>(".trusted-marquee");
-          if (track) track.style.transform = "";
-        }
         window.removeEventListener("scroll", onScroll);
       } else if (!nowMobile && !parallaxEnabled && !prefersReduced) {
         parallaxEnabled = true;
@@ -2497,11 +2533,6 @@ clientEntries.sort((a, b) => a.data.order - b.data.order);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
       if (heroBg) heroBg.style.transform = "";
-      if (trustedSection) {
-        const track =
-          trustedSection.querySelector<HTMLElement>(".trusted-marquee");
-        if (track) track.style.transform = "";
-      }
     };
   };
 
