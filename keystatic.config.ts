@@ -7,9 +7,9 @@ export default config({
         kind: 'github',
         repo: 'Vinuga530/Powernet-Site',
         githubApp: {
-          name: process.env.KEYSTATIC_GITHUB_APP_SLUG ?? '',
-          clientId: process.env.KEYSTATIC_GITHUB_CLIENT_ID ?? '',
-          clientSecret: process.env.KEYSTATIC_GITHUB_CLIENT_SECRET ?? '',
+          name: import.meta.env.PUBLIC_KEYSTATIC_GITHUB_APP_SLUG ?? '',
+          clientId: import.meta.env.KEYSTATIC_GITHUB_CLIENT_ID ?? '',
+          clientSecret: import.meta.env.KEYSTATIC_GITHUB_CLIENT_SECRET ?? '',
         },
       },
 
