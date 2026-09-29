@@ -229,469 +229,473 @@ function fmtBytes(b) {
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 </head>
 <body>
-<div class="page-container">
 
-  <!-- TOP HEADER -->
-  <header class="header">
-    <div class="header-brand">
-      <a href="/admin/media" class="brand-link">
-        <span class="brand-badge">POWERNET</span>
-        <span class="brand-sep">/</span>
-        <span class="brand-sub">Media Library</span>
-      </a>
-      <span class="env-pill">{isDev ? 'Local Disk' : 'GitHub Main'}</span>
-    </div>
+  <!-- TOP HEADER MASTHEAD -->
+  <header class="header-bar">
+    <div class="header-inner">
+      <div class="header-brand">
+        <a href="/admin/media" class="brand-link">
+          <span class="brand-badge">POWERNET</span>
+          <span class="brand-sep">/</span>
+          <span class="brand-sub">Media Library</span>
+        </a>
+        <span class="env-pill">{isDev ? 'Local Workspace' : 'GitHub Production'}</span>
+      </div>
 
-    <div class="header-nav">
-      <a href="/keystatic" class="nav-btn">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="15 18 9 12 15 6"></polyline>
-        </svg>
-        <span>Keystatic CMS</span>
-      </a>
-      <a href="/" target="_blank" rel="noopener noreferrer" class="nav-btn">
-        <span>Live Site</span>
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-          <polyline points="15 3 21 3 21 9"></polyline>
-          <line x1="10" y1="14" x2="21" y2="3"></line>
-        </svg>
-      </a>
+      <div class="header-nav">
+        <a href="/keystatic" class="nav-btn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+          <span>Keystatic CMS</span>
+        </a>
+        <a href="/" target="_blank" rel="noopener noreferrer" class="nav-btn">
+          <span>Live Site</span>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+            <polyline points="15 3 21 3 21 9"></polyline>
+            <line x1="10" y1="14" x2="21" y2="3"></line>
+          </svg>
+        </a>
+      </div>
     </div>
   </header>
 
-  <!-- METRICS SUMMARY BANNER -->
-  <section class="metrics-bar">
-    <div class="metric-item">
-      <span class="metric-label">TOTAL MEDIA</span>
-      <div class="metric-value-wrap">
-        <span class="metric-num" id="statTotal">{totalCount}</span>
-        <span class="metric-sub" id="statTotalBytes">{fmtBytes(totalBytes)}</span>
-      </div>
-    </div>
+  <!-- MAIN VIEWPORT CONTAINER -->
+  <div class="page-container">
 
-    <div class="metric-item">
-      <span class="metric-label">LINKED IN CONTENT</span>
-      <div class="metric-value-wrap">
-        <span class="metric-num" id="statInUse">{inUseCount}</span>
-        <span class="metric-sub text-success">Active & Verified</span>
-      </div>
-    </div>
-
-    <div class="metric-item">
-      <span class="metric-label">ORPHANED ASSETS</span>
-      <div class="metric-value-wrap">
-        <span class="metric-num text-warning" id="statUnused">{unusedCount}</span>
-        <span class="metric-sub" id="statUnusedBytes">{fmtBytes(unusedBytes)} reclaimable</span>
-      </div>
-    </div>
-
-    <div class="metric-actions">
-      <button
-        type="button"
-        id="btnAutoCleanup"
-        class="action-btn action-btn-danger"
-        data-unused={unusedCount}
-        disabled={unusedCount === 0}
-        title="Permanently remove all unreferenced files from disk & git"
-      >
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="3 6 5 6 21 6"></polyline>
-          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-        </svg>
-        <span>Prune All Unused ({unusedCount})</span>
-      </button>
-    </div>
-  </section>
-
-  <!-- TOOLBAR: FILTER & ACTIONS -->
-  <section class="toolbar">
-    <div class="toolbar-filter-row">
-      <!-- CATEGORY PILLS -->
-      <nav class="category-tabs" aria-label="Media Categories">
-        <button class="tab-btn active" data-filter="all">
-          <span>All Media</span>
-          <span class="tab-count" id="countAll">{totalCount}</span>
-        </button>
-        <button class="tab-btn" data-filter="projects">
-          <span>Projects</span>
-          <span class="tab-count" id="countProjects">{projectsCount}</span>
-        </button>
-        <button class="tab-btn" data-filter="hero-media">
-          <span>Hero Media</span>
-          <span class="tab-count" id="countHero">{heroCount}</span>
-        </button>
-        <button class="tab-btn" data-filter="site-assets">
-          <span>Site Assets</span>
-          <span class="tab-count" id="countSiteAssets">{siteAssetsCount}</span>
-        </button>
-        <button class="tab-btn tab-btn-warning" data-filter="unused">
-          <span>Unreferenced</span>
-          <span class="tab-count" id="countUnused">{unusedCount}</span>
-        </button>
-      </nav>
-
-      <!-- SEARCH -->
-      <div class="search-wrap">
-        <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="11" cy="11" r="8"></circle>
-          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-        </svg>
-        <input type="text" id="searchInput" placeholder="Filter by name, subfolder or usage…" autocomplete="off" />
-        <button type="button" id="searchClear" class="search-clear" title="Clear filter" hidden>&times;</button>
+    <!-- METRICS SUMMARY BANNER -->
+    <section class="metrics-bar">
+      <div class="metric-item">
+        <span class="metric-label">TOTAL REPOSITORY ASSETS</span>
+        <div class="metric-value-wrap">
+          <span class="metric-num" id="statTotal">{totalCount}</span>
+          <span class="metric-sub" id="statTotalBytes">{fmtBytes(totalBytes)}</span>
+        </div>
       </div>
 
-      <!-- VIEW TOGGLE -->
-      <div class="view-toggle" role="group" aria-label="View format">
-        <button type="button" id="viewGridBtn" class="toggle-btn active" title="Grid cards view">
+      <div class="metric-item">
+        <span class="metric-label">LINKED IN CMS CONTENT</span>
+        <div class="metric-value-wrap">
+          <span class="metric-num text-success" id="statInUse">{inUseCount}</span>
+          <span class="metric-sub text-success-sub">Active & Verified</span>
+        </div>
+      </div>
+
+      <div class="metric-item">
+        <span class="metric-label">ORPHANED / UNREFERENCED</span>
+        <div class="metric-value-wrap">
+          <span class="metric-num text-warning" id="statUnused">{unusedCount}</span>
+          <span class="metric-sub" id="statUnusedBytes">{fmtBytes(unusedBytes)} reclaimable</span>
+        </div>
+      </div>
+
+      <div class="metric-actions">
+        <button
+          type="button"
+          id="btnAutoCleanup"
+          class="action-btn action-btn-danger"
+          data-unused={unusedCount}
+          disabled={unusedCount === 0}
+          title="Permanently remove all unreferenced files from disk and commit to GitHub"
+        >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="3" width="7" height="7"></rect>
-            <rect x="14" y="3" width="7" height="7"></rect>
-            <rect x="14" y="14" width="7" height="7"></rect>
-            <rect x="3" y="14" width="7" height="7"></rect>
-          </svg>
-        </button>
-        <button type="button" id="viewTableBtn" class="toggle-btn" title="Detailed table view">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="8" y1="6" x2="21" y2="6"></line>
-            <line x1="8" y1="12" x2="21" y2="12"></line>
-            <line x1="8" y1="18" x2="21" y2="18"></line>
-            <line x1="3" y1="6" x2="3.01" y2="6"></line>
-            <line x1="3" y1="12" x2="3.01" y2="12"></line>
-            <line x1="3" y1="18" x2="3.01" y2="18"></line>
-          </svg>
-        </button>
-      </div>
-    </div>
-
-    <!-- SELECTION ACTIONS ROW -->
-    <div class="selection-bar">
-      <div class="selection-status">
-        <label class="master-checkbox-label" title="Select / deselect all visible files">
-          <input type="checkbox" id="masterCheckbox" class="app-checkbox" />
-          <span class="sel-text"><span id="selCount">0</span> of <span id="visibleCount">{totalCount}</span> selected</span>
-        </label>
-        <button type="button" id="btnSelectUnusedOnly" class="text-link-btn">Select all unreferenced</button>
-      </div>
-
-      <div class="selection-buttons">
-        <button type="button" id="btnDeleteSelected" class="action-btn action-btn-danger" disabled>
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="3 6 5 6 21 6"></polyline>
             <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
           </svg>
-          <span>Delete Selected</span>
+          <span>Prune All Unused ({unusedCount})</span>
         </button>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- CONTENT VIEW AREA -->
-  <main class="content-area">
-    {mediaItems.length === 0 ? (
-      <div class="empty-state">
-        <div class="empty-icon">
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <rect x="3" y="3" width="18" height="18" rx="2"></rect>
-            <circle cx="8.5" cy="8.5" r="1.5"></circle>
-            <polyline points="21 15 16 10 5 21"></polyline>
-          </svg>
-        </div>
-        <h2 class="empty-title">No Media Assets Found</h2>
-        <p class="empty-desc">Uploaded images and videos for Projects, Hero, and Services will appear here.</p>
-        <a href="/keystatic" class="nav-btn nav-btn-primary">Return to Keystatic CMS</a>
-      </div>
-    ) : (
-      <>
-        <!-- GRID VIEW -->
-        <div class="media-grid" id="mediaGrid">
-          {mediaItems.map((item) => (
-            <article
-              class={`asset-card${!item.inUse ? ' is-unreferenced' : ''}`}
-              data-path={item.path}
-              data-name={item.name.toLowerCase()}
-              data-filename={item.fileName.toLowerCase()}
-              data-cat={item.category.toLowerCase().replace(/ /g, '-')}
-              data-inuse={item.inUse ? 'true' : 'false'}
-              data-size={item.size}
-              data-usedin={item.usedIn.join(' ').toLowerCase()}
-            >
-              <div class="card-thumb" data-preview-path={item.path} data-is-video={item.isVideo ? 'true' : 'false'} data-name={item.name}>
-                <label class="card-checkbox-label" onclick="event.stopPropagation();">
-                  <input type="checkbox" class="app-checkbox item-checkbox" value={item.path} />
-                </label>
-
-                {item.isVideo ? (
-                  <div class="video-container">
-                    <video src={item.path} muted playsinline preload="metadata" class="thumb-media"></video>
-                    <span class="video-badge">VIDEO</span>
-                  </div>
-                ) : (
-                  <img src={item.path} alt={item.name} loading="lazy" class="thumb-media" />
-                )}
-
-                <div class="thumb-overlay">
-                  <span class="preview-prompt">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <circle cx="11" cy="11" r="8"></circle>
-                      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                      <line x1="11" y1="8" x2="11" y2="14"></line>
-                      <line x1="8" y1="11" x2="14" y2="11"></line>
-                    </svg>
-                    <span>Preview</span>
-                  </span>
-                </div>
-
-                <div class="card-status-badge">
-                  {item.inUse ? (
-                    <span class="status-tag tag-success" title={`Referenced in: ${item.usedIn.join(', ')}`}>
-                      In Use
-                    </span>
-                  ) : (
-                    <span class="status-tag tag-warning" title="No active content references found. Safe to delete.">
-                      Unreferenced
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              <div class="card-details">
-                <div class="name-row">
-                  <span class="file-name" title={item.path}>{item.name}</span>
-                </div>
-
-                <div class="meta-row">
-                  <span class="meta-cat">{item.category}</span>
-                  <span class="meta-dot">&bull;</span>
-                  <span class="meta-ext">{item.ext}</span>
-                  <span class="meta-dot">&bull;</span>
-                  <span class="meta-size">{fmtBytes(item.size)}</span>
-                </div>
-
-                {item.inUse ? (
-                  <div class="usage-row" title={`Referenced in: ${item.usedIn.join(', ')}`}>
-                    <span class="usage-label">Used in:</span>
-                    <span class="usage-files">{item.usedIn.map((f) => f.split('/').pop()).join(', ')}</span>
-                  </div>
-                ) : (
-                  <div class="usage-row is-unused-note">
-                    <span>Not linked in content</span>
-                  </div>
-                )}
-
-                <div class="card-actions">
-                  <button type="button" class="btn-copy-path" data-copy-path={item.path} title="Copy public URL to clipboard">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                    </svg>
-                    <span>Copy Path</span>
-                  </button>
-                  <button type="button" class="btn-delete-card" data-delete-path={item.path} title={`Delete ${item.fileName}`}>
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <polyline points="3 6 5 6 21 6"></polyline>
-                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                    </svg>
-                  </button>
-                </div>
-              </div>
-            </article>
-          ))}
-        </div>
-
-        <!-- TABLE VIEW -->
-        <div class="media-table-wrap" id="mediaTable" hidden>
-          <table class="media-table">
-            <thead>
-              <tr>
-                <th class="th-chk"><span class="sr-only">Select</span></th>
-                <th class="th-preview">Preview</th>
-                <th class="th-file">Asset Name & Path</th>
-                <th class="th-cat">Category</th>
-                <th class="th-status">Content Reference</th>
-                <th class="th-size">Size</th>
-                <th class="th-actions">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {mediaItems.map((item) => (
-                <tr
-                  class={`table-row${!item.inUse ? ' is-unreferenced' : ''}`}
-                  data-path={item.path}
-                  data-name={item.name.toLowerCase()}
-                  data-filename={item.fileName.toLowerCase()}
-                  data-cat={item.category.toLowerCase().replace(/ /g, '-')}
-                  data-inuse={item.inUse ? 'true' : 'false'}
-                  data-size={item.size}
-                  data-usedin={item.usedIn.join(' ').toLowerCase()}
-                >
-                  <td class="td-chk">
-                    <input type="checkbox" class="app-checkbox item-checkbox" value={item.path} />
-                  </td>
-                  <td class="td-preview">
-                    <div class="table-thumb" data-preview-path={item.path} data-is-video={item.isVideo ? 'true' : 'false'} data-name={item.name}>
-                      {item.isVideo ? (
-                        <div class="table-video-icon">VIDEO</div>
-                      ) : (
-                        <img src={item.path} alt={item.name} loading="lazy" />
-                      )}
-                    </div>
-                  </td>
-                  <td class="td-file">
-                    <span class="table-file-name">{item.name}</span>
-                    <span class="table-file-path">{item.path}</span>
-                  </td>
-                  <td class="td-cat">
-                    <span class="table-cat-badge">{item.category}</span>
-                  </td>
-                  <td class="td-status">
-                    {item.inUse ? (
-                      <div class="table-usage-tag tag-success">
-                        <span class="status-indicator-dot"></span>
-                        <span>Used in {item.usedIn.map((f) => f.split('/').pop()).join(', ')}</span>
-                      </div>
-                    ) : (
-                      <div class="table-usage-tag tag-warning">
-                        <span class="status-indicator-dot"></span>
-                        <span>Unreferenced (safe to delete)</span>
-                      </div>
-                    )}
-                  </td>
-                  <td class="td-size">
-                    <span class="table-size-num">{fmtBytes(item.size)}</span>
-                  </td>
-                  <td class="td-actions">
-                    <div class="table-action-btns">
-                      <button type="button" class="btn-copy-path btn-table-act" data-copy-path={item.path} title="Copy public path">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                        </svg>
-                      </button>
-                      <button type="button" class="btn-table-act" data-preview-path={item.path} data-is-video={item.isVideo ? 'true' : 'false'} data-name={item.name} title="Inspect">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <circle cx="11" cy="11" r="8"></circle>
-                          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                        </svg>
-                      </button>
-                      <button type="button" class="btn-delete-card btn-table-act btn-table-danger" data-delete-path={item.path} title="Delete">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <polyline points="3 6 5 6 21 6"></polyline>
-                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                        </svg>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </>
-    )}
-  </main>
-</div>
-
-<!-- LIGHTBOX INSPECTOR MODAL -->
-<div id="lightbox" class="modal-backdrop" hidden>
-  <div class="lightbox-card" role="dialog" aria-modal="true" aria-labelledby="lbTitle">
-    <div class="lightbox-header">
-      <div class="lb-title-wrap">
-        <h3 id="lbTitle" class="lb-title">Asset Inspection</h3>
-        <span id="lbPath" class="lb-path"></span>
-      </div>
-      <button id="lbClose" class="modal-close-btn" title="Close inspector (Esc)">&times;</button>
-    </div>
-
-    <div class="lightbox-body">
-      <div class="lb-media-viewport" id="lbMediaWrap"></div>
-
-      <div class="lb-sidebar">
-        <h4 class="sidebar-heading">ASSET METADATA</h4>
-        <dl class="meta-dl">
-          <div class="dl-row">
-            <dt>Public Path</dt>
-            <dd id="lbMetaPath"></dd>
-          </div>
-          <div class="dl-row">
-            <dt>Category</dt>
-            <dd id="lbMetaCategory"></dd>
-          </div>
-          <div class="dl-row">
-            <dt>File Size</dt>
-            <dd id="lbMetaSize"></dd>
-          </div>
-          <div class="dl-row">
-            <dt>Status</dt>
-            <dd id="lbMetaStatus"></dd>
-          </div>
-        </dl>
-
-        <div class="sidebar-divider"></div>
-
-        <h4 class="sidebar-heading">REFERENCED IN</h4>
-        <div id="lbReferences" class="lb-references-list"></div>
-
-        <div class="sidebar-actions">
-          <button type="button" id="lbCopyBtn" class="action-btn action-btn-secondary">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-            </svg>
-            <span>Copy Public URL</span>
+    <!-- TOOLBAR: FILTER & ACTIONS -->
+    <section class="toolbar">
+      <div class="toolbar-filter-row">
+        <!-- CATEGORY PILLS -->
+        <nav class="category-tabs" aria-label="Media Categories">
+          <button class="tab-btn active" data-filter="all">
+            <span>All Media</span>
+            <span class="tab-count" id="countAll">{totalCount}</span>
           </button>
-          <a id="lbExternalLink" href="#" target="_blank" rel="noopener" class="action-btn action-btn-secondary">
-            <span>Open in Tab ↗</span>
-          </a>
-          <button type="button" id="lbDeleteBtn" class="action-btn action-btn-danger">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <button class="tab-btn" data-filter="projects">
+            <span>Projects</span>
+            <span class="tab-count" id="countProjects">{projectsCount}</span>
+          </button>
+          <button class="tab-btn" data-filter="hero-media">
+            <span>Hero Media</span>
+            <span class="tab-count" id="countHero">{heroCount}</span>
+          </button>
+          <button class="tab-btn" data-filter="site-assets">
+            <span>Site Assets</span>
+            <span class="tab-count" id="countSiteAssets">{siteAssetsCount}</span>
+          </button>
+          <button class="tab-btn tab-btn-warning" data-filter="unused">
+            <span>Unreferenced</span>
+            <span class="tab-count" id="countUnused">{unusedCount}</span>
+          </button>
+        </nav>
+
+        <!-- SEARCH -->
+        <div class="search-wrap">
+          <svg class="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="searchInput" placeholder="Filter by name, subfolder or usage…" autocomplete="off" />
+          <button type="button" id="searchClear" class="search-clear" title="Clear filter" hidden>&times;</button>
+        </div>
+
+        <!-- VIEW TOGGLE -->
+        <div class="view-toggle" role="group" aria-label="View format">
+          <button type="button" id="viewGridBtn" class="toggle-btn active" title="Grid cards view">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="7"></rect>
+              <rect x="14" y="3" width="7" height="7"></rect>
+              <rect x="14" y="14" width="7" height="7"></rect>
+              <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+          </button>
+          <button type="button" id="viewTableBtn" class="toggle-btn" title="Detailed table view">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="8" y1="6" x2="21" y2="6"></line>
+              <line x1="8" y1="12" x2="21" y2="12"></line>
+              <line x1="8" y1="18" x2="21" y2="18"></line>
+              <line x1="3" y1="6" x2="3.01" y2="6"></line>
+              <line x1="3" y1="12" x2="3.01" y2="12"></line>
+              <line x1="3" y1="18" x2="3.01" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- SELECTION ACTIONS ROW -->
+      <div class="selection-bar">
+        <div class="selection-status">
+          <label class="master-checkbox-label" title="Select / deselect all visible files">
+            <input type="checkbox" id="masterCheckbox" class="app-checkbox" />
+            <span class="sel-text"><span id="selCount">0</span> of <span id="visibleCount">{totalCount}</span> selected</span>
+          </label>
+          <button type="button" id="btnSelectUnusedOnly" class="text-link-btn">Select all unreferenced</button>
+        </div>
+
+        <div class="selection-buttons">
+          <button type="button" id="btnDeleteSelected" class="action-btn action-btn-danger" disabled>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="3 6 5 6 21 6"></polyline>
               <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
             </svg>
-            <span>Delete Asset</span>
+            <span>Delete Selected</span>
           </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTENT VIEW AREA -->
+    <main class="content-area">
+      {mediaItems.length === 0 ? (
+        <div class="empty-state">
+          <div class="empty-icon">
+            <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+              <circle cx="8.5" cy="8.5" r="1.5"></circle>
+              <polyline points="21 15 16 10 5 21"></polyline>
+            </svg>
+          </div>
+          <h2 class="empty-title">No Media Assets Found</h2>
+          <p class="empty-desc">Uploaded images and videos for Projects, Hero, and Services will appear here.</p>
+          <a href="/keystatic" class="nav-btn nav-btn-primary">Return to Keystatic CMS</a>
+        </div>
+      ) : (
+        <>
+          <!-- GRID VIEW -->
+          <div class="media-grid" id="mediaGrid">
+            {mediaItems.map((item) => (
+              <article
+                class={`asset-card${!item.inUse ? ' is-unreferenced' : ''}`}
+                data-path={item.path}
+                data-name={item.name.toLowerCase()}
+                data-filename={item.fileName.toLowerCase()}
+                data-cat={item.category.toLowerCase().replace(/ /g, '-')}
+                data-inuse={item.inUse ? 'true' : 'false'}
+                data-size={item.size}
+                data-usedin={item.usedIn.join(' ').toLowerCase()}
+              >
+                <div class="card-thumb" data-preview-path={item.path} data-is-video={item.isVideo ? 'true' : 'false'} data-name={item.name}>
+                  <label class="card-checkbox-label" onclick="event.stopPropagation();">
+                    <input type="checkbox" class="app-checkbox item-checkbox" value={item.path} />
+                  </label>
+
+                  {item.isVideo ? (
+                    <div class="video-container">
+                      <video src={item.path} muted playsinline preload="metadata" class="thumb-media"></video>
+                      <span class="video-badge">VIDEO</span>
+                    </div>
+                  ) : (
+                    <img src={item.path} alt={item.name} loading="lazy" class="thumb-media" />
+                  )}
+
+                  <div class="thumb-overlay">
+                    <span class="preview-prompt">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        <line x1="11" y1="8" x2="11" y2="14"></line>
+                        <line x1="8" y1="11" x2="14" y2="11"></line>
+                      </svg>
+                      <span>Inspect</span>
+                    </span>
+                  </div>
+
+                  <div class="card-status-badge">
+                    {item.inUse ? (
+                      <span class="status-tag tag-success" title={`Referenced in: ${item.usedIn.join(', ')}`}>
+                        In Use
+                      </span>
+                    ) : (
+                      <span class="status-tag tag-warning" title="No active content references found. Safe to delete.">
+                        Unreferenced
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div class="card-details">
+                  <div class="name-row">
+                    <span class="file-name" title={item.path}>{item.name}</span>
+                  </div>
+
+                  <div class="meta-row">
+                    <span class="meta-cat">{item.category}</span>
+                    <span class="meta-dot">&bull;</span>
+                    <span class="meta-ext">{item.ext}</span>
+                    <span class="meta-dot">&bull;</span>
+                    <span class="meta-size">{fmtBytes(item.size)}</span>
+                  </div>
+
+                  {item.inUse ? (
+                    <div class="usage-row" title={`Referenced in: ${item.usedIn.join(', ')}`}>
+                      <span class="usage-label">Used in:</span>
+                      <span class="usage-files">{item.usedIn.map((f) => f.split('/').pop()).join(', ')}</span>
+                    </div>
+                  ) : (
+                    <div class="usage-row is-unused-note">
+                      <span>Not linked in content</span>
+                    </div>
+                  )}
+
+                  <div class="card-actions">
+                    <button type="button" class="btn-copy-path" data-copy-path={item.path} title="Copy public URL to clipboard">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                      </svg>
+                      <span>Copy Path</span>
+                    </button>
+                    <button type="button" class="btn-delete-card" data-delete-path={item.path} title={`Delete ${item.fileName}`}>
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+
+          <!-- TABLE VIEW -->
+          <div class="media-table-wrap" id="mediaTable" hidden>
+            <table class="media-table">
+              <thead>
+                <tr>
+                  <th class="th-chk"><span class="sr-only">Select</span></th>
+                  <th class="th-preview">Preview</th>
+                  <th class="th-file">Asset Name & Public Path</th>
+                  <th class="th-cat">Category</th>
+                  <th class="th-status">Content Reference</th>
+                  <th class="th-size">Size</th>
+                  <th class="th-actions">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {mediaItems.map((item) => (
+                  <tr
+                    class={`table-row${!item.inUse ? ' is-unreferenced' : ''}`}
+                    data-path={item.path}
+                    data-name={item.name.toLowerCase()}
+                    data-filename={item.fileName.toLowerCase()}
+                    data-cat={item.category.toLowerCase().replace(/ /g, '-')}
+                    data-inuse={item.inUse ? 'true' : 'false'}
+                    data-size={item.size}
+                    data-usedin={item.usedIn.join(' ').toLowerCase()}
+                  >
+                    <td class="td-chk">
+                      <input type="checkbox" class="app-checkbox item-checkbox" value={item.path} />
+                    </td>
+                    <td class="td-preview">
+                      <div class="table-thumb" data-preview-path={item.path} data-is-video={item.isVideo ? 'true' : 'false'} data-name={item.name}>
+                        {item.isVideo ? (
+                          <div class="table-video-icon">VIDEO</div>
+                        ) : (
+                          <img src={item.path} alt={item.name} loading="lazy" />
+                        )}
+                      </div>
+                    </td>
+                    <td class="td-file">
+                      <span class="table-file-name">{item.name}</span>
+                      <span class="table-file-path">{item.path}</span>
+                    </td>
+                    <td class="td-cat">
+                      <span class="table-cat-badge">{item.category}</span>
+                    </td>
+                    <td class="td-status">
+                      {item.inUse ? (
+                        <div class="table-usage-tag tag-success">
+                          <span class="status-indicator-dot"></span>
+                          <span>Used in {item.usedIn.map((f) => f.split('/').pop()).join(', ')}</span>
+                        </div>
+                      ) : (
+                        <div class="table-usage-tag tag-warning">
+                          <span class="status-indicator-dot"></span>
+                          <span>Unreferenced (safe to delete)</span>
+                        </div>
+                      )}
+                    </td>
+                    <td class="td-size">
+                      <span class="table-size-num">{fmtBytes(item.size)}</span>
+                    </td>
+                    <td class="td-actions">
+                      <div class="table-action-btns">
+                        <button type="button" class="btn-copy-path btn-table-act" data-copy-path={item.path} title="Copy public path">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                          </svg>
+                        </button>
+                        <button type="button" class="btn-table-act" data-preview-path={item.path} data-is-video={item.isVideo ? 'true' : 'false'} data-name={item.name} title="Inspect">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                          </svg>
+                        </button>
+                        <button type="button" class="btn-delete-card btn-table-act btn-table-danger" data-delete-path={item.path} title="Delete">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                          </svg>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
+    </main>
+  </div>
+
+  <!-- LIGHTBOX INSPECTOR MODAL -->
+  <div id="lightbox" class="modal-backdrop" hidden>
+    <div class="lightbox-card" role="dialog" aria-modal="true" aria-labelledby="lbTitle">
+      <div class="lightbox-header">
+        <div class="lb-title-wrap">
+          <h3 id="lbTitle" class="lb-title">Asset Inspection</h3>
+          <span id="lbPath" class="lb-path"></span>
+        </div>
+        <button id="lbClose" class="modal-close-btn" title="Close inspector (Esc)">&times;</button>
+      </div>
+
+      <div class="lightbox-body">
+        <div class="lb-media-viewport" id="lbMediaWrap"></div>
+
+        <div class="lb-sidebar">
+          <h4 class="sidebar-heading">ASSET METADATA</h4>
+          <dl class="meta-dl">
+            <div class="dl-row">
+              <dt>Public Path</dt>
+              <dd id="lbMetaPath"></dd>
+            </div>
+            <div class="dl-row">
+              <dt>Category</dt>
+              <dd id="lbMetaCategory"></dd>
+            </div>
+            <div class="dl-row">
+              <dt>File Size</dt>
+              <dd id="lbMetaSize"></dd>
+            </div>
+            <div class="dl-row">
+              <dt>Usage Status</dt>
+              <dd id="lbMetaStatus"></dd>
+            </div>
+          </dl>
+
+          <div class="sidebar-divider"></div>
+
+          <h4 class="sidebar-heading">REFERENCED IN CONTENT</h4>
+          <div id="lbReferences" class="lb-references-list"></div>
+
+          <div class="sidebar-actions">
+            <button type="button" id="lbCopyBtn" class="action-btn action-btn-secondary">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              <span>Copy Public URL</span>
+            </button>
+            <a id="lbExternalLink" href="#" target="_blank" rel="noopener" class="action-btn action-btn-secondary">
+              <span>Open in New Tab ↗</span>
+            </a>
+            <button type="button" id="lbDeleteBtn" class="action-btn action-btn-danger">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+              <span>Delete Asset</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
 
-<!-- CONFIRMATION MODAL -->
-<div id="confirmModal" class="modal-backdrop" hidden>
-  <div class="confirm-card" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle">
-    <div class="confirm-icon-wrap">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-        <line x1="12" y1="9" x2="12" y2="13"></line>
-        <line x1="12" y1="17" x2="12.01" y2="17"></line>
-      </svg>
-    </div>
-    <h3 id="confirmTitle" class="confirm-title">Delete Media Assets</h3>
-    <p id="confirmMessage" class="confirm-text">This will permanently delete the selected file(s) from local storage and commit the deletion to GitHub.</p>
+  <!-- CONFIRMATION MODAL -->
+  <div id="confirmModal" class="modal-backdrop" hidden>
+    <div class="confirm-card" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle">
+      <div class="confirm-icon-wrap">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+          <line x1="12" y1="9" x2="12" y2="13"></line>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+      </div>
+      <h3 id="confirmTitle" class="confirm-title">Delete Media Assets</h3>
+      <p id="confirmMessage" class="confirm-text">This will permanently delete the selected file(s) from local storage and commit the deletion to GitHub.</p>
 
-    <div id="confirmWarningInUse" class="confirm-warning-box" hidden>
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="12" cy="12" r="10"></circle>
-        <line x1="12" y1="8" x2="12" y2="12"></line>
-        <line x1="12" y1="16" x2="12.01" y2="16"></line>
-      </svg>
-      <div>
-        <strong>Warning: Content Dependency</strong>
-        <p>One or more selected files are actively referenced on the website. Deleting them will cause broken images or missing video playback.</p>
+      <div id="confirmWarningInUse" class="confirm-warning-box" hidden>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <div>
+          <strong>Warning: Content Dependency</strong>
+          <p>One or more selected files are actively referenced on the website. Deleting them will cause broken images or missing video playback.</p>
+        </div>
+      </div>
+
+      <div class="confirm-file-preview" id="confirmFileList"></div>
+
+      <div class="confirm-buttons">
+        <button type="button" id="confirmCancelBtn" class="action-btn action-btn-secondary">Cancel</button>
+        <button type="button" id="confirmOkBtn" class="action-btn action-btn-danger">Yes, Permanently Delete</button>
       </div>
     </div>
-
-    <div class="confirm-file-preview" id="confirmFileList"></div>
-
-    <div class="confirm-buttons">
-      <button type="button" id="confirmCancelBtn" class="action-btn action-btn-secondary">Cancel</button>
-      <button type="button" id="confirmOkBtn" class="action-btn action-btn-danger">Yes, Permanently Delete</button>
-    </div>
   </div>
-</div>
 
-<!-- TOAST CONTAINER -->
-<div id="toast" class="toast-notification" role="status" aria-live="polite"></div>
+  <!-- TOAST CONTAINER -->
+  <div id="toast" class="toast-notification" role="status" aria-live="polite"></div>
 
 <script>
   // DOM Elements
@@ -784,6 +788,7 @@ function fmtBytes(b) {
   function applyFilters() {
     let visibleCount = 0;
     const items = allItems();
+
     items.forEach((card) => {
       const pathVal = card.dataset.path || '';
       const row = document.querySelector(`.table-row[data-path="${pathVal}"]`);
@@ -961,7 +966,7 @@ function fmtBytes(b) {
   // Master Checkbox
   masterCheckbox?.addEventListener('change', (e) => {
     const isChecked = e.target.checked;
-    allItems().forEach((card, idx) => {
+    allItems().forEach((card) => {
       if (card.style.display !== 'none') {
         const pathVal = card.dataset.path;
         document.querySelectorAll(`.item-checkbox[value="${pathVal}"]`).forEach((cb) => {
@@ -993,7 +998,6 @@ function fmtBytes(b) {
       await navigator.clipboard.writeText(pathVal);
       showToast(`Copied "${pathVal}" to clipboard`, 'success');
     } catch {
-      // Fallback
       const ta = document.createElement('textarea');
       ta.value = pathVal;
       document.body.appendChild(ta);
@@ -1112,7 +1116,6 @@ function fmtBytes(b) {
   function openConfirm(paths) {
     if (!confirmModal || !paths.length) return Promise.resolve(false);
 
-    // Check if any in-use
     let hasInUse = false;
     paths.forEach((p) => {
       const c = document.querySelector(`.asset-card[data-path="${p}"]`);
@@ -1245,7 +1248,7 @@ function fmtBytes(b) {
 </script>
 
 <style>
-/* ─── RESET & CSS VARIABLES ──────────────────────────────── */
+/* ─── RESET & COMFORTABLE TONAL SYSTEM ───────────────────── */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -1253,26 +1256,39 @@ function fmtBytes(b) {
 }
 
 :root {
-  --bg-page: #f8f9fa;
+  /* Warm-slate eye-friendly canvas (eliminates snow-blindness) */
+  --bg-page: #edf0f5;
   --bg-surface: #ffffff;
-  --bg-surface-hover: #f4f4f5;
-  --bg-surface-subtle: #f9fafb;
-  --border-color: #e4e4e7;
-  --border-subtle: #f0f0f2;
-  --border-strong: #d4d4d8;
-  --text-main: #09090b;
-  --text-muted: #71717a;
-  --text-dim: #a1a1aa;
+  --bg-surface-hover: #f8fafc;
+  --bg-surface-subtle: #f1f4f9;
+  --bg-surface-inset: #e2e6ee;
+  
+  /* Crisp, defined borders for architectural separation */
+  --border-color: #d1d7e2;
+  --border-subtle: #e2e7ef;
+  --border-strong: #94a3b8;
+
+  /* Rich high-contrast typography (comfortable to read) */
+  --text-main: #0f172a;        /* Deep slate-black */
+  --text-body: #334155;        /* Clear slate body */
+  --text-muted: #475569;       /* High-contrast secondary text */
+  --text-dim: #64748b;
+
+  /* Powernet Brand Crimson */
   --brand-color: #d32f2f;
   --brand-dark: #b71c1c;
   --brand-light: #fef2f2;
   --brand-border: #fecaca;
-  --success-color: #15803d;
-  --success-bg: #f0fdf4;
-  --success-border: #bbf7d0;
-  --warning-color: #b45309;
-  --warning-bg: #fffbeb;
-  --warning-border: #fde68a;
+
+  /* Status Colors */
+  --success-color: #166534;
+  --success-bg: #ecfdf5;
+  --success-border: #a7f3d0;
+  
+  --warning-color: #92400e;
+  --warning-bg: #fef3c7;
+  --warning-border: #fcd34d;
+
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'Roboto Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
 }
@@ -1286,20 +1302,23 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-.page-container {
-  max-width: 1480px;
-  margin: 0 auto;
-  padding: 0 24px 60px;
+/* ─── ANCHORED MASTHEAD HEADER BAR ───────────────────────── */
+.header-bar {
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+  position: sticky;
+  top: 0;
+  z-index: 50;
 }
 
-/* ─── HEADER ──────────────────────────────────────────────── */
-.header {
+.header-inner {
+  max-width: 1480px;
+  margin: 0 auto;
+  padding: 14px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 24px 0 20px;
-  border-bottom: 1px solid var(--border-color);
-  margin-bottom: 24px;
   flex-wrap: wrap;
   gap: 16px;
 }
@@ -1320,14 +1339,14 @@ body {
 
 .brand-badge {
   font-size: 0.85rem;
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: 0.08em;
   color: var(--brand-color);
 }
 
 .brand-sep {
   color: var(--border-strong);
-  font-weight: 300;
+  font-weight: 400;
 }
 
 .brand-sub {
@@ -1340,9 +1359,9 @@ body {
 .env-pill {
   font-family: var(--font-mono);
   font-size: 0.68rem;
-  font-weight: 500;
-  padding: 2px 8px;
-  background: var(--bg-surface-hover);
+  font-weight: 600;
+  padding: 3px 9px;
+  background: var(--bg-surface-subtle);
   color: var(--text-muted);
   border: 1px solid var(--border-color);
   border-radius: 4px;
@@ -1361,17 +1380,19 @@ body {
   padding: 7px 14px;
   border-radius: 6px;
   font-size: 0.82rem;
-  font-weight: 500;
+  font-weight: 600;
   text-decoration: none;
-  color: var(--text-main);
-  background: var(--bg-surface);
+  color: var(--text-body);
+  background: var(--bg-surface-subtle);
   border: 1px solid var(--border-color);
   transition: all 0.15s ease;
 }
 
 .nav-btn:hover {
-  background: var(--bg-surface-hover);
+  background: var(--bg-surface);
+  color: var(--text-main);
   border-color: var(--border-strong);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
 }
 
 .nav-btn-primary {
@@ -1386,29 +1407,43 @@ body {
   color: #ffffff;
 }
 
+/* ─── PAGE CONTAINER ──────────────────────────────────────── */
+.page-container {
+  max-width: 1480px;
+  margin: 0 auto;
+  padding: 24px 24px 60px;
+}
+
 /* ─── METRICS BAR ─────────────────────────────────────────── */
 .metrics-bar {
   display: grid;
-  grid-template-columns: repeat(3, minmax(180px, 1fr)) auto;
-  gap: 16px;
+  grid-template-columns: repeat(3, minmax(200px, 1fr)) auto;
+  gap: 20px;
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 18px 24px;
+  border-radius: 10px;
+  padding: 20px 24px;
   margin-bottom: 24px;
   align-items: center;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04), 0 1px 2px rgba(15, 23, 42, 0.02);
 }
 
 .metric-item {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  border-right: 1px solid var(--border-subtle);
+  padding-right: 20px;
+}
+
+.metric-item:nth-child(3) {
+  border-right: none;
 }
 
 .metric-label {
   font-size: 0.68rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  font-weight: 700;
+  letter-spacing: 0.06em;
   color: var(--text-muted);
   text-transform: uppercase;
 }
@@ -1421,19 +1456,21 @@ body {
 
 .metric-num {
   font-family: var(--font-mono);
-  font-size: 1.8rem;
+  font-size: 1.9rem;
   font-weight: 700;
   color: var(--text-main);
-  line-height: 1;
+  line-height: 1.1;
 }
 
 .metric-sub {
   font-size: 0.8rem;
   color: var(--text-muted);
   font-family: var(--font-mono);
+  font-weight: 500;
 }
 
 .text-success { color: var(--success-color); }
+.text-success-sub { color: #15803d; font-family: var(--font-sans); }
 .text-warning { color: var(--warning-color); }
 
 .metric-actions {
@@ -1449,7 +1486,7 @@ body {
   padding: 8px 16px;
   border-radius: 6px;
   font-size: 0.82rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   border: 1px solid transparent;
   transition: all 0.15s ease;
@@ -1504,21 +1541,22 @@ body {
   display: inline-flex;
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
-  border-radius: 6px;
-  padding: 3px;
-  gap: 2px;
+  border-radius: 8px;
+  padding: 4px;
+  gap: 3px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
 }
 
 .tab-btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 5px 12px;
-  border-radius: 4px;
+  gap: 7px;
+  padding: 6px 13px;
+  border-radius: 5px;
   border: none;
   background: transparent;
   color: var(--text-muted);
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.14s ease;
@@ -1526,36 +1564,39 @@ body {
 
 .tab-btn:hover {
   color: var(--text-main);
+  background: var(--bg-surface-subtle);
 }
 
 .tab-btn.active {
-  background: var(--bg-page);
-  color: var(--text-main);
+  background: #0f172a;
+  color: #ffffff;
   font-weight: 600;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12);
 }
 
 .tab-count {
   font-family: var(--font-mono);
-  font-size: 0.7rem;
-  background: var(--bg-surface-hover);
-  padding: 1px 5px;
-  border-radius: 3px;
-  color: var(--text-muted);
+  font-size: 0.72rem;
+  background: var(--bg-surface-inset);
+  padding: 1px 6px;
+  border-radius: 4px;
+  color: var(--text-main);
+  font-weight: 600;
 }
 
 .tab-btn.active .tab-count {
-  background: #ffffff;
-  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
 }
 
 .tab-btn-warning.active {
-  color: var(--warning-color);
+  background: #92400e;
+  color: #ffffff;
 }
 
 .tab-btn-warning.active .tab-count {
-  color: var(--warning-color);
-  background: var(--warning-bg);
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.25);
 }
 
 .search-wrap {
@@ -1563,19 +1604,22 @@ body {
   align-items: center;
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
-  border-radius: 6px;
+  border-radius: 8px;
   padding: 0 12px;
-  height: 34px;
+  height: 38px;
   position: relative;
-  min-width: 280px;
+  min-width: 300px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .search-wrap:focus-within {
-  border-color: var(--text-main);
+  border-color: #0f172a;
+  box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.06);
 }
 
 .search-icon {
-  color: var(--text-muted);
+  color: var(--text-dim);
   margin-right: 8px;
   flex-shrink: 0;
 }
@@ -1585,7 +1629,7 @@ body {
   outline: none;
   background: transparent;
   color: var(--text-main);
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   width: 100%;
 }
 
@@ -1596,27 +1640,32 @@ body {
 .search-clear {
   background: transparent;
   border: none;
-  color: var(--text-muted);
-  font-size: 1.1rem;
+  color: var(--text-dim);
+  font-size: 1.15rem;
   line-height: 1;
   cursor: pointer;
   padding: 2px 4px;
+}
+
+.search-clear:hover {
+  color: var(--text-main);
 }
 
 .view-toggle {
   display: inline-flex;
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
-  border-radius: 6px;
-  padding: 2px;
+  border-radius: 8px;
+  padding: 3px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
 }
 
 .toggle-btn {
   background: transparent;
   border: none;
-  border-radius: 4px;
-  padding: 5px 8px;
-  color: var(--text-muted);
+  border-radius: 5px;
+  padding: 6px 10px;
+  color: var(--text-dim);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -1625,11 +1674,12 @@ body {
 
 .toggle-btn:hover {
   color: var(--text-main);
+  background: var(--bg-surface-subtle);
 }
 
 .toggle-btn.active {
-  background: var(--bg-page);
-  color: var(--text-main);
+  background: #0f172a;
+  color: #ffffff;
 }
 
 /* ─── SELECTION ROW ───────────────────────────────────────── */
@@ -1639,9 +1689,10 @@ body {
   justify-content: space-between;
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
-  border-radius: 6px;
-  padding: 9px 16px;
-  font-size: 0.8rem;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-size: 0.82rem;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
 }
 
 .selection-status {
@@ -1653,13 +1704,13 @@ body {
 .master-checkbox-label {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 9px;
   cursor: pointer;
   user-select: none;
 }
 
 .sel-text {
-  font-weight: 500;
+  font-weight: 600;
   color: var(--text-main);
 }
 
@@ -1667,11 +1718,11 @@ body {
   background: transparent;
   border: none;
   color: var(--brand-color);
-  font-size: 0.78rem;
-  font-weight: 500;
+  font-size: 0.8rem;
+  font-weight: 600;
   cursor: pointer;
   text-decoration: underline;
-  text-underline-offset: 2px;
+  text-underline-offset: 3px;
 }
 
 .text-link-btn:hover {
@@ -1682,10 +1733,10 @@ body {
 .app-checkbox {
   appearance: none;
   -webkit-appearance: none;
-  width: 16px;
-  height: 16px;
-  border: 1.5px solid var(--border-strong);
-  border-radius: 3px;
+  width: 17px;
+  height: 17px;
+  border: 2px solid var(--border-strong);
+  border-radius: 4px;
   background: #ffffff;
   outline: none;
   cursor: pointer;
@@ -1704,9 +1755,9 @@ body {
   content: '';
   position: absolute;
   left: 4px;
-  top: 1.5px;
-  width: 4px;
-  height: 8px;
+  top: 1px;
+  width: 5px;
+  height: 9px;
   border: 2px solid #ffffff;
   border-top: none;
   border-left: none;
@@ -1731,33 +1782,35 @@ body {
 /* ─── MEDIA GRID ──────────────────────────────────────────── */
 .media-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 18px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
 }
 
 .asset-card {
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: 10px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
   position: relative;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04), 0 1px 2px rgba(15, 23, 42, 0.02);
 }
 
 .asset-card:hover {
   border-color: var(--border-strong);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  transform: translateY(-2px);
 }
 
 .asset-card.is-selected {
   border-color: var(--brand-color);
-  box-shadow: 0 0 0 1px var(--brand-color);
+  box-shadow: 0 0 0 2px var(--brand-color);
 }
 
 .asset-card.is-unreferenced {
-  border-color: #f3e8b5;
+  border-color: #f6d892;
 }
 
 /* Thumbnail container */
@@ -1765,7 +1818,8 @@ body {
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 10;
-  background: #f1f2f4;
+  background: var(--bg-surface-inset);
+  border-bottom: 1px solid var(--border-subtle);
   overflow: hidden;
   cursor: pointer;
 }
@@ -1781,32 +1835,32 @@ body {
   width: 100%;
   height: 100%;
   position: relative;
-  background: #111;
+  background: #0f172a;
 }
 
 .video-badge {
   position: absolute;
   bottom: 8px;
   left: 8px;
-  background: rgba(0,0,0,0.75);
+  background: rgba(15, 23, 42, 0.85);
   color: #ffffff;
   font-family: var(--font-mono);
   font-size: 0.62rem;
-  font-weight: 600;
-  padding: 2px 6px;
-  border-radius: 3px;
-  letter-spacing: 0.05em;
+  font-weight: 700;
+  padding: 3px 7px;
+  border-radius: 4px;
+  letter-spacing: 0.06em;
 }
 
 .card-checkbox-label {
   position: absolute;
-  top: 8px;
-  left: 8px;
+  top: 9px;
+  left: 9px;
   z-index: 5;
-  background: rgba(255,255,255,0.9);
+  background: rgba(255, 255, 255, 0.95);
   padding: 4px;
-  border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  border-radius: 5px;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.12);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1814,18 +1868,19 @@ body {
 
 .card-status-badge {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: 9px;
+  right: 9px;
   z-index: 4;
 }
 
 .status-tag {
-  font-size: 0.65rem;
-  font-weight: 600;
-  padding: 3px 7px;
-  border-radius: 4px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 5px;
   letter-spacing: 0.02em;
   display: inline-block;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
 }
 
 .tag-success {
@@ -1843,7 +1898,7 @@ body {
 .thumb-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0,0,0,0.25);
+  background: rgba(15, 23, 42, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1858,22 +1913,22 @@ body {
 .preview-prompt {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   background: #ffffff;
-  color: var(--text-main);
-  padding: 5px 10px;
-  border-radius: 4px;
-  font-size: 0.72rem;
-  font-weight: 600;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  color: #0f172a;
+  padding: 6px 12px;
+  border-radius: 5px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
 }
 
 /* Card details */
 .card-details {
-  padding: 12px 14px 14px;
+  padding: 14px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   flex: 1;
 }
 
@@ -1884,54 +1939,60 @@ body {
 }
 
 .file-name {
-  font-size: 0.82rem;
-  font-weight: 600;
+  font-size: 0.85rem;
+  font-weight: 700;
   color: var(--text-main);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  letter-spacing: -0.01em;
 }
 
 .meta-row {
   display: flex;
   align-items: center;
-  gap: 5px;
-  font-size: 0.72rem;
+  gap: 6px;
+  font-size: 0.74rem;
   color: var(--text-muted);
 }
 
 .meta-cat {
-  font-weight: 500;
+  font-weight: 600;
+  color: var(--text-body);
 }
 
 .meta-ext {
   font-family: var(--font-mono);
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-main);
 }
 
 .meta-size {
   font-family: var(--font-mono);
+  color: var(--text-dim);
 }
 
 .meta-dot {
-  color: var(--border-strong);
+  color: var(--border-color);
 }
 
 .usage-row {
   display: flex;
   align-items: center;
-  gap: 4px;
-  font-size: 0.7rem;
-  color: var(--text-muted);
+  gap: 6px;
+  font-size: 0.72rem;
+  color: var(--text-body);
+  background: var(--bg-surface-subtle);
+  border: 1px solid var(--border-subtle);
+  padding: 5px 8px;
+  border-radius: 5px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  padding-top: 2px;
 }
 
 .usage-label {
-  font-weight: 500;
+  font-weight: 700;
   color: var(--text-main);
   flex-shrink: 0;
 }
@@ -1940,11 +2001,14 @@ body {
   font-family: var(--font-mono);
   overflow: hidden;
   text-overflow: ellipsis;
+  color: var(--text-body);
 }
 
 .is-unused-note {
+  background: var(--warning-bg);
+  border-color: var(--warning-border);
   color: var(--warning-color);
-  font-style: italic;
+  font-weight: 600;
 }
 
 .card-actions {
@@ -1952,7 +2016,7 @@ body {
   align-items: center;
   justify-content: space-between;
   margin-top: 6px;
-  padding-top: 8px;
+  padding-top: 10px;
   border-top: 1px solid var(--border-subtle);
 }
 
@@ -1960,28 +2024,29 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  background: var(--bg-surface-hover);
+  background: var(--bg-surface-subtle);
   border: 1px solid var(--border-color);
-  border-radius: 4px;
-  padding: 4px 8px;
-  font-size: 0.72rem;
-  font-weight: 500;
-  color: var(--text-main);
+  border-radius: 5px;
+  padding: 5px 9px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--text-body);
   cursor: pointer;
   transition: all 0.12s ease;
 }
 
 .btn-copy-path:hover {
-  background: var(--bg-page);
-  border-color: var(--border-strong);
+  background: #0f172a;
+  color: #ffffff;
+  border-color: #0f172a;
 }
 
 .btn-delete-card {
   background: transparent;
-  border: 1px solid transparent;
-  border-radius: 4px;
-  padding: 4px;
-  color: var(--text-muted);
+  border: 1px solid var(--border-subtle);
+  border-radius: 5px;
+  padding: 5px;
+  color: var(--text-dim);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -1999,21 +2064,22 @@ body {
 .media-table-wrap {
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: 10px;
   overflow-x: auto;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
 }
 
 .media-table {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
-  font-size: 0.8rem;
+  font-size: 0.82rem;
 }
 
 .media-table th {
-  padding: 10px 14px;
-  font-size: 0.68rem;
-  font-weight: 600;
+  padding: 12px 16px;
+  font-size: 0.7rem;
+  font-weight: 700;
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -2022,7 +2088,7 @@ body {
 }
 
 .media-table td {
-  padding: 10px 14px;
+  padding: 12px 16px;
   border-bottom: 1px solid var(--border-subtle);
   vertical-align: middle;
 }
@@ -2031,25 +2097,30 @@ body {
   border-bottom: none;
 }
 
+.media-table tr:hover td {
+  background: var(--bg-surface-hover);
+}
+
 .media-table tr.is-selected td {
   background: var(--brand-light);
 }
 
 .th-chk, .td-chk {
-  width: 32px;
+  width: 34px;
   text-align: center;
   padding-right: 0;
 }
 
 .th-preview, .td-preview {
-  width: 50px;
+  width: 54px;
 }
 
 .table-thumb {
-  width: 40px;
-  height: 40px;
-  border-radius: 4px;
-  background: #eee;
+  width: 44px;
+  height: 44px;
+  border-radius: 6px;
+  background: var(--bg-surface-inset);
+  border: 1px solid var(--border-color);
   overflow: hidden;
   cursor: pointer;
 }
@@ -2064,44 +2135,47 @@ body {
 .table-video-icon {
   width: 100%;
   height: 100%;
-  background: #111;
+  background: #0f172a;
   color: #fff;
-  font-size: 0.55rem;
+  font-size: 0.58rem;
   font-family: var(--font-mono);
+  font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .table-file-name {
-  font-weight: 600;
+  font-weight: 700;
   display: block;
   color: var(--text-main);
 }
 
 .table-file-path {
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   color: var(--text-muted);
   display: block;
 }
 
 .table-cat-badge {
-  font-size: 0.72rem;
-  font-weight: 500;
-  background: var(--bg-surface-hover);
-  padding: 2px 7px;
-  border-radius: 4px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  background: var(--bg-surface-subtle);
+  padding: 3px 8px;
+  border-radius: 5px;
   border: 1px solid var(--border-color);
+  color: var(--text-body);
 }
 
 .table-usage-tag {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.72rem;
-  padding: 2px 8px;
-  border-radius: 4px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 5px;
 }
 
 .status-indicator-dot {
@@ -2114,19 +2188,20 @@ body {
 .table-size-num {
   font-family: var(--font-mono);
   color: var(--text-muted);
+  font-weight: 500;
 }
 
 .table-action-btns {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
 }
 
 .btn-table-act {
-  background: transparent;
+  background: var(--bg-surface-subtle);
   border: 1px solid var(--border-color);
-  border-radius: 4px;
-  padding: 5px;
+  border-radius: 5px;
+  padding: 6px;
   color: var(--text-muted);
   cursor: pointer;
   display: flex;
@@ -2135,8 +2210,9 @@ body {
 }
 
 .btn-table-act:hover {
-  background: var(--bg-surface-hover);
+  background: var(--bg-surface);
   color: var(--text-main);
+  border-color: var(--border-strong);
 }
 
 .btn-table-danger:hover {
@@ -2151,11 +2227,12 @@ body {
   padding: 80px 20px;
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 12px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
 }
 
 .empty-icon {
@@ -2163,24 +2240,24 @@ body {
 }
 
 .empty-title {
-  font-size: 1.1rem;
-  font-weight: 600;
+  font-size: 1.15rem;
+  font-weight: 700;
   color: var(--text-main);
 }
 
 .empty-desc {
-  font-size: 0.85rem;
+  font-size: 0.88rem;
   color: var(--text-muted);
-  max-width: 360px;
+  max-width: 380px;
 }
 
 /* ─── MODAL STYLES ────────────────────────────────────────── */
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(9, 9, 11, 0.6);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
   z-index: 200;
   display: flex;
   align-items: center;
@@ -2204,13 +2281,13 @@ body {
 .lightbox-card {
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
-  border-radius: 10px;
+  border-radius: 12px;
   width: 100%;
-  max-width: 960px;
+  max-width: 980px;
   max-height: 90vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+  box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
   overflow: hidden;
 }
 
@@ -2218,8 +2295,9 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 20px;
+  padding: 16px 22px;
   border-bottom: 1px solid var(--border-color);
+  background: #ffffff;
 }
 
 .lb-title-wrap {
@@ -2229,22 +2307,23 @@ body {
 }
 
 .lb-title {
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-main);
 }
 
 .lb-path {
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   color: var(--text-muted);
 }
 
 .modal-close-btn {
   background: transparent;
   border: none;
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   line-height: 1;
-  color: var(--text-muted);
+  color: var(--text-dim);
   cursor: pointer;
   padding: 4px 8px;
 }
@@ -2255,7 +2334,7 @@ body {
 
 .lightbox-body {
   display: grid;
-  grid-template-columns: 1fr 300px;
+  grid-template-columns: 1fr 310px;
   overflow: hidden;
   height: calc(80vh - 60px);
 }
@@ -2276,7 +2355,7 @@ body {
 }
 
 .lb-sidebar {
-  padding: 20px;
+  padding: 22px;
   border-left: 1px solid var(--border-color);
   background: var(--bg-surface-subtle);
   overflow-y: auto;
@@ -2286,8 +2365,8 @@ body {
 }
 
 .sidebar-heading {
-  font-size: 0.65rem;
-  font-weight: 700;
+  font-size: 0.68rem;
+  font-weight: 800;
   letter-spacing: 0.08em;
   color: var(--text-muted);
 }
@@ -2295,7 +2374,7 @@ body {
 .meta-dl {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .dl-row {
@@ -2305,14 +2384,15 @@ body {
 }
 
 .dl-row dt {
-  font-size: 0.68rem;
+  font-size: 0.7rem;
+  font-weight: 600;
   color: var(--text-muted);
 }
 
 .dl-row dd {
   font-family: var(--font-mono);
-  font-size: 0.78rem;
-  font-weight: 500;
+  font-size: 0.8rem;
+  font-weight: 600;
   color: var(--text-main);
   word-break: break-all;
 }
@@ -2325,18 +2405,18 @@ body {
 .lb-references-list {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 7px;
 }
 
 .ref-badge {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 0.72rem;
+  gap: 7px;
+  font-size: 0.74rem;
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
-  padding: 4px 8px;
-  border-radius: 4px;
+  padding: 5px 9px;
+  border-radius: 5px;
 }
 
 .ref-dot {
@@ -2351,27 +2431,27 @@ body {
   flex-direction: column;
   gap: 8px;
   margin-top: auto;
-  padding-top: 14px;
+  padding-top: 16px;
 }
 
 /* ─── CONFIRMATION CARD ───────────────────────────────────── */
 .confirm-card {
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
-  border-radius: 10px;
+  border-radius: 12px;
   width: 100%;
-  max-width: 440px;
+  max-width: 450px;
   padding: 24px;
   display: flex;
   flex-direction: column;
   gap: 14px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+  box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
 }
 
 .confirm-icon-wrap {
-  width: 42px;
-  height: 42px;
-  border-radius: 8px;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
   background: var(--warning-bg);
   border: 1px solid var(--warning-border);
   color: var(--warning-color);
@@ -2381,13 +2461,14 @@ body {
 }
 
 .confirm-title {
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-main);
 }
 
 .confirm-text {
-  font-size: 0.84rem;
-  color: var(--text-muted);
+  font-size: 0.86rem;
+  color: var(--text-body);
   line-height: 1.5;
 }
 
@@ -2398,19 +2479,19 @@ body {
   background: var(--brand-light);
   border: 1px solid var(--brand-border);
   color: var(--brand-dark);
-  padding: 10px 12px;
-  border-radius: 6px;
-  font-size: 0.78rem;
-  line-height: 1.4;
+  padding: 11px 13px;
+  border-radius: 7px;
+  font-size: 0.8rem;
+  line-height: 1.45;
 }
 
 .confirm-file-preview {
-  background: var(--bg-page);
+  background: var(--bg-surface-subtle);
   border: 1px solid var(--border-color);
-  border-radius: 6px;
-  padding: 8px 12px;
+  border-radius: 7px;
+  padding: 9px 13px;
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   max-height: 120px;
   overflow-y: auto;
   display: flex;
@@ -2448,13 +2529,13 @@ body {
   position: fixed;
   bottom: 24px;
   right: 24px;
-  background: #09090b;
+  background: #0f172a;
   color: #ffffff;
-  padding: 10px 18px;
-  border-radius: 6px;
-  font-size: 0.8rem;
-  font-weight: 500;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  padding: 11px 18px;
+  border-radius: 7px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.25);
   transform: translateY(12px);
   opacity: 0;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
@@ -2485,6 +2566,9 @@ body {
   .metrics-bar {
     grid-template-columns: repeat(2, 1fr);
   }
+  .metric-item:nth-child(2) {
+    border-right: none;
+  }
   .metric-actions {
     grid-column: 1 / -1;
     justify-content: stretch;
@@ -2507,10 +2591,17 @@ body {
 
 @media (max-width: 640px) {
   .page-container {
-    padding: 0 16px 40px;
+    padding: 16px 16px 40px;
   }
   .metrics-bar {
     grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .metric-item {
+    border-right: none;
+    padding-right: 0;
+    border-bottom: 1px solid var(--border-subtle);
+    padding-bottom: 12px;
   }
   .category-tabs {
     overflow-x: auto;
@@ -2522,7 +2613,7 @@ body {
   .selection-bar {
     flex-direction: column;
     align-items: flex-start;
-    gap: 10px;
+    gap: 12px;
   }
   .media-grid {
     grid-template-columns: 1fr;
