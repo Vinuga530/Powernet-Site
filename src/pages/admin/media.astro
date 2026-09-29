@@ -5,17 +5,13 @@ import path from 'node:path';
 export const prerender = false;
 
 // ─── AUTH GATE ────────────────────────────────────────────────────────────────
-// Require the Keystatic GitHub OAuth cookie that is set by Keystatic after
-// the user authenticates via GitHub. Without it, redirect to the Keystatic
-// login flow. This prevents unauthenticated access to the media manager.
+// Protect access in production via Keystatic's GitHub OAuth token
 const ghToken =
   Astro.cookies.get('keystatic-gh-access-token')?.value ||
   Astro.request.headers.get('cookie')?.match(/keystatic-gh-access-token=([^;]+)/)?.[1];
 
 const isDev = import.meta.env.DEV;
 
-// In production: require the GitHub OAuth token from Keystatic.
-// In dev: allow through (local-only, not exposed to internet).
 if (!isDev && !ghToken) {
   return Astro.redirect('/keystatic', 302);
 }
@@ -26,12 +22,6 @@ const rootDir = process.cwd();
 const publicDir = path.join(rootDir, 'public');
 const srcDir = path.join(rootDir, 'src');
 
-const managedDirs = [
-  { category: 'Projects', dir: path.join(publicDir, 'images', 'projects'), prefix: 'public/images/projects/', icon: '🏗️' },
-  { category: 'Hero Images', dir: path.join(publicDir, 'images', 'hero'), prefix: 'public/images/hero/', icon: '🖼️' },
-  { category: 'Hero Videos', dir: path.join(publicDir, 'videos', 'hero'), prefix: 'public/videos/hero/', icon: '🎬' },
-];
-
 const PROTECTED_FILES = new Set([
   '.gitkeep',
   'favicon.ico',
@@ -40,6 +30,8 @@ const PROTECTED_FILES = new Set([
   'powernet-logo-coloured.png',
   'apple-touch-icon.png',
 ]);
+
+const MEDIA_EXTS = new Set(['.jpg', '.jpeg', '.png', '.webp', '.svg', '.gif', '.avif', '.mp4', '.webm', '.mov', '.ogg']);
 
 function getAllFiles(dirPath, arr = []) {
   if (!fs.existsSync(dirPath)) return arr;
@@ -62,19 +54,33 @@ function collectReferencedAssets(sDir) {
     try {
       const content = fs.readFileSync(file, 'utf-8');
       const rel = path.relative(sDir, file).replace(/\\/g, '/');
-      const matches = content.match(/["']?(\/(images|videos)\/[^"'\s\n\r]+)/g) || [];
+
+      // Match patterns like /images/... or /videos/...
+      const matches = content.match(/["']?(\/?(images|videos)\/[^"'\s\n\r<>]+)/g) || [];
       for (const m of matches) {
-        const cleaned = m.replace(/^['"]/, '').replace(/['",;]$/, '').trim().replace(/\\/g, '/');
+        const cleaned = m.replace(/^['"]/, '').replace(/['",;)]$/, '').trim().replace(/\\/g, '/');
+        const withSlash = cleaned.startsWith('/') ? cleaned : '/' + cleaned;
+        const withoutSlash = withSlash.slice(1);
         const fn = path.basename(cleaned).toLowerCase();
-        for (const key of [cleaned, fn]) {
+
+        for (const key of [withSlash, withoutSlash]) {
           const ex = map.get(key) || [];
           if (!ex.includes(rel)) ex.push(rel);
           map.set(key, ex);
         }
+
+        if (!['image.jpg', 'image.png', 'image.webp', 'image.jpeg', 'icon.svg'].includes(fn)) {
+          const ex = map.get(fn) || [];
+          if (!ex.includes(rel)) ex.push(rel);
+          map.set(fn, ex);
+        }
       }
-      const fnm = content.match(/[\w\-.]+\.(png|jpe?g|webp|svg|mp4|webm|gif|avif)/gi) || [];
-      for (const fn of fnm) {
+
+      // Match filenames with media extensions
+      const fnMatches = content.match(/[\w\-.]+\.(png|jpe?g|webp|svg|mp4|webm|gif|avif)/gi) || [];
+      for (const fn of fnMatches) {
         const fnl = fn.toLowerCase();
+        if (['image.jpg', 'image.png', 'image.webp', 'image.jpeg', 'icon.svg'].includes(fnl)) continue;
         const ex = map.get(fnl) || [];
         if (!ex.includes(rel)) ex.push(rel);
         map.set(fnl, ex);
@@ -87,16 +93,35 @@ function collectReferencedAssets(sDir) {
 const usageMap = collectReferencedAssets(srcDir);
 const mediaItems = [];
 
+function determineCategory(relPathSlash) {
+  if (relPathSlash.startsWith('/images/projects/')) return 'Projects';
+  if (relPathSlash.startsWith('/images/hero/') || relPathSlash.startsWith('/videos/hero/')) return 'Hero Media';
+  if (relPathSlash.startsWith('/images/icons/')) return 'Icons';
+  return 'Site Assets';
+}
+
+function getDisplayName(relPathSlash, fileName) {
+  if (relPathSlash.startsWith('/images/projects/')) {
+    return relPathSlash.replace('/images/projects/', '');
+  }
+  return fileName;
+}
+
 // 1. Scan local disk
 let localCount = 0;
-for (const group of managedDirs) {
-  if (fs.existsSync(group.dir)) {
-    for (const filePath of getAllFiles(group.dir)) {
+const scanDirs = [path.join(publicDir, 'images'), path.join(publicDir, 'videos')];
+
+for (const scanDir of scanDirs) {
+  if (fs.existsSync(scanDir)) {
+    for (const filePath of getAllFiles(scanDir)) {
+      const ext = path.extname(filePath).toLowerCase();
+      if (!MEDIA_EXTS.has(ext)) continue;
+
       const fileName = path.basename(filePath);
       if (PROTECTED_FILES.has(fileName.toLowerCase())) continue;
 
       const rel = '/' + path.relative(publicDir, filePath).replace(/\\/g, '/');
-      const isVideo = ['.mp4', '.webm', '.mov', '.ogg'].includes(path.extname(filePath).toLowerCase());
+      const isVideo = ['.mp4', '.webm', '.mov', '.ogg'].includes(ext);
       const usedIn = usageMap.get(rel) || usageMap.get(rel.slice(1)) || usageMap.get(fileName.toLowerCase()) || [];
       let size = 0;
       try {
@@ -105,11 +130,12 @@ for (const group of managedDirs) {
 
       localCount++;
       mediaItems.push({
-        name: fileName,
+        name: getDisplayName(rel, fileName),
+        fileName,
         path: rel,
-        category: group.category,
-        icon: group.icon,
+        category: determineCategory(rel),
         size,
+        ext: ext.replace('.', '').toUpperCase(),
         isVideo,
         inUse: usedIn.length > 0,
         usedIn,
@@ -118,10 +144,10 @@ for (const group of managedDirs) {
   }
 }
 
-// 2. In production on Vercel lambda where public/ is not mounted on disk, query GitHub Trees API
+// 2. Production Vercel lambda (GitHub Trees API fallback)
 if (localCount === 0) {
   try {
-    const ghToken =
+    const ghTokenVal =
       Astro.cookies.get('keystatic-gh-access-token')?.value ||
       Astro.request.headers.get('cookie')?.match(/keystatic-gh-access-token=([^;]+)/)?.[1] ||
       Astro.request.headers.get('x-github-token') ||
@@ -133,7 +159,7 @@ if (localCount === 0) {
       'Accept': 'application/vnd.github+json',
       'User-Agent': 'Powernet-CMS-MediaManager',
     };
-    if (ghToken) ghHeaders['Authorization'] = `Bearer ${ghToken}`;
+    if (ghTokenVal) ghHeaders['Authorization'] = `Bearer ${ghTokenVal}`;
 
     const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/git/trees/main?recursive=1`, {
       headers: ghHeaders,
@@ -144,47 +170,50 @@ if (localCount === 0) {
       for (const item of data.tree || []) {
         if (item.type !== 'blob') continue;
         const p = item.path;
+        if (!p.startsWith('public/images/') && !p.startsWith('public/videos/')) continue;
+
         const fn = path.basename(p);
+        const ext = path.extname(fn).toLowerCase();
+        if (!MEDIA_EXTS.has(ext)) continue;
         if (PROTECTED_FILES.has(fn.toLowerCase())) continue;
 
-        let matched = null;
-        for (const g of managedDirs) {
-          if (p.startsWith(g.prefix)) {
-            matched = g;
-            break;
-          }
-        }
-        if (matched) {
-          const rel = '/' + p.replace(/^public\//, '');
-          const isVideo = ['.mp4', '.webm', '.mov', '.ogg'].includes(path.extname(fn).toLowerCase());
-          const usedIn = usageMap.get(rel) || usageMap.get(fn.toLowerCase()) || [];
+        const rel = '/' + p.replace(/^public\//, '');
+        const isVideo = ['.mp4', '.webm', '.mov', '.ogg'].includes(ext);
+        const usedIn = usageMap.get(rel) || usageMap.get(fn.toLowerCase()) || [];
 
-          mediaItems.push({
-            name: fn,
-            path: rel,
-            category: matched.category,
-            icon: matched.icon,
-            size: item.size || 0,
-            isVideo,
-            inUse: usedIn.length > 0,
-            usedIn,
-          });
-        }
+        mediaItems.push({
+          name: getDisplayName(rel, fn),
+          fileName: fn,
+          path: rel,
+          category: determineCategory(rel),
+          size: item.size || 0,
+          ext: ext.replace('.', '').toUpperCase(),
+          isVideo,
+          inUse: usedIn.length > 0,
+          usedIn,
+        });
       }
     }
   } catch {}
 }
 
+mediaItems.sort((a, b) => a.path.localeCompare(b.path));
+
 const totalCount = mediaItems.length;
 const unusedCount = mediaItems.filter((m) => !m.inUse).length;
+const inUseCount = totalCount - unusedCount;
 const totalBytes = mediaItems.reduce((a, m) => a + m.size, 0);
 const unusedBytes = mediaItems.filter((m) => !m.inUse).reduce((a, m) => a + m.size, 0);
 
+const projectsCount = mediaItems.filter((m) => m.category === 'Projects').length;
+const heroCount = mediaItems.filter((m) => m.category === 'Hero Media').length;
+const siteAssetsCount = mediaItems.filter((m) => m.category === 'Site Assets' || m.category === 'Icons').length;
+
 function fmtBytes(b) {
   if (!b) return '0 B';
-  const k = 1024,
-    s = ['B', 'KB', 'MB', 'GB'],
-    i = Math.floor(Math.log(b) / Math.log(k));
+  const k = 1024;
+  const s = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(b) / Math.log(k));
   return `${(b / Math.pow(k, i)).toFixed(1)} ${s[i]}`;
 }
 ---
@@ -193,497 +222,949 @@ function fmtBytes(b) {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Media Manager — Powernet CMS</title>
+  <title>Media Assets — Powernet CMS</title>
   <meta name="robots" content="noindex, nofollow" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 </head>
 <body>
-<div class="app-shell">
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="sidebar-brand">
-      <div class="brand-logo">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+<div class="page-container">
+
+  <!-- TOP HEADER -->
+  <header class="header">
+    <div class="header-brand">
+      <a href="/admin/media" class="brand-link">
+        <span class="brand-badge">POWERNET</span>
+        <span class="brand-sep">/</span>
+        <span class="brand-sub">Media Library</span>
+      </a>
+      <span class="env-pill">{isDev ? 'Local Disk' : 'GitHub Main'}</span>
+    </div>
+
+    <div class="header-nav">
+      <a href="/keystatic" class="nav-btn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"></polyline>
         </svg>
-      </div>
-      <div class="brand-text">
-        <span class="brand-name">Powernet</span>
-        <span class="brand-label">CMS Admin</span>
+        <span>Keystatic CMS</span>
+      </a>
+      <a href="/" target="_blank" rel="noopener noreferrer" class="nav-btn">
+        <span>Live Site</span>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+          <polyline points="15 3 21 3 21 9"></polyline>
+          <line x1="10" y1="14" x2="21" y2="3"></line>
+        </svg>
+      </a>
+    </div>
+  </header>
+
+  <!-- METRICS SUMMARY BANNER -->
+  <section class="metrics-bar">
+    <div class="metric-item">
+      <span class="metric-label">TOTAL MEDIA</span>
+      <div class="metric-value-wrap">
+        <span class="metric-num" id="statTotal">{totalCount}</span>
+        <span class="metric-sub" id="statTotalBytes">{fmtBytes(totalBytes)}</span>
       </div>
     </div>
 
-    <nav class="sidebar-nav">
-      <p class="nav-section-label">Content</p>
-      <a href="/keystatic" class="nav-item">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-        Dashboard
-      </a>
-      <a href="/keystatic/collection/projects" class="nav-item">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-        Projects
-      </a>
-      <a href="/keystatic/collection/services" class="nav-item">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
-        Services
-      </a>
-      <a href="/keystatic/collection/clients" class="nav-item">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        Clients
-      </a>
-      <a href="/keystatic/singleton/hero" class="nav-item">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-        Hero Section
-      </a>
-
-      <div class="nav-divider"></div>
-
-      <p class="nav-section-label">Media & Management</p>
-      <a href="/admin/media" class="nav-item active">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-        Media Manager
-        <span class="nav-badge">{totalCount}</span>
-      </a>
-      <a href="/" target="_blank" class="nav-item">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-        View Live Site ↗
-      </a>
-    </nav>
-
-    <div class="sidebar-footer">
-      <div class="storage-info">
-        <div class="storage-label">
-          <span>Storage</span>
-          <span class="storage-used">{fmtBytes(totalBytes)}</span>
-        </div>
-        <div class="storage-bar">
-          <div class="storage-fill" style={`width: ${Math.min(100, Math.max(5, Math.round((totalBytes / (50 * 1024 * 1024)) * 100)))}%`}></div>
-        </div>
-        <div class="storage-sub">{totalCount} files &bull; {unusedCount} unused</div>
+    <div class="metric-item">
+      <span class="metric-label">LINKED IN CONTENT</span>
+      <div class="metric-value-wrap">
+        <span class="metric-num" id="statInUse">{inUseCount}</span>
+        <span class="metric-sub text-success">Active & Verified</span>
       </div>
     </div>
-  </aside>
 
-  <!-- MAIN VIEW -->
-  <main class="main">
-    <!-- TOPBAR -->
-    <header class="topbar">
-      <div class="topbar-title-wrap">
-        <h1 class="page-title">Media Manager</h1>
-        <p class="page-sub">View, select, and delete uploaded images and videos</p>
+    <div class="metric-item">
+      <span class="metric-label">ORPHANED ASSETS</span>
+      <div class="metric-value-wrap">
+        <span class="metric-num text-warning" id="statUnused">{unusedCount}</span>
+        <span class="metric-sub" id="statUnusedBytes">{fmtBytes(unusedBytes)} reclaimable</span>
+      </div>
+    </div>
+
+    <div class="metric-actions">
+      <button
+        type="button"
+        id="btnAutoCleanup"
+        class="action-btn action-btn-danger"
+        data-unused={unusedCount}
+        disabled={unusedCount === 0}
+        title="Permanently remove all unreferenced files from disk & git"
+      >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="3 6 5 6 21 6"></polyline>
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+        </svg>
+        <span>Prune All Unused ({unusedCount})</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- TOOLBAR: FILTER & ACTIONS -->
+  <section class="toolbar">
+    <div class="toolbar-filter-row">
+      <!-- CATEGORY PILLS -->
+      <nav class="category-tabs" aria-label="Media Categories">
+        <button class="tab-btn active" data-filter="all">
+          <span>All Media</span>
+          <span class="tab-count" id="countAll">{totalCount}</span>
+        </button>
+        <button class="tab-btn" data-filter="projects">
+          <span>Projects</span>
+          <span class="tab-count" id="countProjects">{projectsCount}</span>
+        </button>
+        <button class="tab-btn" data-filter="hero-media">
+          <span>Hero Media</span>
+          <span class="tab-count" id="countHero">{heroCount}</span>
+        </button>
+        <button class="tab-btn" data-filter="site-assets">
+          <span>Site Assets</span>
+          <span class="tab-count" id="countSiteAssets">{siteAssetsCount}</span>
+        </button>
+        <button class="tab-btn tab-btn-warning" data-filter="unused">
+          <span>Unreferenced</span>
+          <span class="tab-count" id="countUnused">{unusedCount}</span>
+        </button>
+      </nav>
+
+      <!-- SEARCH -->
+      <div class="search-wrap">
+        <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" id="searchInput" placeholder="Filter by name, subfolder or usage…" autocomplete="off" />
+        <button type="button" id="searchClear" class="search-clear" title="Clear filter" hidden>&times;</button>
       </div>
 
-      <div class="topbar-actions">
-        <a href="/keystatic" class="btn btn-ghost">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-          Back to CMS
-        </a>
-        <button id="btnAutoCleanup" class="btn btn-danger" data-unused={unusedCount} disabled={unusedCount === 0}>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-          Clean Up All Unused ({unusedCount})
+      <!-- VIEW TOGGLE -->
+      <div class="view-toggle" role="group" aria-label="View format">
+        <button type="button" id="viewGridBtn" class="toggle-btn active" title="Grid cards view">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+          </svg>
+        </button>
+        <button type="button" id="viewTableBtn" class="toggle-btn" title="Detailed table view">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="8" y1="6" x2="21" y2="6"></line>
+            <line x1="8" y1="12" x2="21" y2="12"></line>
+            <line x1="8" y1="18" x2="21" y2="18"></line>
+            <line x1="3" y1="6" x2="3.01" y2="6"></line>
+            <line x1="3" y1="12" x2="3.01" y2="12"></line>
+            <line x1="3" y1="18" x2="3.01" y2="18"></line>
+          </svg>
         </button>
       </div>
-    </header>
+    </div>
 
-    <!-- STATS ROW -->
-    <section class="stats">
-      <div class="stat-card">
-        <div class="sic sic-blue">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-        </div>
-        <div class="si">
-          <span class="sv" id="statTotal">{totalCount}</span>
-          <span class="sl">Total Assets</span>
-        </div>
-        <div class="ss" id="statTotalBytes">{fmtBytes(totalBytes)}</div>
+    <!-- SELECTION ACTIONS ROW -->
+    <div class="selection-bar">
+      <div class="selection-status">
+        <label class="master-checkbox-label" title="Select / deselect all visible files">
+          <input type="checkbox" id="masterCheckbox" class="app-checkbox" />
+          <span class="sel-text"><span id="selCount">0</span> of <span id="visibleCount">{totalCount}</span> selected</span>
+        </label>
+        <button type="button" id="btnSelectUnusedOnly" class="text-link-btn">Select all unreferenced</button>
       </div>
 
-      <div class="stat-card">
-        <div class="sic sic-green">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-        </div>
-        <div class="si">
-          <span class="sv c-green" id="statInUse">{totalCount - unusedCount}</span>
-          <span class="sl">In Active Use</span>
-        </div>
-        <div class="ss">Linked in CMS Content</div>
-      </div>
-
-      <div class="stat-card">
-        <div class="sic sic-amber">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-        </div>
-        <div class="si">
-          <span class="sv c-amber" id="statUnused">{unusedCount}</span>
-          <span class="sl">Unused Assets</span>
-        </div>
-        <div class="ss" id="statUnusedBytes">{fmtBytes(unusedBytes)} reclaimable</div>
-      </div>
-
-      <div class="stat-card">
-        <div class="sic sic-purple">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-        </div>
-        <div class="si">
-          <span class="sv">3</span>
-          <span class="sl">Categories</span>
-        </div>
-        <div class="ss">Projects, Hero Images, Hero Videos</div>
-      </div>
-    </section>
-
-    <!-- TOOLBAR -->
-    <section class="toolbar">
-      <div class="toolbar-left">
-        <div class="ftabs">
-          <button class="tab active" data-f="all">All ({totalCount})</button>
-          <button class="tab" data-f="unused">⚠ Unused ({unusedCount})</button>
-          <button class="tab" data-f="projects">🏗️ Projects</button>
-
-          <button class="tab" data-f="hero-images">🖼️ Hero Images</button>
-          <button class="tab" data-f="hero-videos">🎬 Hero Videos</button>
-        </div>
-
-        <div class="search-box">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input type="text" id="searchInput" placeholder="Filter files…" />
-        </div>
-      </div>
-
-      <div class="sel-bar">
-        <span id="selInfo" class="sel-info" hidden><strong id="selCount">0</strong> selected</span>
-        <button id="btnSelAll" class="btn btn-ghost">Select All</button>
-        <button id="btnSelUnused" class="btn btn-ghost">Select Unused</button>
-        <button id="btnDesel" class="btn btn-ghost" hidden>Deselect</button>
-        <button id="btnDelSel" class="btn btn-del" disabled>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-          Delete Selected
+      <div class="selection-buttons">
+        <button type="button" id="btnDeleteSelected" class="action-btn action-btn-danger" disabled>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+          <span>Delete Selected</span>
         </button>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- MEDIA GRID -->
-    <section class="grid-wrap">
-      {mediaItems.length === 0 ? (
-        <div class="empty">
-          <div class="empty-icon">
-            <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-          </div>
-          <h2 class="empty-title">No media files found</h2>
-          <p class="empty-body">Uploaded media for Projects and Hero will appear here automatically.</p>
-          <a href="/keystatic" class="btn btn-primary">Go to Keystatic CMS →</a>
+  <!-- CONTENT VIEW AREA -->
+  <main class="content-area">
+    {mediaItems.length === 0 ? (
+      <div class="empty-state">
+        <div class="empty-icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+            <polyline points="21 15 16 10 5 21"></polyline>
+          </svg>
         </div>
-      ) : (
-        <div class="mgrid" id="mgrid">
+        <h2 class="empty-title">No Media Assets Found</h2>
+        <p class="empty-desc">Uploaded images and videos for Projects, Hero, and Services will appear here.</p>
+        <a href="/keystatic" class="nav-btn nav-btn-primary">Return to Keystatic CMS</a>
+      </div>
+    ) : (
+      <>
+        <!-- GRID VIEW -->
+        <div class="media-grid" id="mediaGrid">
           {mediaItems.map((item) => (
             <article
-              class={`mcard${!item.inUse ? ' is-unused' : ''}`}
+              class={`asset-card${!item.inUse ? ' is-unreferenced' : ''}`}
               data-path={item.path}
               data-name={item.name.toLowerCase()}
+              data-filename={item.fileName.toLowerCase()}
               data-cat={item.category.toLowerCase().replace(/ /g, '-')}
               data-inuse={item.inUse ? 'true' : 'false'}
               data-size={item.size}
+              data-usedin={item.usedIn.join(' ').toLowerCase()}
             >
-              <label class="chk-wrap" title="Select">
-                <input type="checkbox" class="fchk sr-only" value={item.path} />
-                <span class="chkbox"></span>
-              </label>
+              <div class="card-thumb" data-preview-path={item.path} data-is-video={item.isVideo ? 'true' : 'false'} data-name={item.name}>
+                <label class="card-checkbox-label" onclick="event.stopPropagation();">
+                  <input type="checkbox" class="app-checkbox item-checkbox" value={item.path} />
+                </label>
 
-              <div class="mthumb" data-preview-path={item.path} data-is-video={item.isVideo ? 'true' : 'false'} data-name={item.name}>
                 {item.isVideo ? (
-                  <video src={item.path} muted loop playsinline class="mmedia" preload="metadata" />
+                  <div class="video-container">
+                    <video src={item.path} muted playsinline preload="metadata" class="thumb-media"></video>
+                    <span class="video-badge">VIDEO</span>
+                  </div>
                 ) : (
-                  <img src={item.path} alt={item.name} loading="lazy" class="mmedia" />
+                  <img src={item.path} alt={item.name} loading="lazy" class="thumb-media" />
                 )}
-                <span class={`upill${item.inUse ? ' up-active' : ' up-unused'}`}>
-                  {item.inUse ? '✓ In Use' : '⚠ Unused'}
-                </span>
-                {item.isVideo && <span class="vpill">VIDEO</span>}
-                <div class="thumb-hover-overlay" title="Click to preview">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+
+                <div class="thumb-overlay">
+                  <span class="preview-prompt">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="11" cy="11" r="8"></circle>
+                      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                      <line x1="11" y1="8" x2="11" y2="14"></line>
+                      <line x1="8" y1="11" x2="14" y2="11"></line>
+                    </svg>
+                    <span>Preview</span>
+                  </span>
+                </div>
+
+                <div class="card-status-badge">
+                  {item.inUse ? (
+                    <span class="status-tag tag-success" title={`Referenced in: ${item.usedIn.join(', ')}`}>
+                      In Use
+                    </span>
+                  ) : (
+                    <span class="status-tag tag-warning" title="No active content references found. Safe to delete.">
+                      Unreferenced
+                    </span>
+                  )}
                 </div>
               </div>
 
-              <div class="minfo">
-                <div class="mname-row">
-                  <p class="mname" title={item.name}>{item.name}</p>
-                  <button type="button" class="del-btn" data-dpath={item.path} title={`Delete ${item.name}`}>
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+              <div class="card-details">
+                <div class="name-row">
+                  <span class="file-name" title={item.path}>{item.name}</span>
+                </div>
+
+                <div class="meta-row">
+                  <span class="meta-cat">{item.category}</span>
+                  <span class="meta-dot">&bull;</span>
+                  <span class="meta-ext">{item.ext}</span>
+                  <span class="meta-dot">&bull;</span>
+                  <span class="meta-size">{fmtBytes(item.size)}</span>
+                </div>
+
+                {item.inUse ? (
+                  <div class="usage-row" title={`Referenced in: ${item.usedIn.join(', ')}`}>
+                    <span class="usage-label">Used in:</span>
+                    <span class="usage-files">{item.usedIn.map((f) => f.split('/').pop()).join(', ')}</span>
+                  </div>
+                ) : (
+                  <div class="usage-row is-unused-note">
+                    <span>Not linked in content</span>
+                  </div>
+                )}
+
+                <div class="card-actions">
+                  <button type="button" class="btn-copy-path" data-copy-path={item.path} title="Copy public URL to clipboard">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                    <span>Copy Path</span>
+                  </button>
+                  <button type="button" class="btn-delete-card" data-delete-path={item.path} title={`Delete ${item.fileName}`}>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="3 6 5 6 21 6"></polyline>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
                   </button>
                 </div>
-                <div class="mmeta">
-                  <span class="mbadge">{item.icon} {item.category}</span>
-                  <span class="msize">{fmtBytes(item.size)}</span>
-                </div>
-                {item.inUse && (
-                  <p class="musedIn" title={`Used in: ${item.usedIn.join(', ')}`}>
-                    Used in: {item.usedIn.map((f) => f.split('/').pop()).join(', ')}
-                  </p>
-                )}
               </div>
             </article>
           ))}
         </div>
-      )}
-    </section>
+
+        <!-- TABLE VIEW -->
+        <div class="media-table-wrap" id="mediaTable" hidden>
+          <table class="media-table">
+            <thead>
+              <tr>
+                <th class="th-chk"><span class="sr-only">Select</span></th>
+                <th class="th-preview">Preview</th>
+                <th class="th-file">Asset Name & Path</th>
+                <th class="th-cat">Category</th>
+                <th class="th-status">Content Reference</th>
+                <th class="th-size">Size</th>
+                <th class="th-actions">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {mediaItems.map((item) => (
+                <tr
+                  class={`table-row${!item.inUse ? ' is-unreferenced' : ''}`}
+                  data-path={item.path}
+                  data-name={item.name.toLowerCase()}
+                  data-filename={item.fileName.toLowerCase()}
+                  data-cat={item.category.toLowerCase().replace(/ /g, '-')}
+                  data-inuse={item.inUse ? 'true' : 'false'}
+                  data-size={item.size}
+                  data-usedin={item.usedIn.join(' ').toLowerCase()}
+                >
+                  <td class="td-chk">
+                    <input type="checkbox" class="app-checkbox item-checkbox" value={item.path} />
+                  </td>
+                  <td class="td-preview">
+                    <div class="table-thumb" data-preview-path={item.path} data-is-video={item.isVideo ? 'true' : 'false'} data-name={item.name}>
+                      {item.isVideo ? (
+                        <div class="table-video-icon">VIDEO</div>
+                      ) : (
+                        <img src={item.path} alt={item.name} loading="lazy" />
+                      )}
+                    </div>
+                  </td>
+                  <td class="td-file">
+                    <span class="table-file-name">{item.name}</span>
+                    <span class="table-file-path">{item.path}</span>
+                  </td>
+                  <td class="td-cat">
+                    <span class="table-cat-badge">{item.category}</span>
+                  </td>
+                  <td class="td-status">
+                    {item.inUse ? (
+                      <div class="table-usage-tag tag-success">
+                        <span class="status-indicator-dot"></span>
+                        <span>Used in {item.usedIn.map((f) => f.split('/').pop()).join(', ')}</span>
+                      </div>
+                    ) : (
+                      <div class="table-usage-tag tag-warning">
+                        <span class="status-indicator-dot"></span>
+                        <span>Unreferenced (safe to delete)</span>
+                      </div>
+                    )}
+                  </td>
+                  <td class="td-size">
+                    <span class="table-size-num">{fmtBytes(item.size)}</span>
+                  </td>
+                  <td class="td-actions">
+                    <div class="table-action-btns">
+                      <button type="button" class="btn-copy-path btn-table-act" data-copy-path={item.path} title="Copy public path">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                      </button>
+                      <button type="button" class="btn-table-act" data-preview-path={item.path} data-is-video={item.isVideo ? 'true' : 'false'} data-name={item.name} title="Inspect">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <circle cx="11" cy="11" r="8"></circle>
+                          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                      </button>
+                      <button type="button" class="btn-delete-card btn-table-act btn-table-danger" data-delete-path={item.path} title="Delete">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <polyline points="3 6 5 6 21 6"></polyline>
+                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </>
+    )}
   </main>
 </div>
 
+<!-- LIGHTBOX INSPECTOR MODAL -->
+<div id="lightbox" class="modal-backdrop" hidden>
+  <div class="lightbox-card" role="dialog" aria-modal="true" aria-labelledby="lbTitle">
+    <div class="lightbox-header">
+      <div class="lb-title-wrap">
+        <h3 id="lbTitle" class="lb-title">Asset Inspection</h3>
+        <span id="lbPath" class="lb-path"></span>
+      </div>
+      <button id="lbClose" class="modal-close-btn" title="Close inspector (Esc)">&times;</button>
+    </div>
+
+    <div class="lightbox-body">
+      <div class="lb-media-viewport" id="lbMediaWrap"></div>
+
+      <div class="lb-sidebar">
+        <h4 class="sidebar-heading">ASSET METADATA</h4>
+        <dl class="meta-dl">
+          <div class="dl-row">
+            <dt>Public Path</dt>
+            <dd id="lbMetaPath"></dd>
+          </div>
+          <div class="dl-row">
+            <dt>Category</dt>
+            <dd id="lbMetaCategory"></dd>
+          </div>
+          <div class="dl-row">
+            <dt>File Size</dt>
+            <dd id="lbMetaSize"></dd>
+          </div>
+          <div class="dl-row">
+            <dt>Status</dt>
+            <dd id="lbMetaStatus"></dd>
+          </div>
+        </dl>
+
+        <div class="sidebar-divider"></div>
+
+        <h4 class="sidebar-heading">REFERENCED IN</h4>
+        <div id="lbReferences" class="lb-references-list"></div>
+
+        <div class="sidebar-actions">
+          <button type="button" id="lbCopyBtn" class="action-btn action-btn-secondary">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            <span>Copy Public URL</span>
+          </button>
+          <a id="lbExternalLink" href="#" target="_blank" rel="noopener" class="action-btn action-btn-secondary">
+            <span>Open in Tab ↗</span>
+          </a>
+          <button type="button" id="lbDeleteBtn" class="action-btn action-btn-danger">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+            <span>Delete Asset</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- CONFIRMATION MODAL -->
-<div id="dlg" class="dlg-overlay" hidden>
-  <div class="dlg-box">
-    <div class="dlg-icon">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+<div id="confirmModal" class="modal-backdrop" hidden>
+  <div class="confirm-card" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle">
+    <div class="confirm-icon-wrap">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+        <line x1="12" y1="9" x2="12" y2="13"></line>
+        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+      </svg>
     </div>
-    <h2 class="dlg-title">Delete Selected Files?</h2>
-    <p id="dlgMsg" class="dlg-msg">This will permanently delete the files from the project and the GitHub repository.</p>
-    <div id="dlgWarning" class="dlg-warning" hidden>
-      ⚠️ <strong>Warning:</strong> One or more selected files are actively in use on the live site!
+    <h3 id="confirmTitle" class="confirm-title">Delete Media Assets</h3>
+    <p id="confirmMessage" class="confirm-text">This will permanently delete the selected file(s) from local storage and commit the deletion to GitHub.</p>
+
+    <div id="confirmWarningInUse" class="confirm-warning-box" hidden>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      <div>
+        <strong>Warning: Content Dependency</strong>
+        <p>One or more selected files are actively referenced on the website. Deleting them will cause broken images or missing video playback.</p>
+      </div>
     </div>
-    <div class="dlg-actions">
-      <button id="dlgCancel" class="btn btn-ghost">Cancel</button>
-      <button id="dlgConfirm" class="btn btn-solid">Yes, Delete Files</button>
+
+    <div class="confirm-file-preview" id="confirmFileList"></div>
+
+    <div class="confirm-buttons">
+      <button type="button" id="confirmCancelBtn" class="action-btn action-btn-secondary">Cancel</button>
+      <button type="button" id="confirmOkBtn" class="action-btn action-btn-danger">Yes, Permanently Delete</button>
     </div>
   </div>
 </div>
 
-<!-- LIGHTBOX MODAL -->
-<div id="lightbox" class="lb-overlay" hidden>
-  <div class="lb-box">
-    <div class="lb-header">
-      <span id="lbTitle" class="lb-title"></span>
-      <button id="lbClose" class="lb-close" title="Close preview">&times;</button>
-    </div>
-    <div class="lb-media-wrap" id="lbMediaWrap"></div>
-    <div class="lb-footer">
-      <span id="lbPath" class="lb-path"></span>
-      <button id="lbDelete" class="btn btn-del">Delete This File</button>
-    </div>
-  </div>
-</div>
-
-<!-- TOAST -->
-<div id="toast" class="toast"></div>
+<!-- TOAST CONTAINER -->
+<div id="toast" class="toast-notification" role="status" aria-live="polite"></div>
 
 <script>
+  // DOM Elements
   const toast = document.getElementById('toast');
-  function showToast(msg, type = 'info') {
-    if (!toast) return;
-    toast.textContent = msg;
-    toast.className = 'toast toast-' + type + ' t-on';
-    clearTimeout(toast._t);
-    toast._t = setTimeout(() => {
-      toast.className = 'toast';
-    }, 4500);
-  }
+  const mediaGrid = document.getElementById('mediaGrid');
+  const mediaTable = document.getElementById('mediaTable');
+  const viewGridBtn = document.getElementById('viewGridBtn');
+  const viewTableBtn = document.getElementById('viewTableBtn');
+  const searchInput = document.getElementById('searchInput');
+  const searchClear = document.getElementById('searchClear');
+  const tabButtons = document.querySelectorAll('.tab-btn');
+  const masterCheckbox = document.getElementById('masterCheckbox');
+  const selCountEl = document.getElementById('selCount');
+  const visibleCountEl = document.getElementById('visibleCount');
+  const btnDeleteSelected = document.getElementById('btnDeleteSelected');
+  const btnSelectUnusedOnly = document.getElementById('btnSelectUnusedOnly');
+  const btnAutoCleanup = document.getElementById('btnAutoCleanup');
 
-  // Confirmation dialog
-  const dlg = document.getElementById('dlg');
-  const dlgMsg = document.getElementById('dlgMsg');
-  const dlgWarning = document.getElementById('dlgWarning');
-  const dlgConfirm = document.getElementById('dlgConfirm');
-  const dlgCancel = document.getElementById('dlgCancel');
-  let resolveCfm = null;
+  // Stats Elements
+  const statTotal = document.getElementById('statTotal');
+  const statInUse = document.getElementById('statInUse');
+  const statUnused = document.getElementById('statUnused');
+  const statTotalBytes = document.getElementById('statTotalBytes');
+  const statUnusedBytes = document.getElementById('statUnusedBytes');
+  const countAll = document.getElementById('countAll');
+  const countProjects = document.getElementById('countProjects');
+  const countHero = document.getElementById('countHero');
+  const countSiteAssets = document.getElementById('countSiteAssets');
+  const countUnused = document.getElementById('countUnused');
 
-  function openDlg(msg, hasInUse = false) {
-    if (dlgMsg) dlgMsg.textContent = msg;
-    if (dlgWarning) dlgWarning.hidden = !hasInUse;
-    dlg.hidden = false;
-    dlg.classList.add('open');
-    return new Promise((r) => {
-      resolveCfm = r;
-    });
-  }
-
-  dlgConfirm?.addEventListener('click', () => {
-    dlg.hidden = true;
-    dlg.classList.remove('open');
-    resolveCfm?.(true);
-  });
-  dlgCancel?.addEventListener('click', () => {
-    dlg.hidden = true;
-    dlg.classList.remove('open');
-    resolveCfm?.(false);
-  });
-
-  // Lightbox
+  // Lightbox Elements
   const lightbox = document.getElementById('lightbox');
+  const lbClose = document.getElementById('lbClose');
+  const lbMediaWrap = document.getElementById('lbMediaWrap');
   const lbTitle = document.getElementById('lbTitle');
   const lbPath = document.getElementById('lbPath');
-  const lbMediaWrap = document.getElementById('lbMediaWrap');
-  const lbClose = document.getElementById('lbClose');
-  const lbDelete = document.getElementById('lbDelete');
-  let currentLbPath = '';
+  const lbMetaPath = document.getElementById('lbMetaPath');
+  const lbMetaCategory = document.getElementById('lbMetaCategory');
+  const lbMetaSize = document.getElementById('lbMetaSize');
+  const lbMetaStatus = document.getElementById('lbMetaStatus');
+  const lbReferences = document.getElementById('lbReferences');
+  const lbCopyBtn = document.getElementById('lbCopyBtn');
+  const lbExternalLink = document.getElementById('lbExternalLink');
+  const lbDeleteBtn = document.getElementById('lbDeleteBtn');
 
-  function openLightbox(src, isVideo, name) {
-    if (!lightbox || !lbMediaWrap) return;
-    currentLbPath = src;
-    if (lbTitle) lbTitle.textContent = name;
-    if (lbPath) lbPath.textContent = src;
+  // Confirmation Modal Elements
+  const confirmModal = document.getElementById('confirmModal');
+  const confirmCancelBtn = document.getElementById('confirmCancelBtn');
+  const confirmOkBtn = document.getElementById('confirmOkBtn');
+  const confirmMessage = document.getElementById('confirmMessage');
+  const confirmWarningInUse = document.getElementById('confirmWarningInUse');
+  const confirmFileList = document.getElementById('confirmFileList');
+
+  let activeFilter = 'all';
+  let searchTerm = '';
+  let currentLbItem = null;
+  let confirmResolver = null;
+
+  function fmtBytes(b) {
+    if (!b || isNaN(b)) return '0 B';
+    const k = 1024;
+    const s = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(b) / Math.log(k));
+    return `${(b / Math.pow(k, i)).toFixed(1)} ${s[i]}`;
+  }
+
+  function showToast(message, type = 'default') {
+    if (!toast) return;
+    toast.textContent = message;
+    toast.className = `toast-notification toast-${type} is-visible`;
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(() => {
+      toast.className = 'toast-notification';
+    }, 3800);
+  }
+
+  function allItems() {
+    return Array.from(document.querySelectorAll('.asset-card'));
+  }
+
+  function allTableRows() {
+    return Array.from(document.querySelectorAll('.table-row'));
+  }
+
+  function allCheckboxes() {
+    return Array.from(document.querySelectorAll('.item-checkbox'));
+  }
+
+  // Filter & Search Logic
+  function applyFilters() {
+    let visibleCount = 0;
+    const items = allItems();
+    items.forEach((card) => {
+      const pathVal = card.dataset.path || '';
+      const row = document.querySelector(`.table-row[data-path="${pathVal}"]`);
+      const cat = card.dataset.cat || '';
+      const inUse = card.dataset.inuse === 'true';
+      const name = card.dataset.name || '';
+      const fileName = card.dataset.filename || '';
+      const usedIn = card.dataset.usedin || '';
+
+      let matchesCat = true;
+      if (activeFilter === 'unused') {
+        matchesCat = !inUse;
+      } else if (activeFilter === 'projects') {
+        matchesCat = cat === 'projects';
+      } else if (activeFilter === 'hero-media') {
+        matchesCat = cat === 'hero-media';
+      } else if (activeFilter === 'site-assets') {
+        matchesCat = cat === 'site-assets' || cat === 'icons';
+      }
+
+      let matchesSearch = true;
+      if (searchTerm) {
+        matchesSearch =
+          name.includes(searchTerm) ||
+          fileName.includes(searchTerm) ||
+          pathVal.toLowerCase().includes(searchTerm) ||
+          usedIn.includes(searchTerm);
+      }
+
+      const show = matchesCat && matchesSearch;
+      card.style.display = show ? '' : 'none';
+      if (row) row.style.display = show ? '' : 'none';
+
+      if (show) visibleCount++;
+    });
+
+    if (visibleCountEl) visibleCountEl.textContent = visibleCount;
+    updateSelection();
+  }
+
+  // Selection Handling
+  function updateSelection() {
+    const checked = allCheckboxes().filter((cb) => {
+      const parent = cb.closest('.asset-card') || cb.closest('.table-row');
+      return cb.checked && parent && parent.style.display !== 'none';
+    });
+
+    // Unify card & table row checkbox states for same paths
+    const selectedPaths = new Set(checked.map((cb) => cb.value));
+
+    allCheckboxes().forEach((cb) => {
+      const isSel = selectedPaths.has(cb.value);
+      cb.checked = isSel;
+      const card = cb.closest('.asset-card');
+      if (card) card.classList.toggle('is-selected', isSel);
+      const row = cb.closest('.table-row');
+      if (row) row.classList.toggle('is-selected', isSel);
+    });
+
+    const count = selectedPaths.size;
+    if (selCountEl) selCountEl.textContent = count;
+    if (btnDeleteSelected) {
+      btnDeleteSelected.disabled = count === 0;
+      btnDeleteSelected.querySelector('span').textContent = count > 0 ? `Delete Selected (${count})` : 'Delete Selected';
+    }
+
+    // Master checkbox state
+    const visibleCards = allItems().filter((c) => c.style.display !== 'none');
+    if (masterCheckbox) {
+      if (visibleCards.length === 0 || count === 0) {
+        masterCheckbox.checked = false;
+        masterCheckbox.indeterminate = false;
+      } else if (count === visibleCards.length) {
+        masterCheckbox.checked = true;
+        masterCheckbox.indeterminate = false;
+      } else {
+        masterCheckbox.checked = false;
+        masterCheckbox.indeterminate = true;
+      }
+    }
+  }
+
+  // Recompute and refresh live stats
+  function updateStats() {
+    const items = allItems();
+    const total = items.length;
+    let inUse = 0;
+    let totalB = 0;
+    let unusedB = 0;
+    let proj = 0;
+    let hero = 0;
+    let site = 0;
+
+    items.forEach((card) => {
+      const isU = card.dataset.inuse === 'true';
+      const sz = parseInt(card.dataset.size || '0', 10);
+      const cat = card.dataset.cat || '';
+
+      if (isU) inUse++;
+      else unusedB += sz;
+      totalB += sz;
+
+      if (cat === 'projects') proj++;
+      else if (cat === 'hero-media') hero++;
+      else if (cat === 'site-assets' || cat === 'icons') site++;
+    });
+
+    const unref = total - inUse;
+
+    if (statTotal) statTotal.textContent = total;
+    if (statInUse) statInUse.textContent = inUse;
+    if (statUnused) statUnused.textContent = unref;
+    if (statTotalBytes) statTotalBytes.textContent = fmtBytes(totalB);
+    if (statUnusedBytes) statUnusedBytes.textContent = `${fmtBytes(unusedB)} reclaimable`;
+
+    if (countAll) countAll.textContent = total;
+    if (countProjects) countProjects.textContent = proj;
+    if (countHero) countHero.textContent = hero;
+    if (countSiteAssets) countSiteAssets.textContent = site;
+    if (countUnused) countUnused.textContent = unref;
+
+    if (btnAutoCleanup) {
+      btnAutoCleanup.disabled = unref === 0;
+      btnAutoCleanup.setAttribute('data-unused', unref);
+      btnAutoCleanup.querySelector('span').textContent = `Prune All Unused (${unref})`;
+    }
+  }
+
+  // Tab Filtering
+  tabButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      tabButtons.forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeFilter = btn.dataset.filter || 'all';
+      applyFilters();
+    });
+  });
+
+  // Search Input
+  searchInput?.addEventListener('input', (e) => {
+    searchTerm = e.target.value.toLowerCase().trim();
+    if (searchClear) searchClear.hidden = !searchTerm;
+    applyFilters();
+  });
+
+  searchClear?.addEventListener('click', () => {
+    if (searchInput) searchInput.value = '';
+    searchTerm = '';
+    searchClear.hidden = true;
+    applyFilters();
+  });
+
+  // View Switcher (Grid vs Table)
+  viewGridBtn?.addEventListener('click', () => {
+    viewGridBtn.classList.add('active');
+    viewTableBtn?.classList.remove('active');
+    if (mediaGrid) mediaGrid.hidden = false;
+    if (mediaTable) mediaTable.hidden = true;
+  });
+
+  viewTableBtn?.addEventListener('click', () => {
+    viewTableBtn.classList.add('active');
+    viewGridBtn?.classList.remove('active');
+    if (mediaGrid) mediaGrid.hidden = true;
+    if (mediaTable) mediaTable.hidden = false;
+  });
+
+  // Checkbox Event Delegation
+  document.addEventListener('change', (e) => {
+    if (e.target?.classList.contains('item-checkbox')) {
+      updateSelection();
+    }
+  });
+
+  // Master Checkbox
+  masterCheckbox?.addEventListener('change', (e) => {
+    const isChecked = e.target.checked;
+    allItems().forEach((card, idx) => {
+      if (card.style.display !== 'none') {
+        const pathVal = card.dataset.path;
+        document.querySelectorAll(`.item-checkbox[value="${pathVal}"]`).forEach((cb) => {
+          cb.checked = isChecked;
+        });
+      }
+    });
+    updateSelection();
+  });
+
+  // Select Unused Button
+  btnSelectUnusedOnly?.addEventListener('click', () => {
+    allCheckboxes().forEach((cb) => (cb.checked = false));
+    allItems().forEach((card) => {
+      if (card.style.display !== 'none' && card.dataset.inuse === 'false') {
+        const pathVal = card.dataset.path;
+        document.querySelectorAll(`.item-checkbox[value="${pathVal}"]`).forEach((cb) => {
+          cb.checked = true;
+        });
+      }
+    });
+    updateSelection();
+    showToast('Selected all unreferenced files on view', 'default');
+  });
+
+  // Copy Path Clipboard Helper
+  async function copyPath(pathVal) {
+    try {
+      await navigator.clipboard.writeText(pathVal);
+      showToast(`Copied "${pathVal}" to clipboard`, 'success');
+    } catch {
+      // Fallback
+      const ta = document.createElement('textarea');
+      ta.value = pathVal;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      showToast(`Copied "${pathVal}" to clipboard`, 'success');
+    }
+  }
+
+  document.addEventListener('click', (e) => {
+    const copyBtn = e.target.closest('[data-copy-path]');
+    if (copyBtn) {
+      e.stopPropagation();
+      const p = copyBtn.getAttribute('data-copy-path');
+      if (p) copyPath(p);
+    }
+  });
+
+  // Lightbox Inspection Logic
+  function openLightbox(pathVal, isVideo, displayName) {
+    const card = document.querySelector(`.asset-card[data-path="${pathVal}"]`);
+    if (!card || !lightbox || !lbMediaWrap) return;
+
+    currentLbItem = {
+      path: pathVal,
+      isVideo,
+      name: displayName,
+      inUse: card.dataset.inuse === 'true',
+      size: parseInt(card.dataset.size || '0', 10),
+      category: card.querySelector('.meta-cat')?.textContent || 'Asset',
+      usedIn: card.dataset.usedin ? card.dataset.usedin.split(' ').filter(Boolean) : [],
+    };
+
+    if (lbTitle) lbTitle.textContent = displayName;
+    if (lbPath) lbPath.textContent = pathVal;
+    if (lbMetaPath) lbMetaPath.textContent = pathVal;
+    if (lbMetaCategory) lbMetaCategory.textContent = currentLbItem.category;
+    if (lbMetaSize) lbMetaSize.textContent = fmtBytes(currentLbItem.size);
+
+    if (lbMetaStatus) {
+      lbMetaStatus.innerHTML = currentLbItem.inUse
+        ? '<span class="status-tag tag-success">Active In Content</span>'
+        : '<span class="status-tag tag-warning">Unreferenced</span>';
+    }
+
+    if (lbReferences) {
+      if (currentLbItem.usedIn.length > 0) {
+        lbReferences.innerHTML = currentLbItem.usedIn
+          .map((f) => `<div class="ref-badge"><span class="ref-dot"></span><code>${f}</code></div>`)
+          .join('');
+      } else {
+        lbReferences.innerHTML = '<span class="text-muted">No content files link to this asset.</span>';
+      }
+    }
+
+    if (lbExternalLink) {
+      lbExternalLink.href = pathVal;
+    }
+
     lbMediaWrap.innerHTML = isVideo
-      ? `<video src="${src}" controls autoplay playsinline class="lb-media"></video>`
-      : `<img src="${src}" alt="${name}" class="lb-media" />`;
+      ? `<video src="${pathVal}" controls autoplay playsinline class="lb-viewport-media"></video>`
+      : `<img src="${pathVal}" alt="${displayName}" class="lb-viewport-media" />`;
+
     lightbox.hidden = false;
-    lightbox.classList.add('open');
+    lightbox.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
   }
 
   function closeLightbox() {
     if (!lightbox || !lbMediaWrap) return;
     lightbox.hidden = true;
-    lightbox.classList.remove('open');
+    lightbox.classList.remove('is-open');
     lbMediaWrap.innerHTML = '';
+    currentLbItem = null;
+    document.body.style.overflow = '';
   }
 
   lbClose?.addEventListener('click', closeLightbox);
   lightbox?.addEventListener('click', (e) => {
     if (e.target === lightbox) closeLightbox();
   });
-  lbDelete?.addEventListener('click', () => {
-    if (currentLbPath) {
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (lightbox && !lightbox.hidden) closeLightbox();
+      if (confirmModal && !confirmModal.hidden) closeConfirm(false);
+    }
+  });
+
+  lbCopyBtn?.addEventListener('click', () => {
+    if (currentLbItem?.path) copyPath(currentLbItem.path);
+  });
+
+  lbDeleteBtn?.addEventListener('click', () => {
+    if (currentLbItem?.path) {
+      const p = currentLbItem.path;
       closeLightbox();
-      doDelete([currentLbPath]);
+      executeDelete([p]);
     }
   });
 
-  // Selection & UI elements
-  const btnDelSel = document.getElementById('btnDelSel');
-  const btnSelAll = document.getElementById('btnSelAll');
-  const btnSelUnused = document.getElementById('btnSelUnused');
-  const btnDesel = document.getElementById('btnDesel');
-  const btnAutoCleanup = document.getElementById('btnAutoCleanup');
-  const selCount = document.getElementById('selCount');
-  const selInfo = document.getElementById('selInfo');
-  const tabs = document.querySelectorAll('.tab');
-  const searchInput = document.getElementById('searchInput');
-
-  function cards() {
-    return Array.from(document.querySelectorAll('.mcard'));
-  }
-  function checks() {
-    return Array.from(document.querySelectorAll('.fchk'));
-  }
-
-  function updateSel() {
-    const checked = checks().filter((c) => c.checked);
-    const n = checked.length;
-    if (selCount) selCount.textContent = n;
-    if (selInfo) selInfo.hidden = n === 0;
-    if (btnDelSel) btnDelSel.disabled = n === 0;
-    if (btnDesel) btnDesel.hidden = n === 0;
-
-    cards().forEach((card) => {
-      const cb = card.querySelector('.fchk');
-      card.classList.toggle('is-sel', !!cb?.checked);
-    });
-  }
-
-  document.addEventListener('change', (e) => {
-    if (e.target?.classList.contains('fchk')) updateSel();
-  });
-
-  // Card click (select vs preview)
+  // Preview click handler
   document.addEventListener('click', (e) => {
-    const thumb = e.target.closest('.mthumb');
-    if (thumb) {
-      const p = thumb.getAttribute('data-preview-path');
-      const isVid = thumb.getAttribute('data-is-video') === 'true';
-      const nm = thumb.getAttribute('data-name') || '';
-      openLightbox(p, isVid, nm);
-      return;
-    }
+    const trigger = e.target.closest('[data-preview-path]');
+    if (!trigger) return;
+    if (e.target.closest('.item-checkbox') || e.target.closest('.card-checkbox-label')) return;
 
-    const card = e.target.closest('.mcard');
-    if (!card) return;
-    if (e.target.closest('.del-btn') || e.target.closest('.chk-wrap')) return;
-
-    const cb = card.querySelector('.fchk');
-    if (cb) {
-      cb.checked = !cb.checked;
-      updateSel();
-    }
+    const p = trigger.getAttribute('data-preview-path');
+    const isVid = trigger.getAttribute('data-is-video') === 'true';
+    const name = trigger.getAttribute('data-name') || p.split('/').pop();
+    openLightbox(p, isVid, name);
   });
 
-  // Filter tabs & Search
-  let activeFilter = 'all';
-  let searchTerm = '';
+  // Delete Confirmation Logic
+  function openConfirm(paths) {
+    if (!confirmModal || !paths.length) return Promise.resolve(false);
 
-  function applyFilters() {
-    cards().forEach((card) => {
-      const cat = card.dataset.cat || '';
-      const inUse = card.dataset.inuse === 'true';
-      const name = card.dataset.name || '';
+    // Check if any in-use
+    let hasInUse = false;
+    paths.forEach((p) => {
+      const c = document.querySelector(`.asset-card[data-path="${p}"]`);
+      if (c && c.dataset.inuse === 'true') hasInUse = true;
+    });
 
-      let matchTab = true;
-      if (activeFilter === 'unused') matchTab = !inUse;
-      else if (activeFilter !== 'all') matchTab = cat === activeFilter;
+    if (confirmWarningInUse) confirmWarningInUse.hidden = !hasInUse;
+    if (confirmMessage) {
+      confirmMessage.textContent = `Are you sure you want to permanently delete ${paths.length} file${paths.length > 1 ? 's' : ''}?`;
+    }
 
-      let matchSearch = true;
-      if (searchTerm) matchSearch = name.includes(searchTerm);
+    if (confirmFileList) {
+      confirmFileList.innerHTML = paths
+        .slice(0, 8)
+        .map((p) => `<div class="confirm-file-line"><span class="confirm-bullet">&bull;</span><code>${p}</code></div>`)
+        .join('') + (paths.length > 8 ? `<div class="confirm-more">+ ${paths.length - 8} more files</div>` : '');
+    }
 
-      card.style.display = matchTab && matchSearch ? '' : 'none';
+    confirmModal.hidden = false;
+    confirmModal.classList.add('is-open');
+
+    return new Promise((resolve) => {
+      confirmResolver = resolve;
     });
   }
 
-  tabs.forEach((tab) => {
-    tab.addEventListener('click', () => {
-      tabs.forEach((t) => t.classList.remove('active'));
-      tab.classList.add('active');
-      activeFilter = tab.dataset.f || 'all';
-      applyFilters();
-    });
+  function closeConfirm(result) {
+    if (!confirmModal) return;
+    confirmModal.hidden = true;
+    confirmModal.classList.remove('is-open');
+    if (confirmResolver) {
+      confirmResolver(result);
+      confirmResolver = null;
+    }
+  }
+
+  confirmCancelBtn?.addEventListener('click', () => closeConfirm(false));
+  confirmOkBtn?.addEventListener('click', () => closeConfirm(true));
+  confirmModal?.addEventListener('click', (e) => {
+    if (e.target === confirmModal) closeConfirm(false);
   });
 
-  searchInput?.addEventListener('input', (e) => {
-    searchTerm = e.target.value.toLowerCase().trim();
-    applyFilters();
-  });
-
-  // Bulk selectors
-  btnSelAll?.addEventListener('click', () => {
-    cards().forEach((card) => {
-      if (card.style.display !== 'none') {
-        const cb = card.querySelector('.fchk');
-        if (cb) cb.checked = true;
-      }
-    });
-    updateSel();
-  });
-
-  btnSelUnused?.addEventListener('click', () => {
-    cards().forEach((card) => {
-      const cb = card.querySelector('.fchk');
-      if (cb) {
-        cb.checked = card.dataset.inuse === 'false' && card.style.display !== 'none';
-      }
-    });
-    updateSel();
-  });
-
-  btnDesel?.addEventListener('click', () => {
-    checks().forEach((cb) => (cb.checked = false));
-    updateSel();
-  });
-
-  // Delete Action
-  async function doDelete(paths) {
+  // Execute Delete Operation
+  async function executeDelete(paths) {
     if (!paths || !paths.length) return;
 
-    // Check if any file is in use
-    const hasInUse = paths.some((p) => {
-      const c = document.querySelector(`.mcard[data-path="${p}"]`);
-      return c && c.dataset.inuse === 'true';
-    });
+    const confirmed = await openConfirm(paths);
+    if (!confirmed) return;
 
-    const ok = await openDlg(
-      `Permanently delete ${paths.length} file${paths.length !== 1 ? 's' : ''}? This will remove them immediately from disk and commit the deletion to GitHub.`,
-      hasInUse
-    );
-    if (!ok) return;
+    showToast(`Deleting ${paths.length} asset${paths.length > 1 ? 's' : ''}…`, 'default');
 
-    showToast(`Deleting ${paths.length} file(s) via CMS…`, 'info');
-    if (btnDelSel) btnDelSel.disabled = true;
+    if (btnDeleteSelected) btnDeleteSelected.disabled = true;
     if (btnAutoCleanup) btnAutoCleanup.disabled = true;
 
     try {
@@ -700,54 +1181,71 @@ function fmtBytes(b) {
       const errors = data.errors || [];
 
       deleted.forEach((p) => {
-        const c = document.querySelector(`.mcard[data-path="${p}"]`);
-        if (c) {
-          c.style.transition = 'all 0.3s ease';
-          c.style.opacity = '0';
-          c.style.transform = 'scale(0.85)';
-          setTimeout(() => c.remove(), 300);
-        }
+        document.querySelectorAll(`.asset-card[data-path="${p}"], .table-row[data-path="${p}"]`).forEach((el) => {
+          el.style.transition = 'all 0.28s ease';
+          el.style.opacity = '0';
+          el.style.transform = 'scale(0.92)';
+          setTimeout(() => el.remove(), 280);
+        });
       });
 
-      if (errors.length > 0) {
-        showToast(`Deleted ${deleted.length} file(s). ${errors.length} failed: ${errors[0]}`, 'error');
-      } else {
-        showToast(`✓ Successfully deleted ${deleted.length} file${deleted.length !== 1 ? 's' : ''}`, 'success');
-      }
+      setTimeout(() => {
+        updateStats();
+        applyFilters();
 
-      setTimeout(updateSel, 350);
+        if (errors.length > 0) {
+          showToast(`Deleted ${deleted.length} file(s). Warning: ${errors[0]}`, 'warning');
+        } else {
+          showToast(`✓ Permanently deleted ${deleted.length} file${deleted.length > 1 ? 's' : ''}`, 'success');
+        }
+      }, 300);
+
     } catch (err) {
-      showToast('Error: ' + err.message, 'error');
-      if (btnDelSel) btnDelSel.disabled = false;
+      showToast(`Error: ${err.message}`, 'error');
+      if (btnDeleteSelected) btnDeleteSelected.disabled = false;
       if (btnAutoCleanup) btnAutoCleanup.disabled = false;
     }
   }
 
-  btnDelSel?.addEventListener('click', () => {
-    const selected = checks()
-      .filter((c) => c.checked)
-      .map((c) => c.value);
-    doDelete(selected);
-  });
-
-  btnAutoCleanup?.addEventListener('click', () => {
-    const unused = cards()
-      .filter((c) => c.dataset.inuse === 'false')
-      .map((c) => c.dataset.path)
-      .filter(Boolean);
-    doDelete(unused);
-  });
-
   // Single card delete button
   document.addEventListener('click', (e) => {
-    const btn = e.target.closest('[data-dpath]');
+    const btn = e.target.closest('[data-delete-path]');
     if (!btn) return;
     e.stopPropagation();
-    doDelete([btn.getAttribute('data-dpath')]);
+    const p = btn.getAttribute('data-delete-path');
+    if (p) executeDelete([p]);
   });
+
+  // Bulk Delete Selected
+  btnDeleteSelected?.addEventListener('click', () => {
+    const selected = Array.from(new Set(
+      allCheckboxes()
+        .filter((c) => c.checked)
+        .map((c) => c.value)
+    ));
+    if (selected.length > 0) executeDelete(selected);
+  });
+
+  // Prune All Unused Button
+  btnAutoCleanup?.addEventListener('click', () => {
+    const unusedPaths = allItems()
+      .filter((card) => card.dataset.inuse === 'false')
+      .map((card) => card.dataset.path)
+      .filter(Boolean);
+
+    if (unusedPaths.length > 0) {
+      executeDelete(unusedPaths);
+    } else {
+      showToast('No unreferenced files found to clean up.', 'default');
+    }
+  });
+
+  // Initial setup
+  applyFilters();
 </script>
 
 <style>
+/* ─── RESET & CSS VARIABLES ──────────────────────────────── */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -755,837 +1253,1280 @@ function fmtBytes(b) {
 }
 
 :root {
-  /* surfaces */
-  --bg:   #0d0f14;
-  --sf:   #13161d;
-  --sf2:  #191d26;
-  --sf3:  #1e2330;
-
-  /* borders */
-  --bd:  rgba(255,255,255,0.06);
-  --bd2: rgba(255,255,255,0.11);
-  --bd3: rgba(255,255,255,0.16);
-
-  /* text */
-  --tx:  #eceef4;
-  --tx2: #9aa0ad;
-  --tx3: #636b78;
-
-  /* brand */
-  --ac:     #e5342a;
-  --ac-lo:  rgba(229,52,42,0.14);
-  --ac-md:  rgba(229,52,42,0.28);
-
-  /* semantic colours */
-  --gr: #22c55e;  --gr-lo: rgba(34,197,94,0.13);
-  --am: #f59e0b;  --am-lo: rgba(245,158,11,0.13);
-  --bl: #3b82f6;  --bl-lo: rgba(59,130,246,0.13);
-  --pu: #a855f7;  --pu-lo: rgba(168,85,247,0.13);
-
-  /* geometry */
-  --r-sm:  8px;
-  --r:     14px;
-  --r-lg:  20px;
-  --r-xl:  26px;
-  --sw:    248px;
+  --bg-page: #f8f9fa;
+  --bg-surface: #ffffff;
+  --bg-surface-hover: #f4f4f5;
+  --bg-surface-subtle: #f9fafb;
+  --border-color: #e4e4e7;
+  --border-subtle: #f0f0f2;
+  --border-strong: #d4d4d8;
+  --text-main: #09090b;
+  --text-muted: #71717a;
+  --text-dim: #a1a1aa;
+  --brand-color: #d32f2f;
+  --brand-dark: #b71c1c;
+  --brand-light: #fef2f2;
+  --brand-border: #fecaca;
+  --success-color: #15803d;
+  --success-bg: #f0fdf4;
+  --success-border: #bbf7d0;
+  --warning-color: #b45309;
+  --warning-bg: #fffbeb;
+  --warning-border: #fde68a;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'Roboto Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
 }
 
-html, body {
-  height: 100%;
-  background: var(--bg);
-  color: var(--tx);
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+body {
+  background-color: var(--bg-page);
+  color: var(--text-main);
+  font-family: var(--font-sans);
   font-size: 14px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
 
-/* ─── LAYOUT ─────────────────────────────────────────────── */
-.app-shell {
-  display: flex;
-  height: 100vh;
-  overflow: hidden;
+.page-container {
+  max-width: 1480px;
+  margin: 0 auto;
+  padding: 0 24px 60px;
 }
 
-/* ─── SIDEBAR ─────────────────────────────────────────────── */
-.sidebar {
-  width: var(--sw);
-  min-width: var(--sw);
-  background: var(--sf);
-  border-right: 1px solid var(--bd);
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-  scrollbar-width: none;
-}
-.sidebar::-webkit-scrollbar { display: none; }
-
-/* brand */
-.sidebar-brand {
+/* ─── HEADER ──────────────────────────────────────────────── */
+.header {
   display: flex;
   align-items: center;
-  gap: 11px;
-  padding: 20px 16px 18px;
+  justify-content: space-between;
+  padding: 24px 0 20px;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
 }
 
-.brand-logo {
-  width: 36px;
-  height: 36px;
-  background: linear-gradient(140deg, var(--ac) 0%, #a01c16 100%);
-  border-radius: 11px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  flex-shrink: 0;
-  box-shadow: 0 4px 16px rgba(229,52,42,0.35), inset 0 1px 1px rgba(255,255,255,0.18);
-}
-
-.brand-text {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.2;
-  gap: 1px;
-}
-.brand-name {
-  font-size: 0.92rem;
-  font-weight: 700;
-  color: var(--tx);
-  letter-spacing: -0.02em;
-}
-.brand-label {
-  font-size: 0.62rem;
-  font-weight: 600;
-  color: var(--tx3);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-}
-
-/* nav */
-.sidebar-nav {
-  padding: 6px 10px;
-  flex-grow: 1;
-}
-
-.nav-section-label {
-  font-size: 0.6rem;
-  font-weight: 700;
-  color: var(--tx3);
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  padding: 14px 10px 5px;
-  display: block;
-}
-
-.nav-item {
+.header-brand {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 9px 12px;
-  border-radius: 10px;
-  color: var(--tx2);
-  text-decoration: none;
-  font-size: 0.83rem;
-  font-weight: 500;
-  transition: background 0.14s, color 0.14s;
-  margin-bottom: 1px;
-}
-.nav-item:hover {
-  background: rgba(255,255,255,0.045);
-  color: var(--tx);
-}
-.nav-item.active {
-  background: var(--ac-lo);
-  color: #ff7069;
-  font-weight: 600;
-}
-.nav-item svg {
-  opacity: 0.6;
-  flex-shrink: 0;
-  transition: opacity 0.14s;
-}
-.nav-item:hover svg,
-.nav-item.active svg {
-  opacity: 1;
 }
 
-.nav-badge {
-  margin-left: auto;
-  font-size: 0.64rem;
-  font-weight: 700;
-  background: var(--ac-md);
-  color: #ff7069;
-  padding: 1px 7px;
-  border-radius: 50px;
-  letter-spacing: 0.01em;
-}
-
-.nav-divider {
-  height: 1px;
-  background: var(--bd);
-  margin: 8px 6px;
-}
-
-/* sidebar footer */
-.sidebar-footer {
-  padding: 14px 16px 18px;
-  border-top: 1px solid var(--bd);
-}
-
-.storage-info { display: flex; flex-direction: column; gap: 7px; }
-
-.storage-label {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.72rem;
-  color: var(--tx3);
-}
-.storage-used {
-  color: var(--tx2);
-  font-weight: 600;
-}
-.storage-bar {
-  height: 5px;
-  background: rgba(255,255,255,0.07);
-  border-radius: 99px;
-  overflow: hidden;
-}
-.storage-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--ac), #ff8882);
-  border-radius: 99px;
-  transition: width 0.6s cubic-bezier(0.16,1,0.3,1);
-  min-width: 5px;
-}
-.storage-sub {
-  font-size: 0.68rem;
-  color: var(--tx3);
-}
-
-/* ─── MAIN ────────────────────────────────────────────────── */
-.main {
-  flex: 1;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255,255,255,0.1) transparent;
-}
-
-/* topbar */
-.topbar {
-  display: flex;
+.brand-link {
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 16px 28px;
-  border-bottom: 1px solid var(--bd);
-  background: rgba(13,15,20,0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  gap: 12px;
-  flex-wrap: wrap;
+  gap: 8px;
+  text-decoration: none;
+  color: var(--text-main);
 }
 
-.topbar-title-wrap { display: flex; flex-direction: column; gap: 2px; }
-
-.page-title {
-  font-size: 1.15rem;
+.brand-badge {
+  font-size: 0.85rem;
   font-weight: 700;
-  color: var(--tx);
-  letter-spacing: -0.025em;
+  letter-spacing: 0.08em;
+  color: var(--brand-color);
 }
-.page-sub {
-  font-size: 0.78rem;
-  color: var(--tx3);
+
+.brand-sep {
+  color: var(--border-strong);
+  font-weight: 300;
 }
-.topbar-actions {
+
+.brand-sub {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-main);
+  letter-spacing: -0.01em;
+}
+
+.env-pill {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 500;
+  padding: 2px 8px;
+  background: var(--bg-surface-hover);
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+}
+
+.header-nav {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-/* ─── BUTTONS ─────────────────────────────────────────────── */
-.btn {
+.nav-btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 0 16px;
-  height: 36px;
-  border-radius: 10px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
-  text-decoration: none;
-  transition: background 0.16s, box-shadow 0.16s, transform 0.12s;
-  border: none;
-  white-space: nowrap;
-  letter-spacing: 0.01em;
-}
-.btn:active { transform: scale(0.97); }
-.btn:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
-  transform: none !important;
-}
-
-.btn-primary {
-  background: var(--ac);
-  color: #fff;
-  box-shadow: 0 2px 10px rgba(229,52,42,0.3);
-}
-.btn-primary:hover { background: #cc2b22; box-shadow: 0 4px 16px rgba(229,52,42,0.4); }
-
-.btn-danger {
-  background: var(--ac-lo);
-  color: #ff7069;
-  border: 1px solid var(--ac-md);
-}
-.btn-danger:hover:not(:disabled) { background: var(--ac-md); }
-
-.btn-solid {
-  background: var(--ac);
-  color: #fff;
-  box-shadow: 0 2px 10px rgba(229,52,42,0.3);
-}
-.btn-solid:hover { background: #cc2b22; }
-
-.btn-del {
-  background: var(--ac-lo);
-  color: #ff7069;
-  border: 1px solid rgba(229,52,42,0.22);
-}
-.btn-del:hover:not(:disabled) { background: rgba(229,52,42,0.22); }
-
-.btn-ghost {
-  background: transparent;
-  color: var(--tx2);
-  border: 1px solid var(--bd2);
-}
-.btn-ghost:hover {
-  background: rgba(255,255,255,0.04);
-  color: var(--tx);
-  border-color: var(--bd3);
-}
-
-/* ─── STAT CARDS ──────────────────────────────────────────── */
-.stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(175px,1fr));
-  gap: 14px;
-  padding: 20px 28px;
-  border-bottom: 1px solid var(--bd);
-}
-
-.stat-card {
-  background: var(--sf);
-  border: 1px solid var(--bd);
-  border-radius: var(--r);
-  padding: 16px;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  transition: border-color 0.2s, box-shadow 0.2s;
-  position: relative;
-  overflow: hidden;
-}
-.stat-card::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: var(--r);
-  pointer-events: none;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
-}
-.stat-card:hover {
-  border-color: var(--bd2);
-  box-shadow: 0 6px 24px rgba(0,0,0,0.25);
-}
-
-.sic {
-  width: 44px;
-  height: 44px;
-  border-radius: 13px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-.sic-blue  { background: var(--bl-lo); color: var(--bl); box-shadow: 0 4px 14px rgba(59,130,246,0.15); }
-.sic-green { background: var(--gr-lo); color: var(--gr); box-shadow: 0 4px 14px rgba(34,197,94,0.15); }
-.sic-amber { background: var(--am-lo); color: var(--am); box-shadow: 0 4px 14px rgba(245,158,11,0.15); }
-.sic-purple{ background: var(--pu-lo); color: var(--pu); box-shadow: 0 4px 14px rgba(168,85,247,0.15); }
-
-.si { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.sv {
-  font-size: 1.55rem;
-  font-weight: 700;
-  color: var(--tx);
-  line-height: 1;
-  letter-spacing: -0.03em;
-}
-.sl {
-  font-size: 0.71rem;
-  color: var(--tx3);
+  padding: 7px 14px;
+  border-radius: 6px;
+  font-size: 0.82rem;
   font-weight: 500;
+  text-decoration: none;
+  color: var(--text-main);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  transition: all 0.15s ease;
 }
-.ss {
-  display: none; /* hide the secondary sub-label — cards are self-explanatory */
+
+.nav-btn:hover {
+  background: var(--bg-surface-hover);
+  border-color: var(--border-strong);
 }
-.c-green { color: var(--gr); }
-.c-amber  { color: var(--am); }
+
+.nav-btn-primary {
+  background: var(--brand-color);
+  color: #ffffff;
+  border-color: var(--brand-color);
+}
+
+.nav-btn-primary:hover {
+  background: var(--brand-dark);
+  border-color: var(--brand-dark);
+  color: #ffffff;
+}
+
+/* ─── METRICS BAR ─────────────────────────────────────────── */
+.metrics-bar {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(180px, 1fr)) auto;
+  gap: 16px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 18px 24px;
+  margin-bottom: 24px;
+  align-items: center;
+}
+
+.metric-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.metric-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.metric-value-wrap {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.metric-num {
+  font-family: var(--font-mono);
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1;
+}
+
+.metric-sub {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.text-success { color: var(--success-color); }
+.text-warning { color: var(--warning-color); }
+
+.metric-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* ─── BUTTONS ─────────────────────────────────────────────── */
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.action-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.action-btn-danger {
+  background: var(--brand-light);
+  color: var(--brand-color);
+  border-color: var(--brand-border);
+}
+
+.action-btn-danger:hover:not(:disabled) {
+  background: var(--brand-color);
+  color: #ffffff;
+  border-color: var(--brand-color);
+}
+
+.action-btn-secondary {
+  background: var(--bg-surface);
+  color: var(--text-main);
+  border-color: var(--border-color);
+}
+
+.action-btn-secondary:hover:not(:disabled) {
+  background: var(--bg-surface-hover);
+  border-color: var(--border-strong);
+}
 
 /* ─── TOOLBAR ─────────────────────────────────────────────── */
 .toolbar {
   display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.toolbar-filter-row {
+  display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 12px;
-  padding: 14px 28px;
-  border-bottom: 1px solid var(--bd);
-  background: var(--bg);
-  position: sticky;
-  top: 69px;
-  z-index: 15;
-}
-.toolbar-left {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
 }
 
-/* pill tabs — floating active indicator */
-.ftabs {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  background: var(--sf);
-  border: 1px solid var(--bd);
-  border-radius: var(--r-xl);
-  padding: 4px;
+.category-tabs {
+  display: inline-flex;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 3px;
+  gap: 2px;
 }
-.tab {
-  height: 28px;
-  padding: 0 13px;
-  border-radius: 99px;
-  background: transparent;
+
+.tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 4px;
   border: none;
-  color: var(--tx2);
-  font-size: 0.77rem;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.78rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
-  white-space: nowrap;
-}
-.tab:hover { color: var(--tx); }
-.tab.active {
-  background: var(--sf3);
-  color: var(--tx);
-  font-weight: 600;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  transition: all 0.14s ease;
 }
 
-/* search */
-.search-box {
+.tab-btn:hover {
+  color: var(--text-main);
+}
+
+.tab-btn.active {
+  background: var(--bg-page);
+  color: var(--text-main);
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+}
+
+.tab-count {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  background: var(--bg-surface-hover);
+  padding: 1px 5px;
+  border-radius: 3px;
+  color: var(--text-muted);
+}
+
+.tab-btn.active .tab-count {
+  background: #ffffff;
+  color: var(--text-main);
+}
+
+.tab-btn-warning.active {
+  color: var(--warning-color);
+}
+
+.tab-btn-warning.active .tab-count {
+  color: var(--warning-color);
+  background: var(--warning-bg);
+}
+
+.search-wrap {
   display: flex;
   align-items: center;
-  gap: 8px;
-  background: var(--sf);
-  border: 1px solid var(--bd);
-  border-radius: 10px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
   padding: 0 12px;
-  height: 36px;
-  color: var(--tx3);
-  transition: border-color 0.15s;
+  height: 34px;
+  position: relative;
+  min-width: 280px;
 }
-.search-box:focus-within {
-  border-color: var(--bd3);
-  color: var(--tx2);
+
+.search-wrap:focus-within {
+  border-color: var(--text-main);
 }
-.search-box input {
-  background: transparent;
+
+.search-icon {
+  color: var(--text-muted);
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.search-wrap input {
   border: none;
   outline: none;
-  color: var(--tx);
-  font-size: 0.8rem;
-  width: 150px;
-}
-.search-box input::placeholder { color: var(--tx3); }
-
-/* selection bar */
-.sel-bar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.sel-info {
-  font-size: 0.78rem;
-  color: var(--tx2);
-  font-weight: 500;
-}
-
-/* ─── MEDIA GRID ──────────────────────────────────────────── */
-.grid-wrap {
-  padding: 22px 28px;
-  flex: 1;
-}
-
-.mgrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(215px,1fr));
-  gap: 16px;
-}
-
-.mcard {
-  background: var(--sf);
-  border: 1px solid var(--bd);
-  border-radius: var(--r);
-  overflow: hidden;
-  cursor: pointer;
-  transition: border-color 0.2s, transform 0.22s cubic-bezier(0.16,1,0.3,1), box-shadow 0.22s;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-}
-.mcard:hover {
-  border-color: var(--bd2);
-  transform: translateY(-3px);
-  box-shadow: 0 12px 32px rgba(0,0,0,0.4);
-}
-.mcard.is-unused {
-  border-color: rgba(245,158,11,0.22);
-}
-.mcard.is-sel {
-  border-color: var(--ac);
-  box-shadow: 0 0 0 2px rgba(229,52,42,0.22);
-}
-
-/* checkbox */
-.chk-wrap {
-  position: absolute;
-  top: 9px;
-  left: 9px;
-  z-index: 5;
-  cursor: pointer;
-}
-.sr-only {
-  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
-  overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
-}
-.chkbox {
-  display: block;
-  width: 21px;
-  height: 21px;
-  border: 2px solid rgba(255,255,255,0.35);
-  border-radius: 7px;
-  background: rgba(0,0,0,0.55);
-  backdrop-filter: blur(6px);
-  transition: background 0.15s, border-color 0.15s;
-  position: relative;
-}
-.fchk:checked ~ .chkbox {
-  background: var(--ac);
-  border-color: var(--ac);
-}
-.fchk:checked ~ .chkbox::after {
-  content: '';
-  position: absolute;
-  left: 5px; top: 2px;
-  width: 6px; height: 10px;
-  border: 2px solid white;
-  border-top: none; border-left: none;
-  transform: rotate(45deg);
-}
-
-/* thumbnail */
-.mthumb {
-  height: 158px;
-  background: #080a0f;
-  position: relative;
-  overflow: hidden;
-}
-.mmedia {
-  width: 100%; height: 100%;
-  object-fit: cover;
-  transition: transform 0.38s cubic-bezier(0.16,1,0.3,1);
-}
-.mcard:hover .mmedia { transform: scale(1.06); }
-
-.thumb-hover-overlay {
-  position: absolute; inset: 0;
-  background: rgba(0,0,0,0.32);
-  display: flex; align-items: center; justify-content: center;
-  opacity: 0;
-  transition: opacity 0.2s;
-  color: #fff;
-}
-.mthumb:hover .thumb-hover-overlay { opacity: 1; }
-
-/* pills on thumbnail */
-.upill {
-  position: absolute;
-  bottom: 7px; right: 7px;
-  font-size: 0.6rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding: 3px 8px;
-  border-radius: 99px;
-  pointer-events: none;
-  z-index: 2;
-  backdrop-filter: blur(6px);
-}
-.up-active {
-  background: rgba(34,197,94,0.18);
-  color: #4ade80;
-  border: 1px solid rgba(34,197,94,0.35);
-}
-.up-unused {
-  background: rgba(245,158,11,0.18);
-  color: #fbbf24;
-  border: 1px solid rgba(245,158,11,0.35);
-}
-.vpill {
-  position: absolute;
-  top: 9px; right: 9px;
-  font-size: 0.56rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  padding: 3px 7px;
-  border-radius: 6px;
-  background: rgba(168,85,247,0.22);
-  color: #c084fc;
-  border: 1px solid rgba(168,85,247,0.35);
-  backdrop-filter: blur(6px);
-  z-index: 2;
-}
-
-/* card info */
-.minfo {
-  padding: 11px 13px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  flex: 1;
-}
-.mname-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.mname {
-  flex: 1;
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--tx);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.del-btn {
-  flex-shrink: 0;
-  width: 26px; height: 26px;
-  display: flex; align-items: center; justify-content: center;
   background: transparent;
-  border: 1px solid transparent;
-  border-radius: 7px;
-  color: var(--tx3);
+  color: var(--text-main);
+  font-size: 0.8rem;
+  width: 100%;
+}
+
+.search-wrap input::placeholder {
+  color: var(--text-dim);
+}
+
+.search-clear {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  line-height: 1;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  padding: 2px 4px;
 }
-.del-btn:hover {
-  background: var(--ac-lo);
-  border-color: var(--ac-md);
-  color: #ff7069;
+
+.view-toggle {
+  display: inline-flex;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 2px;
 }
-.mmeta {
+
+.toggle-btn {
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  padding: 5px 8px;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toggle-btn:hover {
+  color: var(--text-main);
+}
+
+.toggle-btn.active {
+  background: var(--bg-page);
+  color: var(--text-main);
+}
+
+/* ─── SELECTION ROW ───────────────────────────────────────── */
+.selection-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 6px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 9px 16px;
+  font-size: 0.8rem;
 }
-.mbadge {
-  font-size: 0.64rem;
+
+.selection-status {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.master-checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.sel-text {
   font-weight: 500;
-  color: var(--tx3);
-  background: rgba(255,255,255,0.04);
-  padding: 2px 8px;
-  border-radius: 99px;
-  border: 1px solid var(--bd);
+  color: var(--text-main);
 }
-.msize {
-  font-size: 0.66rem;
-  color: var(--tx3);
-  font-variant-numeric: tabular-nums;
+
+.text-link-btn {
+  background: transparent;
+  border: none;
+  color: var(--brand-color);
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
-.musedIn {
-  font-size: 0.64rem;
-  color: var(--tx3);
+
+.text-link-btn:hover {
+  color: var(--brand-dark);
+}
+
+/* Checkbox design */
+.app-checkbox {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid var(--border-strong);
+  border-radius: 3px;
+  background: #ffffff;
+  outline: none;
+  cursor: pointer;
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+  transition: all 0.12s ease;
+}
+
+.app-checkbox:checked {
+  background: var(--brand-color);
+  border-color: var(--brand-color);
+}
+
+.app-checkbox:checked::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 1.5px;
+  width: 4px;
+  height: 8px;
+  border: 2px solid #ffffff;
+  border-top: none;
+  border-left: none;
+  transform: rotate(45deg);
+}
+
+.app-checkbox:indeterminate {
+  background: var(--brand-color);
+  border-color: var(--brand-color);
+}
+
+.app-checkbox:indeterminate::after {
+  content: '';
+  position: absolute;
+  left: 3px;
+  top: 6px;
+  width: 8px;
+  height: 2px;
+  background: #ffffff;
+}
+
+/* ─── MEDIA GRID ──────────────────────────────────────────── */
+.media-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 18px;
+}
+
+.asset-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  position: relative;
+}
+
+.asset-card:hover {
+  border-color: var(--border-strong);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+}
+
+.asset-card.is-selected {
+  border-color: var(--brand-color);
+  box-shadow: 0 0 0 1px var(--brand-color);
+}
+
+.asset-card.is-unreferenced {
+  border-color: #f3e8b5;
+}
+
+/* Thumbnail container */
+.card-thumb {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  background: #f1f2f4;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.thumb-media {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.video-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background: #111;
+}
+
+.video-badge {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  background: rgba(0,0,0,0.75);
+  color: #ffffff;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 3px;
+  letter-spacing: 0.05em;
+}
+
+.card-checkbox-label {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 5;
+  background: rgba(255,255,255,0.9);
+  padding: 4px;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-status-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 4;
+}
+
+.status-tag {
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 3px 7px;
+  border-radius: 4px;
+  letter-spacing: 0.02em;
+  display: inline-block;
+}
+
+.tag-success {
+  background: var(--success-bg);
+  color: var(--success-color);
+  border: 1px solid var(--success-border);
+}
+
+.tag-warning {
+  background: var(--warning-bg);
+  color: var(--warning-color);
+  border: 1px solid var(--warning-border);
+}
+
+.thumb-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.card-thumb:hover .thumb-overlay {
+  opacity: 1;
+}
+
+.preview-prompt {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #ffffff;
+  color: var(--text-main);
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+/* Card details */
+.card-details {
+  padding: 12px 14px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.name-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.file-name {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-main);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* ─── EMPTY STATE ─────────────────────────────────────────── */
-.empty {
-  display: flex; flex-direction: column; align-items: center;
-  justify-content: center; gap: 14px; text-align: center;
-  padding: 80px 40px; color: var(--tx2);
-}
-.empty-icon { color: rgba(255,255,255,0.08); }
-.empty-title { font-size: 1.1rem; font-weight: 700; color: var(--tx); }
-.empty-body { font-size: 0.85rem; max-width: 360px; color: var(--tx3); line-height: 1.6; }
-
-/* ─── CONFIRM MODAL ───────────────────────────────────────── */
-.dlg-overlay {
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,0.65);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  display: flex; align-items: center; justify-content: center;
-  z-index: 100;
-  opacity: 0; transition: opacity 0.2s; pointer-events: none;
-}
-.dlg-overlay[hidden] { display: none; }
-.dlg-overlay.open { opacity: 1; pointer-events: all; }
-
-.dlg-box {
-  background: var(--sf2);
-  border: 1px solid var(--bd2);
-  border-radius: var(--r-lg);
-  padding: 30px 28px;
-  max-width: 370px; width: 90%;
-  text-align: center;
-  display: flex; flex-direction: column; align-items: center; gap: 12px;
-  box-shadow: 0 32px 80px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.05);
-  animation: dlg-in 0.22s cubic-bezier(0.16,1,0.3,1);
-}
-@keyframes dlg-in {
-  from { transform: scale(0.93) translateY(10px); opacity: 0; }
-  to   { transform: scale(1) translateY(0); opacity: 1; }
-}
-.dlg-icon {
-  width: 54px; height: 54px;
-  background: var(--am-lo);
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  color: var(--am);
-  box-shadow: 0 4px 20px rgba(245,158,11,0.2);
-}
-.dlg-title { font-size: 1rem; font-weight: 700; color: var(--tx); }
-.dlg-msg   { font-size: 0.84rem; color: var(--tx2); line-height: 1.5; }
-.dlg-warning {
-  background: var(--ac-lo);
-  border: 1px solid var(--ac-md);
-  color: #ff7069;
-  padding: 9px 13px;
-  border-radius: var(--r-sm);
-  font-size: 0.76rem;
-  text-align: left;
-  width: 100%;
-}
-.dlg-actions { display: flex; gap: 9px; margin-top: 4px; }
-
-/* ─── LIGHTBOX ────────────────────────────────────────────── */
-.lb-overlay {
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,0.88);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  display: flex; align-items: center; justify-content: center;
-  z-index: 150;
-  opacity: 0; transition: opacity 0.2s; pointer-events: none;
-  padding: 20px;
-}
-.lb-overlay[hidden] { display: none; }
-.lb-overlay.open { opacity: 1; pointer-events: all; }
-
-.lb-box {
-  background: var(--sf2);
-  border: 1px solid var(--bd2);
-  border-radius: var(--r-lg);
-  max-width: 820px; width: 100%;
-  max-height: 90vh;
-  display: flex; flex-direction: column; overflow: hidden;
-  box-shadow: 0 40px 100px rgba(0,0,0,0.75), inset 0 1px 0 rgba(255,255,255,0.05);
-}
-.lb-header {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 15px 20px;
-  border-bottom: 1px solid var(--bd);
-}
-.lb-title { font-weight: 600; font-size: 0.88rem; color: var(--tx); }
-.lb-close {
-  background: rgba(255,255,255,0.06);
-  border: 1px solid var(--bd2);
-  border-radius: 8px;
-  font-size: 1.1rem;
-  line-height: 1;
-  color: var(--tx2);
-  cursor: pointer;
-  padding: 3px 9px;
-  transition: background 0.15s, color 0.15s;
-}
-.lb-close:hover { background: rgba(255,255,255,0.1); color: var(--tx); }
-.lb-media-wrap {
-  flex: 1;
-  display: flex; align-items: center; justify-content: center;
-  padding: 18px;
-  background: #050608;
-  min-height: 300px; max-height: 62vh; overflow: hidden;
-}
-.lb-media { max-width: 100%; max-height: 100%; object-fit: contain; }
-.lb-footer {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 12px 20px;
-  border-top: 1px solid var(--bd);
-  background: var(--sf);
-}
-.lb-path {
-  font-size: 0.73rem;
-  color: var(--tx3);
-  font-family: 'Roboto Mono', ui-monospace, monospace;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  max-width: 60%;
+.meta-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.72rem;
+  color: var(--text-muted);
 }
 
-/* ─── TOAST ───────────────────────────────────────────────── */
-.toast {
-  position: fixed;
-  bottom: 22px; right: 22px;
-  z-index: 200;
-  padding: 11px 18px;
-  border-radius: 12px;
-  font-size: 0.81rem;
+.meta-cat {
   font-weight: 500;
-  box-shadow: 0 12px 36px rgba(0,0,0,0.5);
-  transform: translateY(14px) scale(0.97);
-  opacity: 0;
-  transition: opacity 0.28s, transform 0.28s cubic-bezier(0.16,1,0.3,1);
-  pointer-events: none;
+}
+
+.meta-ext {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.meta-size {
+  font-family: var(--font-mono);
+}
+
+.meta-dot {
+  color: var(--border-strong);
+}
+
+.usage-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-top: 2px;
+}
+
+.usage-label {
+  font-weight: 500;
+  color: var(--text-main);
+  flex-shrink: 0;
+}
+
+.usage-files {
+  font-family: var(--font-mono);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.is-unused-note {
+  color: var(--warning-color);
+  font-style: italic;
+}
+
+.card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 6px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.btn-copy-path {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--bg-surface-hover);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.btn-copy-path:hover {
+  background: var(--bg-page);
+  border-color: var(--border-strong);
+}
+
+.btn-delete-card {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 4px;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.12s ease;
+}
+
+.btn-delete-card:hover {
+  background: var(--brand-light);
+  border-color: var(--brand-border);
+  color: var(--brand-color);
+}
+
+/* ─── MEDIA TABLE ─────────────────────────────────────────── */
+.media-table-wrap {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+.media-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.8rem;
+}
+
+.media-table th {
+  padding: 10px 14px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: var(--bg-surface-subtle);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.media-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-subtle);
+  vertical-align: middle;
+}
+
+.media-table tr:last-child td {
+  border-bottom: none;
+}
+
+.media-table tr.is-selected td {
+  background: var(--brand-light);
+}
+
+.th-chk, .td-chk {
+  width: 32px;
+  text-align: center;
+  padding-right: 0;
+}
+
+.th-preview, .td-preview {
+  width: 50px;
+}
+
+.table-thumb {
+  width: 40px;
+  height: 40px;
+  border-radius: 4px;
+  background: #eee;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.table-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.table-video-icon {
+  width: 100%;
+  height: 100%;
+  background: #111;
+  color: #fff;
+  font-size: 0.55rem;
+  font-family: var(--font-mono);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.table-file-name {
+  font-weight: 600;
+  display: block;
+  color: var(--text-main);
+}
+
+.table-file-path {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  display: block;
+}
+
+.table-cat-badge {
+  font-size: 0.72rem;
+  font-weight: 500;
+  background: var(--bg-surface-hover);
+  padding: 2px 7px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+}
+
+.table-usage-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.status-indicator-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.table-size-num {
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+}
+
+.table-action-btns {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-table-act {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 5px;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-table-act:hover {
+  background: var(--bg-surface-hover);
+  color: var(--text-main);
+}
+
+.btn-table-danger:hover {
+  background: var(--brand-light);
+  border-color: var(--brand-border);
+  color: var(--brand-color);
+}
+
+/* ─── EMPTY STATE ─────────────────────────────────────────── */
+.empty-state {
+  text-align: center;
+  padding: 80px 20px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.empty-icon {
+  color: var(--text-dim);
+}
+
+.empty-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.empty-desc {
+  font-size: 0.85rem;
+  color: var(--text-muted);
   max-width: 360px;
 }
-.t-on { opacity: 1; transform: translateY(0) scale(1); }
 
-.toast-success {
-  background: #071d10;
-  color: #4ade80;
-  border: 1px solid rgba(34,197,94,0.28);
+/* ─── MODAL STYLES ────────────────────────────────────────── */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(9, 9, 11, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
 }
-.toast-error {
-  background: #1e0808;
-  color: #f87171;
-  border: 1px solid rgba(239,68,68,0.28);
+
+.modal-backdrop.is-open {
+  opacity: 1;
+  pointer-events: auto;
 }
-.toast-info {
-  background: #110f1e;
-  color: #a78bfa;
-  border: 1px solid rgba(139,92,246,0.28);
+
+.modal-backdrop[hidden] {
+  display: none;
+}
+
+/* Lightbox Card */
+.lightbox-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  width: 100%;
+  max-width: 960px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+  overflow: hidden;
+}
+
+.lightbox-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.lb-title-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.lb-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.lb-path {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.modal-close-btn {
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.modal-close-btn:hover {
+  color: var(--text-main);
+}
+
+.lightbox-body {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  overflow: hidden;
+  height: calc(80vh - 60px);
+}
+
+.lb-media-viewport {
+  background: #09090b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  overflow: hidden;
+}
+
+.lb-viewport-media {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.lb-sidebar {
+  padding: 20px;
+  border-left: 1px solid var(--border-color);
+  background: var(--bg-surface-subtle);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.sidebar-heading {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.meta-dl {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dl-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.dl-row dt {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
+
+.dl-row dd {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-main);
+  word-break: break-all;
+}
+
+.sidebar-divider {
+  height: 1px;
+  background: var(--border-color);
+}
+
+.lb-references-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ref-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.ref-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--success-color);
+}
+
+.sidebar-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 14px;
+}
+
+/* ─── CONFIRMATION CARD ───────────────────────────────────── */
+.confirm-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  width: 100%;
+  max-width: 440px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+.confirm-icon-wrap {
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  background: var(--warning-bg);
+  border: 1px solid var(--warning-border);
+  color: var(--warning-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.confirm-title {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.confirm-text {
+  font-size: 0.84rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.confirm-warning-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: var(--brand-light);
+  border: 1px solid var(--brand-border);
+  color: var(--brand-dark);
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.confirm-file-preview {
+  background: var(--bg-page);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  max-height: 120px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.confirm-file-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  word-break: break-all;
+}
+
+.confirm-bullet {
+  color: var(--text-dim);
+}
+
+.confirm-more {
+  color: var(--text-muted);
+  font-style: italic;
+  padding-top: 4px;
+}
+
+.confirm-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+/* ─── TOAST NOTIFICATION ──────────────────────────────────── */
+.toast-notification {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: #09090b;
+  color: #ffffff;
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  transform: translateY(12px);
+  opacity: 0;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+  z-index: 300;
+  max-width: 400px;
+}
+
+.toast-notification.is-visible {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.toast-notification.toast-success {
+  background: var(--success-color);
+}
+
+.toast-notification.toast-warning {
+  background: var(--warning-color);
+}
+
+.toast-notification.toast-error {
+  background: var(--brand-color);
+}
+
+/* ─── RESPONSIVE ──────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .metrics-bar {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .metric-actions {
+    grid-column: 1 / -1;
+    justify-content: stretch;
+  }
+  .metric-actions .action-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  .lightbox-body {
+    grid-template-columns: 1fr;
+    height: auto;
+    max-height: 75vh;
+    overflow-y: auto;
+  }
+  .lb-sidebar {
+    border-left: none;
+    border-top: 1px solid var(--border-color);
+  }
+}
+
+@media (max-width: 640px) {
+  .page-container {
+    padding: 0 16px 40px;
+  }
+  .metrics-bar {
+    grid-template-columns: 1fr;
+  }
+  .category-tabs {
+    overflow-x: auto;
+    width: 100%;
+  }
+  .search-wrap {
+    min-width: 100%;
+  }
+  .selection-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .media-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>
 </body>

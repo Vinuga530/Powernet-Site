@@ -46,28 +46,35 @@ function collectReferencedAssets(srcDir: string): Map<string, string[]> {
       const relativeFile = path.relative(srcDir, file).replace(/\\/g, '/');
 
       // Match patterns like /images/... or /videos/...
-      const matches = content.match(/["']?(\/(images|videos)\/[^"'\s\n\r]+)/g);
+      const matches = content.match(/["']?(\/?(images|videos)\/[^"'\s\n\r<>]+)/g);
       if (matches) {
         for (const rawMatch of matches) {
-          const cleaned = rawMatch.replace(/^['"]/, '').replace(/['",;]$/, '').trim();
-          const normSlash = cleaned.replace(/\\/g, '/');
+          const cleaned = rawMatch.replace(/^['"]/, '').replace(/['",;)]$/, '').trim().replace(/\\/g, '/');
+          const withSlash = cleaned.startsWith('/') ? cleaned : '/' + cleaned;
+          const withoutSlash = withSlash.slice(1);
           const fileName = path.basename(cleaned).toLowerCase();
 
-          const existing = usageMap.get(normSlash) || [];
-          if (!existing.includes(relativeFile)) existing.push(relativeFile);
-          usageMap.set(normSlash, existing);
+          for (const key of [withSlash, withoutSlash]) {
+            const existing = usageMap.get(key) || [];
+            if (!existing.includes(relativeFile)) existing.push(relativeFile);
+            usageMap.set(key, existing);
+          }
 
-          const existingByFn = usageMap.get(fileName) || [];
-          if (!existingByFn.includes(relativeFile)) existingByFn.push(relativeFile);
-          usageMap.set(fileName, existingByFn);
+          // Map by filename only for distinctive, non-generic names
+          if (!['image.jpg', 'image.png', 'image.webp', 'image.jpeg', 'icon.svg'].includes(fileName)) {
+            const existingByFn = usageMap.get(fileName) || [];
+            if (!existingByFn.includes(relativeFile)) existingByFn.push(relativeFile);
+            usageMap.set(fileName, existingByFn);
+          }
         }
       }
 
-      // Match filenames with extensions
+      // Match filenames with media extensions
       const fnMatches = content.match(/[\w\-.]+\.(png|jpe?g|webp|svg|mp4|webm|gif|avif)/gi);
       if (fnMatches) {
         for (const fn of fnMatches) {
           const fnLower = fn.toLowerCase();
+          if (['image.jpg', 'image.png', 'image.webp', 'image.jpeg', 'icon.svg'].includes(fnLower)) continue;
           const existing = usageMap.get(fnLower) || [];
           if (!existing.includes(relativeFile)) existing.push(relativeFile);
           usageMap.set(fnLower, existing);
@@ -103,27 +110,42 @@ export const GET: APIRoute = async ({ request, cookies }) => {
   const publicDir = path.join(rootDir, 'public');
   const srcDir = path.join(rootDir, 'src');
 
-  const managedDirs = [
-    { category: 'Projects', dir: path.join(publicDir, 'images', 'projects'), prefix: 'public/images/projects/' },
-    { category: 'Hero Images', dir: path.join(publicDir, 'images', 'hero'), prefix: 'public/images/hero/' },
-    { category: 'Hero Videos', dir: path.join(publicDir, 'videos', 'hero'), prefix: 'public/videos/hero/' },
-  ];
-
   const usageMap = collectReferencedAssets(srcDir);
   let mediaItems: any[] = [];
 
+  const MEDIA_EXTS = new Set(['.jpg', '.jpeg', '.png', '.webp', '.svg', '.gif', '.avif', '.mp4', '.webm', '.mov', '.ogg']);
+
+  function determineCategory(relPathSlash: string): string {
+    if (relPathSlash.startsWith('/images/projects/')) return 'Projects';
+    if (relPathSlash.startsWith('/images/hero/') || relPathSlash.startsWith('/videos/hero/')) return 'Hero Media';
+    if (relPathSlash.startsWith('/images/icons/')) return 'Icons';
+    return 'Site Assets';
+  }
+
+  function getDisplayName(relPathSlash: string, fileName: string): string {
+    if (relPathSlash.startsWith('/images/projects/')) {
+      return relPathSlash.replace('/images/projects/', '');
+    }
+    return fileName;
+  }
+
   // 1. Try local filesystem first
   let localFilesFound = 0;
-  for (const group of managedDirs) {
-    if (fs.existsSync(group.dir)) {
-      const files = getAllFiles(group.dir);
+  const scanDirs = [path.join(publicDir, 'images'), path.join(publicDir, 'videos')];
+
+  for (const scanDir of scanDirs) {
+    if (fs.existsSync(scanDir)) {
+      const files = getAllFiles(scanDir);
       for (const filePath of files) {
+        const ext = path.extname(filePath).toLowerCase();
+        if (!MEDIA_EXTS.has(ext)) continue;
+
         const fileName = path.basename(filePath);
         if (PROTECTED_FILES.has(fileName.toLowerCase())) continue;
 
         const relPathSlash = '/' + path.relative(publicDir, filePath).replace(/\\/g, '/');
         const relPathNoSlash = relPathSlash.slice(1);
-        const isVideo = ['.mp4', '.webm', '.mov', '.ogg'].includes(path.extname(filePath).toLowerCase());
+        const isVideo = ['.mp4', '.webm', '.mov', '.ogg'].includes(ext);
 
         const usedIn = usageMap.get(relPathSlash) || usageMap.get(relPathNoSlash) || usageMap.get(fileName.toLowerCase()) || [];
         let size = 0;
@@ -133,9 +155,10 @@ export const GET: APIRoute = async ({ request, cookies }) => {
 
         localFilesFound++;
         mediaItems.push({
-          name: fileName,
+          name: getDisplayName(relPathSlash, fileName),
+          fileName,
           path: relPathSlash,
-          category: group.category,
+          category: determineCategory(relPathSlash),
           size,
           isVideo,
           inUse: usedIn.length > 0,
@@ -174,33 +197,28 @@ export const GET: APIRoute = async ({ request, cookies }) => {
 
         for (const item of treeItems) {
           if (item.type !== 'blob') continue;
-          const ghPath: string = item.path; // e.g. "public/images/logos/boc.png"
+          const ghPath: string = item.path; // e.g. "public/images/projects/..."
+          if (!ghPath.startsWith('public/images/') && !ghPath.startsWith('public/videos/')) continue;
+
           const fileName = path.basename(ghPath);
+          const ext = path.extname(fileName).toLowerCase();
+          if (!MEDIA_EXTS.has(ext)) continue;
           if (PROTECTED_FILES.has(fileName.toLowerCase())) continue;
 
-          let matchedCat: string | null = null;
-          for (const group of managedDirs) {
-            if (ghPath.startsWith(group.prefix)) {
-              matchedCat = group.category;
-              break;
-            }
-          }
+          const relPathSlash = '/' + ghPath.replace(/^public\//, '');
+          const isVideo = ['.mp4', '.webm', '.mov', '.ogg'].includes(ext);
+          const usedIn = usageMap.get(relPathSlash) || usageMap.get(fileName.toLowerCase()) || [];
 
-          if (matchedCat) {
-            const relPathSlash = '/' + ghPath.replace(/^public\//, '');
-            const isVideo = ['.mp4', '.webm', '.mov', '.ogg'].includes(path.extname(fileName).toLowerCase());
-            const usedIn = usageMap.get(relPathSlash) || usageMap.get(fileName.toLowerCase()) || [];
-
-            mediaItems.push({
-              name: fileName,
-              path: relPathSlash,
-              category: matchedCat,
-              size: item.size || 0,
-              isVideo,
-              inUse: usedIn.length > 0,
-              usedIn,
-            });
-          }
+          mediaItems.push({
+            name: getDisplayName(relPathSlash, fileName),
+            fileName,
+            path: relPathSlash,
+            category: determineCategory(relPathSlash),
+            size: item.size || 0,
+            isVideo,
+            inUse: usedIn.length > 0,
+            usedIn,
+          });
         }
       }
     } catch (err) {
