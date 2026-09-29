@@ -605,11 +605,32 @@ const pad2 = (n: number) => String(n).padStart(2, "0");
     <!-- top marquee bar -->
     <div class="clients-marquee-bar" aria-hidden="true">
       <div class="clients-marquee-track">
-        {
-          Array.from({ length: 8 }).map(() => (
-            <span class="clients-marquee-word">Selected Clients&nbsp;&nbsp;&mdash;&nbsp;&nbsp;</span>
-          ))
-        }
+        <!-- set A -->
+        <div class="clients-marquee-set">
+          <span class="clients-marquee-word">Selected Clients&nbsp;&nbsp;&mdash;&nbsp;&nbsp;</span>
+          <span class="clients-marquee-word">Banking &amp; Finance&nbsp;&nbsp;&mdash;&nbsp;&nbsp;</span>
+          <span class="clients-marquee-word">Telecom&nbsp;&nbsp;&mdash;&nbsp;&nbsp;</span>
+          <span class="clients-marquee-word">Education&nbsp;&nbsp;&mdash;&nbsp;&nbsp;</span>
+          <span class="clients-marquee-word">Industry&nbsp;&nbsp;&mdash;&nbsp;&nbsp;</span>
+          <span class="clients-marquee-word">Selected Clients&nbsp;&nbsp;&mdash;&nbsp;&nbsp;</span>
+          <span class="clients-marquee-word">Banking &amp; Finance&nbsp;&nbsp;&mdash;&nbsp;&nbsp;</span>
+          <span class="clients-marquee-word">Telecom&nbsp;&nbsp;&mdash;&nbsp;&nbsp;</span>
+          <span class="clients-marquee-word">Education&nbsp;&nbsp;&mdash;&nbsp;&nbsp;</span>
+          <span class="clients-marquee-word">Industry&nbsp;&nbsp;&mdash;&nbsp;&nbsp;</span>
+        </div>
+        <!-- set B — exact duplicate for seamless loop -->
+        <div class="clients-marquee-set" aria-hidden="true">
+          <span class="clients-marquee-word">Selected Clients&nbsp;&nbsp;&mdash;&nbsp;&nbsp;</span>
+          <span class="clients-marquee-word">Banking &amp; Finance&nbsp;&nbsp;&mdash;&nbsp;&nbsp;</span>
+          <span class="clients-marquee-word">Telecom&nbsp;&nbsp;&mdash;&nbsp;&nbsp;</span>
+          <span class="clients-marquee-word">Education&nbsp;&nbsp;&mdash;&nbsp;&nbsp;</span>
+          <span class="clients-marquee-word">Industry&nbsp;&nbsp;&mdash;&nbsp;&nbsp;</span>
+          <span class="clients-marquee-word">Selected Clients&nbsp;&nbsp;&mdash;&nbsp;&nbsp;</span>
+          <span class="clients-marquee-word">Banking &amp; Finance&nbsp;&nbsp;&mdash;&nbsp;&nbsp;</span>
+          <span class="clients-marquee-word">Telecom&nbsp;&nbsp;&mdash;&nbsp;&nbsp;</span>
+          <span class="clients-marquee-word">Education&nbsp;&nbsp;&mdash;&nbsp;&nbsp;</span>
+          <span class="clients-marquee-word">Industry&nbsp;&nbsp;&mdash;&nbsp;&nbsp;</span>
+        </div>
       </div>
     </div>
 
@@ -1732,6 +1753,11 @@ const pad2 = (n: number) => String(n).padStart(2, "0");
     display: flex;
     width: max-content;
     animation: marquee-scroll 32s linear infinite;
+  }
+
+  .clients-marquee-set {
+    display: flex;
+    flex-shrink: 0;
   }
 
   .clients-marquee-word {
