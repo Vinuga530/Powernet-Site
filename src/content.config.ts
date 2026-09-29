@@ -62,7 +62,7 @@ const statsCollection = defineCollection({
     contractualStaffLabel: z.string(),
     coverageValue: z.string(),
     coverageLabel: z.string(),
-    annualTurnover: z.string(),
+    annualTurnover: z.string().optional(),
   }),
 });
 

@@ -276,14 +276,5 @@ export default config({
       },
     }),
 
-    mediaManager: singleton({
-      label: '📁 Media Library & Clean Up',
-      path: 'src/content/media-manager/info',
-      format: { data: 'yaml' },
-      entryLayout: 'form',
-      schema: {
-        launch: fields.empty(),
-      },
-    }),
   },
 });
