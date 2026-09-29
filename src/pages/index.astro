@@ -605,6 +605,36 @@ clientEntries.sort((a, b) => a.data.order - b.data.order);
       <div class="trusted-header">
         <span class="trusted-rule" aria-hidden="true"></span>
         <span class="trusted-meta">Selected clients &middot; {clientEntries.length}</span>
+
+        <!-- hand-drawn doodle: arrow + note, desktop only, aria-hidden -->
+        <div class="trusted-doodle" aria-hidden="true">
+          <svg
+            width="72"
+            height="58"
+            viewBox="0 0 72 58"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+          >
+            <!-- wobbly arrow shaft curving left-to-right then tip pointing down-right -->
+            <path
+              d="M8 6 C12 14, 28 10, 34 22 C40 34, 30 46, 44 52"
+              stroke="var(--color-muted)"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              fill="none"
+            />
+            <!-- arrowhead -->
+            <path
+              d="M44 52 L36 48 M44 52 L48 44"
+              stroke="var(--color-muted)"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              fill="none"
+            />
+          </svg>
+          <span class="trusted-doodle-note">and counting</span>
+        </div>
       </div>
 
       <ul class="trusted-list">
@@ -614,36 +644,6 @@ clientEntries.sort((a, b) => a.data.order - b.data.order);
           ))
         }
       </ul>
-
-      <!-- hand-drawn doodle: arrow + note, desktop only, aria-hidden -->
-      <div class="trusted-doodle" aria-hidden="true">
-        <svg
-          width="72"
-          height="58"
-          viewBox="0 0 72 58"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          aria-hidden="true"
-        >
-          <!-- wobbly arrow shaft curving left-to-right then tip pointing down-right -->
-          <path
-            d="M8 6 C12 14, 28 10, 34 22 C40 34, 30 46, 44 52"
-            stroke="var(--color-muted)"
-            stroke-width="1.5"
-            stroke-linecap="round"
-            fill="none"
-          />
-          <!-- arrowhead -->
-          <path
-            d="M44 52 L36 48 M44 52 L48 44"
-            stroke="var(--color-muted)"
-            stroke-width="1.5"
-            stroke-linecap="round"
-            fill="none"
-          />
-        </svg>
-        <span class="trusted-doodle-note">and counting</span>
-      </div>
 
     </div>
   </section>
@@ -1728,15 +1728,14 @@ clientEntries.sort((a, b) => a.data.order - b.data.order);
 
   .trusted-inner {
     position: relative;
-    max-width: 60rem;
   }
 
-  /* header: rule + label */
+  /* header: rule + label + doodle */
   .trusted-header {
     display: flex;
     align-items: center;
     gap: var(--space-sm);
-    margin-bottom: var(--space-lg);
+    margin-bottom: var(--space-md);
   }
 
   .trusted-rule {
@@ -1756,49 +1755,70 @@ clientEntries.sort((a, b) => a.data.order - b.data.order);
     color: var(--color-muted);
   }
 
+  /* doodle — desktop only, points down-right into the list */
+  .trusted-doodle {
+    display: none;
+  }
+
+  @media (min-width: 768px) {
+    .trusted-doodle {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-left: var(--space-sm);
+      pointer-events: none;
+      user-select: none;
+    }
+  }
+
+  .trusted-doodle-note {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--color-muted);
+    white-space: nowrap;
+  }
+
   /* the list */
   .trusted-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+    column-gap: var(--space-xl);
     list-style: none;
     margin: 0;
     padding: 0;
-    line-height: 1.35;
   }
 
   .trusted-item {
-    display: inline;
+    position: relative;
+    display: block;
+    padding: 0.9rem 0 0.9rem 1rem;
+    border-top: 1px solid var(--color-border);
     font-family: var(--font-sans);
-    font-size: clamp(1.25rem, 2.6vw, 2.25rem);
     font-weight: 500;
+    font-size: clamp(1.05rem, 1.4vw, 1.25rem);
+    line-height: 1.3;
     color: var(--color-foreground);
     transition: opacity 250ms ease-out;
   }
 
-  /* slash separator — trailing, so wrapped lines never start with a slash */
-  .trusted-item:not(:last-child)::after {
-    content: ' /';
-    display: inline;
-    margin: 0 0.35em;
-    color: var(--color-muted);
-    font-weight: 400;
-  }
-
-  /* red dot injected before the hovered item text */
+  /* 6px red dot in the reserved left padding (no layout shift) */
   .trusted-item::before {
     content: '';
-    display: inline-block;
+    position: absolute;
+    left: 0;
+    top: calc(0.9rem + 0.65em);
+    transform: translateY(-50%);
     width: 6px;
     height: 6px;
     border-radius: 50%;
     background: #ee1c25;
-    vertical-align: middle;
-    margin-right: 0.3em;
     opacity: 0;
-    transition: opacity 200ms ease-out;
+    transition: opacity 250ms ease-out;
   }
 
   /* hover interaction — only on pointer devices */
   @media (hover: hover) {
-    .trusted-list:has(li:hover) .trusted-item:not(:hover) {
+    .trusted-list:has(li:hover) li:not(:hover) {
       opacity: 0.35;
     }
     .trusted-item:hover::before {
@@ -1811,32 +1831,6 @@ clientEntries.sort((a, b) => a.data.order - b.data.order);
     .trusted-item::before {
       transition: none !important;
     }
-  }
-
-  /* doodle — desktop only */
-  .trusted-doodle {
-    display: none;
-  }
-
-  @media (min-width: 768px) {
-    .trusted-doodle {
-      display: flex;
-      align-items: flex-start;
-      gap: 4px;
-      position: absolute;
-      right: 0;
-      top: 0;
-      pointer-events: none;
-      user-select: none;
-    }
-  }
-
-  .trusted-doodle-note {
-    font-family: var(--font-mono);
-    font-size: 0.65rem;
-    color: var(--color-muted);
-    margin-top: 10px;
-    white-space: nowrap;
   }
 
   /* ===== location / map ===== */
