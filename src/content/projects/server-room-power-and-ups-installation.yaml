@@ -1,12 +1,14 @@
-client: "The World Bank Sri Lanka"
-title: "Server Room Power & UPS Installation"
-category: "Electrical & UPS"
+title: Server Room Power & UPS Installation
+client: The World Bank Sri Lanka
+category: Electrical & UPS
 year: 2024
-image: "/images/projects/server-room.jpg"
-summary: "Installed dedicated distribution panels, redundant UPS systems, and structured network drops across the main office."
+image: /images/projects/server-room-power-and-ups-installation/image.jpg
+summary: >-
+  Installed dedicated distribution panels, redundant UPS systems, and structured
+  network drops across the main office.
 specs:
-  - "Redundant UPS power backup"
-  - "Automatic transfer switches"
-  - "Server rack layout & cabling"
-  - "Zero-downtime cutover"
+  - Redundant UPS power backup
+  - Automatic transfer switches
+  - Server rack layout & cabling
+  - Zero-downtime cutover
 order: 1
