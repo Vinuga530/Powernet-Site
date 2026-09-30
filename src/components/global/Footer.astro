@@ -98,8 +98,10 @@ const navLinks = [
   </div>
 
   <div class="footer-watermark" aria-hidden="true">
-    <span class="footer-watermark-text">POWERNET<span class="footer-watermark-baseline"></span></span>
-    <canvas class="footer-watermark-canvas" aria-hidden="true"></canvas>
+    <div class="footer-watermark-wrapper">
+      <span class="footer-watermark-base">POWERNET</span>
+      <span class="footer-watermark-glow" aria-hidden="true">POWERNET</span>
+    </div>
   </div>
 </footer>
 
@@ -256,38 +258,54 @@ const navLinks = [
   .footer-watermark {
     position: relative;
     background-color: #0d0e12;
-    color: rgba(255, 255, 255, 0.06);
+    padding-top: 0.15em;
+    user-select: none;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .footer-watermark-wrapper {
+    position: relative;
+    display: block;
+    width: 100%;
+    text-align: center;
     font-family: var(--font-sans);
     font-weight: 800;
     font-size: clamp(6rem, 16vw, 14rem);
     line-height: 0.78;
     letter-spacing: -0.03em;
-    text-align: center;
-    padding-top: 0.15em;
-    user-select: none;
     white-space: nowrap;
+    user-select: none;
   }
 
-  .footer-watermark-text {
-    display: inline-block;
-    position: relative;
+  .footer-watermark-base {
+    display: block;
+    color: rgba(255, 255, 255, 0.06);
+    user-select: none;
   }
 
-  .footer-watermark-baseline {
-    display: inline-block;
-    vertical-align: baseline;
-    width: 0;
-    height: 0;
-    visibility: hidden;
-    pointer-events: none;
-  }
-
-  .footer-watermark-canvas {
+  .footer-watermark-glow {
     position: absolute;
     inset: 0;
-    width: 100%;
-    height: 100%;
+    display: block;
+    user-select: none;
     pointer-events: none;
+    color: transparent;
+    background: linear-gradient(
+      180deg,
+      #ff5e5e 0%,
+      var(--color-brand) 38%,
+      var(--color-brand-dark) 78%,
+      #7d0d0d 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 18px rgba(227, 24, 55, 0.8))
+      drop-shadow(0 0 45px rgba(211, 47, 47, 0.45));
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    will-change: mask-image, -webkit-mask-image, opacity;
   }
 
   /* ===== responsive ===== */
@@ -350,24 +368,13 @@ const navLinks = [
 
 <script>
   /* =====================================================================
-     FOOTER WATERMARK REVEAL ENGINE
-     - Fluid liquid water physics with viscous inertia and organic diffusion
-     - Exact sub-pixel baseline alignment anchoring directly to DOM text
-     - Lifecycle-safe: cleans up and re-inits on astro:page-load
-     - Disabled when: prefers-reduced-motion: reduce
-     - RAF loop strictly halts when fluid settles (zero idle CPU usage)
+     FOOTER WATERMARK FLUID REVEAL ENGINE
+     - Dual-DOM layer architecture: 100.0% pixel-perfect coincidence
+     - Zero canvas misalignment or baseline drift across all screens
+     - iOS-level fluid water spring lag with dynamic teardrop stretch
+     - Multi-node organic liquid diffusion mask
+     - Zero idle CPU usage (RAF loop halts when liquid settles)
      ===================================================================== */
-  interface WaterDroplet {
-    x: number;
-    y: number;
-    vx: number;
-    vy: number;
-    baseR: number;
-    maxR: number;
-    born: number;
-    life: number;
-  }
-
   let watermarkRAF: number | null = null;
   let watermarkCleanup: (() => void) | null = null;
 
@@ -387,342 +394,105 @@ const navLinks = [
     if (prefersReduced) return;
 
     const watermarkEl = document.querySelector<HTMLElement>(".footer-watermark");
-    const canvas = watermarkEl?.querySelector<HTMLCanvasElement>(".footer-watermark-canvas");
-    if (!watermarkEl || !canvas) return;
+    const wrapper = watermarkEl?.querySelector<HTMLElement>(".footer-watermark-wrapper");
+    const glowEl = watermarkEl?.querySelector<HTMLElement>(".footer-watermark-glow");
+    if (!watermarkEl || !wrapper || !glowEl) return;
 
-    const visibleCtx = canvas.getContext("2d");
-    if (!visibleCtx) return;
-
-    /* Offscreen canvas layers for compositing */
-    const textureCanvas = document.createElement("canvas");
-    const maskCanvas = document.createElement("canvas");
-    const scratchCanvas = document.createElement("canvas");
-
-    const maskCtx = maskCanvas.getContext("2d");
-    const scratchCtx = scratchCanvas.getContext("2d");
-    if (!maskCtx || !scratchCtx) return;
-
-    let droplets: WaterDroplet[] = [];
-    let isAnimating = false;
-    let dpr = Math.min(window.devicePixelRatio || 1, 2);
-    let clientW = 0;
-    let clientH = 0;
-    let brandColor = "#d32f2f";
-    let brandDarkColor = "#b71c1c";
-
-    let pointerX = -1000;
-    let pointerY = -1000;
+    let targetX = -1000;
+    let targetY = -1000;
     let fluidX = -1000;
     let fluidY = -1000;
     let prevFluidX = -1000;
     let prevFluidY = -1000;
+    let trailX = -1000;
+    let trailY = -1000;
     let isInside = false;
+    let isAnimating = false;
 
-    /* Exact sub-pixel baseline alignment anchored to DOM text */
-    const drawWatermarkText = (
-      targetCtx: CanvasRenderingContext2D,
-      width: number,
-      height: number,
-      style: CSSStyleDeclaration,
-    ) => {
-      const fontSize = style.fontSize;
-      const fontWeight = style.fontWeight || "800";
-      const fontFamily = style.fontFamily;
-      const letterSpacing = style.letterSpacing;
+    const updateFluidMask = () => {
+      // 1. Primary viscous follower (spring lag)
+      fluidX += (targetX - fluidX) * 0.20;
+      fluidY += (targetY - fluidY) * 0.20;
 
-      targetCtx.font = `${fontWeight} ${fontSize} ${fontFamily}`;
-      targetCtx.textAlign = "center";
-      targetCtx.textBaseline = "alphabetic";
+      // 2. Secondary droplet trailer (fluid drag effect)
+      trailX += (fluidX - trailX) * 0.14;
+      trailY += (fluidY - trailY) * 0.14;
 
-      if ("letterSpacing" in targetCtx) {
-        if (letterSpacing && letterSpacing !== "normal") {
-          (targetCtx as any).letterSpacing = letterSpacing;
-        } else {
-          (targetCtx as any).letterSpacing = "0px";
-        }
-      }
+      // 3. Dynamic speed-based liquid deformation
+      const dx = fluidX - prevFluidX;
+      const dy = fluidY - prevFluidY;
+      const speed = Math.hypot(dx, dy);
+      prevFluidX = fluidX;
+      prevFluidY = fluidY;
 
-      let textX = width / 2;
-      let baselineY = height / 2;
+      const rect = wrapper.getBoundingClientRect();
+      const baseR = Math.max(160, Math.min(rect.width * 0.18, 340));
+      const stretch = Math.min(speed * 2.2, baseR * 0.55);
+      const rx = baseR + stretch;
+      const ry = Math.max(baseR * 0.65, baseR - stretch * 0.25);
+      const trailR = Math.max(baseR * 0.68, baseR * 0.85 - stretch * 0.2);
 
-      const textEl = watermarkEl.querySelector<HTMLElement>(".footer-watermark-text");
-      const baselineEl = watermarkEl.querySelector<HTMLElement>(".footer-watermark-baseline");
-      if (textEl && baselineEl) {
-        try {
-          const tRect = textEl.getBoundingClientRect();
-          const bRect = baselineEl.getBoundingClientRect();
-          const pRect = watermarkEl.getBoundingClientRect();
-          if (tRect.width > 0) {
-            textX = tRect.left - pRect.left + tRect.width / 2;
-            baselineY = bRect.bottom - pRect.top;
-          }
-        } catch {}
-      } else {
-        const metrics = targetCtx.measureText("POWERNET");
-        const ascent = metrics.actualBoundingBoxAscent || parseFloat(fontSize) * 0.72;
-        baselineY = height / 2 + ascent / 2;
-      }
+      // Multi-droplet organic liquid mask with ultra-soft Gaussian falloff
+      const mask = `radial-gradient(${rx}px ${ry}px at ${fluidX}px ${fluidY}px, black 0%, rgba(0,0,0,0.85) 30%, rgba(0,0,0,0.45) 60%, rgba(0,0,0,0.12) 82%, transparent 100%), radial-gradient(${trailR}px ${trailR}px at ${trailX}px ${trailY}px, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.35) 45%, rgba(0,0,0,0.08) 75%, transparent 100%)`;
 
-      targetCtx.fillText("POWERNET", textX, baselineY);
-    };
+      glowEl.style.webkitMaskImage = mask;
+      glowEl.style.maskImage = mask;
 
-    /* Procedural offscreen texture layer */
-    const updateTextureCanvas = (
-      w: number,
-      h: number,
-      width: number,
-      height: number,
-      style: CSSStyleDeclaration,
-    ) => {
-      textureCanvas.width = w;
-      textureCanvas.height = h;
-      const tCtx = textureCanvas.getContext("2d");
-      if (!tCtx) return;
-
-      tCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      tCtx.clearRect(0, 0, width, height);
-
-      brandColor = style.getPropertyValue("--color-brand").trim() || "#d32f2f";
-      brandDarkColor =
-        style.getPropertyValue("--color-brand-dark").trim() || "#b71c1c";
-
-      /* Deep rich liquid gradient */
-      const baseGrad = tCtx.createLinearGradient(0, 0, 0, height);
-      baseGrad.addColorStop(0, "#ff4d4d");
-      baseGrad.addColorStop(0.35, brandColor);
-      baseGrad.addColorStop(0.75, brandDarkColor);
-      baseGrad.addColorStop(1, "#7d0d0d");
-      tCtx.fillStyle = baseGrad;
-      tCtx.fillRect(0, 0, width, height);
-
-      /* Silky diagonal refraction sheen */
-      const sheen = tCtx.createLinearGradient(0, 0, width * 0.75, height);
-      sheen.addColorStop(0, "rgba(255, 255, 255, 0)");
-      sheen.addColorStop(0.38, "rgba(255, 255, 255, 0.08)");
-      sheen.addColorStop(0.5, "rgba(255, 255, 255, 0.42)");
-      sheen.addColorStop(0.56, "rgba(255, 255, 255, 0.18)");
-      sheen.addColorStop(0.7, "rgba(255, 255, 255, 0)");
-      tCtx.fillStyle = sheen;
-      tCtx.fillRect(0, 0, width, height);
-
-      /* Surface specular highlight band */
-      const topHighlight = tCtx.createLinearGradient(0, 0, 0, height * 0.4);
-      topHighlight.addColorStop(0, "rgba(255, 255, 255, 0.32)");
-      topHighlight.addColorStop(1, "rgba(255, 255, 255, 0)");
-      tCtx.fillStyle = topHighlight;
-      tCtx.fillRect(0, 0, width, height * 0.4);
-    };
-
-    /* Animation frame render pass with liquid fluid dynamics */
-    const renderFrame = () => {
-      const now = performance.now();
-
-      /* 1. Viscous liquid follower (iOS spring lag) */
-      if (isInside && pointerX >= 0) {
-        const easing = 0.22;
-        fluidX += (pointerX - fluidX) * easing;
-        fluidY += (pointerY - fluidY) * easing;
-
-        const dx = fluidX - prevFluidX;
-        const dy = fluidY - prevFluidY;
-        const speed = Math.hypot(dx, dy);
-
-        const baseRadius = Math.min(clientW, clientH) * 0.20;
-        // Water dynamically stretches with speed, narrowing slightly during fast sweep
-        const dropletR = Math.max(baseRadius * 0.65, baseRadius * (1 - Math.min(speed / 60, 0.32)));
-        const maxR = dropletR * 1.38;
-
-        const step = Math.max(10, dropletR * 0.3);
-        const count = Math.max(1, Math.min(8, Math.floor(speed / step)));
-
-        for (let i = 1; i <= count; i++) {
-          const t = i / count;
-          const px = prevFluidX + dx * t;
-          const py = prevFluidY + dy * t;
-
-          droplets.push({
-            x: px,
-            y: py,
-            vx: dx * 0.035,
-            vy: dy * 0.035,
-            baseR: dropletR,
-            maxR: maxR,
-            born: now,
-            life: 1100 + Math.random() * 200,
-          });
-        }
-
-        prevFluidX = fluidX;
-        prevFluidY = fluidY;
-      }
-
-      /* 2. Update and prune droplets */
-      for (let i = droplets.length - 1; i >= 0; i--) {
-        const d = droplets[i];
-        const age = now - d.born;
-        if (age >= d.life) {
-          droplets.splice(i, 1);
-          continue;
-        }
-
-        d.x += d.vx;
-        d.y += d.vy;
-        d.vx *= 0.94;
-        d.vy *= 0.94;
-      }
-
-      if (droplets.length === 0 && !isInside) {
-        visibleCtx.clearRect(0, 0, canvas.width, canvas.height);
+      // Check if settled
+      const dist = Math.hypot(targetX - fluidX, targetY - fluidY);
+      if (!isInside && dist < 0.8) {
+        glowEl.style.opacity = "0";
         isAnimating = false;
         watermarkRAF = null;
         fluidX = -1000;
         fluidY = -1000;
+        targetX = -1000;
+        targetY = -1000;
         return;
       }
 
-      /* 3. Build soft liquid mask */
-      const w = canvas.width;
-      const h = canvas.height;
-      const width = clientW;
-      const height = clientH;
-      const style = window.getComputedStyle(watermarkEl);
-
-      maskCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      maskCtx.clearRect(0, 0, width, height);
-      maskCtx.globalCompositeOperation = "source-over";
-
-      for (let i = 0; i < droplets.length; i++) {
-        const d = droplets[i];
-        const age = now - d.born;
-        const progress = age / d.life;
-
-        // Smooth liquid diffusion curve
-        const expandEase = 1 - Math.pow(1 - progress, 2.5);
-        const currentR = d.baseR + (d.maxR - d.baseR) * expandEase;
-
-        // Viscous dissolve curve (lingers with fluid presence, then softly dissipates)
-        const alpha = Math.pow(1 - progress, 2.2);
-        if (alpha <= 0.005) continue;
-
-        // 6-stop Gaussian liquid light gradient (ultra-soft, zero hard banding)
-        const grad = maskCtx.createRadialGradient(d.x, d.y, 0, d.x, d.y, currentR);
-        grad.addColorStop(0, `rgba(255, 255, 255, ${alpha * 0.95})`);
-        grad.addColorStop(0.2, `rgba(255, 255, 255, ${alpha * 0.84})`);
-        grad.addColorStop(0.42, `rgba(255, 255, 255, ${alpha * 0.52})`);
-        grad.addColorStop(0.68, `rgba(255, 255, 255, ${alpha * 0.22})`);
-        grad.addColorStop(0.88, `rgba(255, 255, 255, ${alpha * 0.05})`);
-        grad.addColorStop(1, "rgba(255, 255, 255, 0)");
-
-        maskCtx.fillStyle = grad;
-        maskCtx.beginPath();
-        maskCtx.arc(d.x, d.y, currentR, 0, Math.PI * 2);
-        maskCtx.fill();
-      }
-
-      /* 4. Clip mask to exact glyph shapes of "POWERNET" */
-      maskCtx.globalCompositeOperation = "source-in";
-      maskCtx.fillStyle = "#ffffff";
-      drawWatermarkText(maskCtx, width, height, style);
-
-      /* 5. Composite against energized texture */
-      scratchCtx.setTransform(1, 0, 0, 1, 0, 0);
-      scratchCtx.clearRect(0, 0, w, h);
-      scratchCtx.globalCompositeOperation = "source-over";
-      scratchCtx.drawImage(textureCanvas, 0, 0);
-      scratchCtx.globalCompositeOperation = "destination-in";
-      scratchCtx.drawImage(maskCanvas, 0, 0);
-
-      /* 6. Draw with dual-stage soft bloom */
-      visibleCtx.setTransform(1, 0, 0, 1, 0, 0);
-      visibleCtx.clearRect(0, 0, w, h);
-
-      // Deep ambient glow
-      visibleCtx.save();
-      visibleCtx.shadowColor = brandColor;
-      visibleCtx.shadowBlur = Math.round(32 * dpr);
-      visibleCtx.drawImage(scratchCanvas, 0, 0);
-      visibleCtx.restore();
-
-      // Soft specular core
-      visibleCtx.save();
-      visibleCtx.shadowColor = "#ff4d4d";
-      visibleCtx.shadowBlur = Math.round(14 * dpr);
-      visibleCtx.drawImage(scratchCanvas, 0, 0);
-      visibleCtx.restore();
-
-      // Crisp top layer
-      visibleCtx.drawImage(scratchCanvas, 0, 0);
-
-      watermarkRAF = requestAnimationFrame(renderFrame);
+      watermarkRAF = requestAnimationFrame(updateFluidMask);
     };
 
-    /* Pointermove / pointerleave scoped to .footer-watermark only */
     const onPointerMove = (e: PointerEvent) => {
-      const rect = watermarkEl.getBoundingClientRect();
-      pointerX = e.clientX - rect.left;
-      pointerY = e.clientY - rect.top;
+      const rect = wrapper.getBoundingClientRect();
+      targetX = e.clientX - rect.left;
+      targetY = e.clientY - rect.top;
       isInside = true;
 
       if (fluidX < -500) {
-        fluidX = pointerX;
-        fluidY = pointerY;
-        prevFluidX = pointerX;
-        prevFluidY = pointerY;
+        fluidX = targetX;
+        fluidY = targetY;
+        prevFluidX = targetX;
+        prevFluidY = targetY;
+        trailX = targetX;
+        trailY = targetY;
       }
+
+      glowEl.style.opacity = "1";
 
       if (!isAnimating) {
         isAnimating = true;
-        watermarkRAF = requestAnimationFrame(renderFrame);
+        watermarkRAF = requestAnimationFrame(updateFluidMask);
       }
     };
 
     const onPointerLeave = () => {
       isInside = false;
+      glowEl.style.opacity = "0";
     };
 
     watermarkEl.addEventListener("pointermove", onPointerMove, { passive: true });
     watermarkEl.addEventListener("pointerleave", onPointerLeave, { passive: true });
 
-    /* ResizeObserver to keep canvas resolution in sync with element size and DPR */
-    const onResize = () => {
-      clientW = watermarkEl.clientWidth;
-      clientH = watermarkEl.clientHeight;
-      if (clientW === 0 || clientH === 0) return;
-
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const w = Math.round(clientW * dpr);
-      const h = Math.round(clientH * dpr);
-
-      canvas.width = w;
-      canvas.height = h;
-      maskCanvas.width = w;
-      maskCanvas.height = h;
-      scratchCanvas.width = w;
-      scratchCanvas.height = h;
-
-      const style = window.getComputedStyle(watermarkEl);
-      updateTextureCanvas(w, h, clientW, clientH, style);
-
-      if (droplets.length > 0) {
-        renderFrame();
-      }
-    };
-
-    const resizeObserver = new ResizeObserver(onResize);
-    resizeObserver.observe(watermarkEl);
-
-    /* Store cleanup for lifecycle management */
     watermarkCleanup = () => {
       if (watermarkRAF) {
         cancelAnimationFrame(watermarkRAF);
         watermarkRAF = null;
       }
-      resizeObserver.disconnect();
       watermarkEl.removeEventListener("pointermove", onPointerMove);
       watermarkEl.removeEventListener("pointerleave", onPointerLeave);
-      droplets = [];
       isAnimating = false;
-      visibleCtx.clearRect(0, 0, canvas.width, canvas.height);
     };
   };
 
