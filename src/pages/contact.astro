@@ -27,15 +27,25 @@ hotlineEntries.sort((a, b) => a.data.order - b.data.order);
       <section class="contact-col contact-departments scroll-reveal reveal-up">
         <h2 class="contact-group-title">Departments</h2>
         <ol class="hotlines-list">
-          {hotlineEntries.map((entry, idx) => (
-            <li class="hotline-item">
-              <span class="hotline-index">{String(idx + 1).padStart(2, '0')}</span>
-              <span class="hotline-name">{entry.data.department}</span>
-              <a href={`tel:${entry.data.phone.replace(/\s+/g, '')}`} class="hotline-phone">
-                {entry.data.phone}
-              </a>
-            </li>
-          ))}
+          {hotlineEntries.map((entry, idx) => {
+            const phones = entry.data.phone.split('/').map((p: string) => p.trim());
+            return (
+              <li class="hotline-item">
+                <span class="hotline-index">{String(idx + 1).padStart(2, '0')}</span>
+                <span class="hotline-name">{entry.data.department}</span>
+                <span class="hotline-phone-wrap">
+                  {phones.map((phone: string, pIdx: number) => (
+                    <>
+                      {pIdx > 0 && <span class="hotline-phone-sep">/</span>}
+                      <a href={`tel:${phone.replace(/\s+/g, '')}`} class="hotline-phone">
+                        {phone}
+                      </a>
+                    </>
+                  ))}
+                </span>
+              </li>
+            );
+          })}
         </ol>
       </section>
 
@@ -218,24 +228,41 @@ hotlineEntries.sort((a, b) => a.data.order - b.data.order);
     line-height: 1.3;
   }
 
+  .hotline-phone-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .hotline-phone-sep {
+    font-family: var(--font-mono);
+    font-size: var(--text-body);
+    color: var(--color-muted);
+    user-select: none;
+  }
+
   .hotline-phone {
     font-family: var(--font-mono);
     font-size: var(--text-body);
     font-weight: 500;
     color: var(--color-muted);
     white-space: nowrap;
+    text-decoration: none;
+    position: relative;
+    z-index: 2;
     transition: color 0.2s ease;
+  }
+
+  .hotline-phone:hover {
+    color: var(--color-brand);
+    text-decoration: underline;
   }
 
   .hotline-item:hover .hotline-phone,
   .hotline-item:focus-within .hotline-phone {
     color: var(--color-brand);
-  }
-
-  .hotline-phone::after {
-    content: "";
-    position: absolute;
-    inset: 0;
   }
 
   @media (max-width: 600px) {
@@ -245,8 +272,9 @@ hotlineEntries.sort((a, b) => a.data.order - b.data.order);
       column-gap: var(--space-sm);
     }
 
-    .hotline-phone {
+    .hotline-phone-wrap {
       grid-column: 2 / -1;
+      justify-content: flex-start;
     }
   }
 
