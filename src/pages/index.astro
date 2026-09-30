@@ -869,7 +869,7 @@ const pad2 = (n: number) => String(n).padStart(2, "0");
   }
 
   .hero-title {
-    margin-bottom: var(--space-md);
+    margin-bottom: 0;
     --text-display-xl: clamp(3.2rem, 5.2vw, 5.64rem);
     text-shadow:
       0 4px 16px rgba(0, 0, 0, 0.4),
@@ -877,13 +877,15 @@ const pad2 = (n: number) => String(n).padStart(2, "0");
   }
 
   .hero-subtitle {
-    max-width: 520px;
-    font-size: clamp(1rem, 1.15vw, 1.18rem);
-    line-height: 1.6;
-    margin-top: 24px;
+    max-width: min(640px, 90vw);
+    font-size: clamp(1.0625rem, 1.3vw, 1.2rem);
+    line-height: 1.55;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    margin-top: clamp(18px, 2.2vw, 24px);
     margin-left: auto;
     margin-right: auto;
-    color: rgba(255, 255, 255, 0.95);
+    color: rgba(255, 255, 255, 0.92);
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
   }
 
@@ -2098,8 +2100,11 @@ const pad2 = (n: number) => String(n).padStart(2, "0");
     }
 
     .hero-subtitle {
-      padding: 0;
-      font-size: 1rem;
+      padding: 0 16px;
+      font-size: 1.02rem;
+      line-height: 1.5;
+      text-wrap: balance;
+      margin-top: 16px;
     }
 
     .hero-actions {

@@ -685,13 +685,12 @@ const nextProject = total > 1 ? projects[1] : current;
       if (focusTitle) focusTitle.textContent = current.title || "";
       if (focusSummary) focusSummary.textContent = current.summary || "";
       if (focusSpecs) {
-        focusSpecs.replaceChildren(
-          ...(current.specs || []).map((s: string) => {
-            const li = document.createElement("li");
-            li.textContent = s;
-            return li;
-          })
-        );
+        focusSpecs.innerHTML = "";
+        (current.specs || []).forEach(s => {
+          const li = document.createElement("li");
+          li.textContent = s;
+          focusSpecs.appendChild(li);
+        });
       }
 
       /* update flanks */
