@@ -685,7 +685,13 @@ const nextProject = total > 1 ? projects[1] : current;
       if (focusTitle) focusTitle.textContent = current.title || "";
       if (focusSummary) focusSummary.textContent = current.summary || "";
       if (focusSpecs) {
-        focusSpecs.innerHTML = (current.specs || []).map(s => `<li>${s}</li>`).join("");
+        focusSpecs.replaceChildren(
+          ...(current.specs || []).map((s: string) => {
+            const li = document.createElement("li");
+            li.textContent = s;
+            return li;
+          })
+        );
       }
 
       /* update flanks */

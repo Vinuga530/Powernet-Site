@@ -90,15 +90,11 @@ function collectReferencedAssets(srcDir: string): Map<string, string[]> {
 
 export const GET: APIRoute = async ({ request, cookies }) => {
   // ── AUTH GATE ──────────────────────────────────────────────────────────────
-  const ghToken =
+  const userToken =
     cookies.get('keystatic-gh-access-token')?.value ||
-    request.headers.get('cookie')?.match(/keystatic-gh-access-token=([^;]+)/)?.[1] ||
-    request.headers.get('x-github-token') ||
-    process.env.KEYSTATIC_GITHUB_TOKEN ||
-    process.env.GITHUB_TOKEN ||
-    process.env.GH_TOKEN;
+    request.headers.get('cookie')?.match(/keystatic-gh-access-token=([^;]+)/)?.[1];
 
-  if (!import.meta.env.DEV && !ghToken) {
+  if (!import.meta.env.DEV && !userToken) {
     return new Response(JSON.stringify({ error: 'Unauthorized. Please log in via /keystatic.' }), {
       status: 401,
       headers: { 'Content-Type': 'application/json', 'WWW-Authenticate': 'Cookie realm="Keystatic"' },
@@ -171,9 +167,7 @@ export const GET: APIRoute = async ({ request, cookies }) => {
   // 2. If no local files found (production Vercel lambda), query GitHub Git Tree API
   if (localFilesFound === 0) {
     const ghToken =
-      cookies.get('keystatic-gh-access-token')?.value ||
-      request.headers.get('cookie')?.match(/keystatic-gh-access-token=([^;]+)/)?.[1] ||
-      request.headers.get('x-github-token') ||
+      userToken ||
       process.env.KEYSTATIC_GITHUB_TOKEN ||
       process.env.GITHUB_TOKEN ||
       process.env.GH_TOKEN;
@@ -244,22 +238,48 @@ export const GET: APIRoute = async ({ request, cookies }) => {
 };
 
 export const POST: APIRoute = async ({ request, cookies }) => {
-  // ── AUTH GATE ──────────────────────────────────────────────────────────────
-  // POST deletes files — always require auth, even in dev.
-  const ghToken =
-    cookies.get('keystatic-gh-access-token')?.value ||
-    request.headers.get('cookie')?.match(/keystatic-gh-access-token=([^;]+)/)?.[1] ||
-    request.headers.get('x-github-token') ||
-    process.env.KEYSTATIC_GITHUB_TOKEN ||
-    process.env.GITHUB_TOKEN ||
-    process.env.GH_TOKEN;
+  // ── CSRF & ORIGIN CHECK ──────────────────────────────────────────────────
+  const secFetchSite = request.headers.get('sec-fetch-site');
+  if (secFetchSite === 'cross-site') {
+    return new Response(JSON.stringify({ error: 'Cross-origin deletion forbidden.' }), {
+      status: 403,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
 
-  if (!ghToken) {
+  const origin = request.headers.get('origin');
+  if (origin) {
+    try {
+      const originHost = new URL(origin).host;
+      const requestHost = new URL(request.url).host;
+      if (originHost !== requestHost) {
+        return new Response(JSON.stringify({ error: 'Origin mismatch forbidden.' }), {
+          status: 403,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
+    } catch {
+      return new Response(JSON.stringify({ error: 'Invalid origin header.' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+  }
+
+  // ── AUTH GATE ──────────────────────────────────────────────────────────────
+  const isDev = import.meta.env.DEV;
+  const userToken =
+    cookies.get('keystatic-gh-access-token')?.value ||
+    request.headers.get('cookie')?.match(/keystatic-gh-access-token=([^;]+)/)?.[1];
+
+  if (!isDev && !userToken) {
     return new Response(JSON.stringify({ error: 'Unauthorized. Please log in via /keystatic first.' }), {
       status: 401,
       headers: { 'Content-Type': 'application/json', 'WWW-Authenticate': 'Cookie realm="Keystatic"' },
     });
   }
+
+  const ghToken = userToken || process.env.KEYSTATIC_GITHUB_TOKEN || process.env.GITHUB_TOKEN || process.env.GH_TOKEN;
   // ──────────────────────────────────────────────────────────────────────────
 
   try {
@@ -275,15 +295,27 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
     const rootDir = process.cwd();
     const publicDir = path.join(rootDir, 'public');
-    const isDev = import.meta.env.DEV;
     const deleted: string[] = [];
     const errors: string[] = [];
 
-    // ghToken is already validated in the auth gate above
     for (const relPath of paths) {
-      const cleanRel = relPath.replace(/^[\/\\]+/, '');
+      if (typeof relPath !== 'string') continue;
+
+      // Normalize and sanitize path to prevent traversal
+      const cleanRel = path.normalize(relPath).replace(/^[\\\/]+/, '');
       const fullPath = path.resolve(publicDir, cleanRel);
       const fileName = path.basename(fullPath);
+
+      // Verify that target path resides strictly inside public/images or public/videos
+      const relFromPublic = path.relative(publicDir, fullPath).replace(/\\/g, '/');
+      const isInsideAllowed = !relFromPublic.startsWith('..') && (
+        relFromPublic.startsWith('images/') || relFromPublic.startsWith('videos/')
+      );
+
+      if (!isInsideAllowed) {
+        errors.push(`Forbidden: Out-of-bounds or invalid asset path: ${relPath}`);
+        continue;
+      }
 
       if (PROTECTED_FILES.has(fileName.toLowerCase())) {
         errors.push(`Cannot delete protected file: ${fileName}`);
@@ -322,7 +354,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
         }
 
         try {
-          const ghPath = `public/${cleanRel}`.replace(/\\/g, '/');
+          const ghPath = `public/${relFromPublic}`;
 
           // 1. Get file SHA from GitHub
           const getRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${ghPath}?ref=main`, {
