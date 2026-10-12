@@ -116,24 +116,6 @@ export default config({
       },
     }),
 
-    clients: collection({
-      label: 'Clients / Trusted By',
-      slugField: 'name',
-      path: 'src/content/clients/*',
-      format: { data: 'yaml' },
-      entryLayout: 'form',
-      schema: {
-        name: fields.slug({
-          name: { label: 'Company Name', description: 'e.g. "Hemas Holdings"' },
-        }),
-        order: fields.integer({
-          label: 'Display Order',
-          description: 'Lower numbers show first',
-          defaultValue: 99,
-        }),
-      },
-    }),
-
     processSteps: collection({
       label: 'How We Work (Process Steps)',
       slugField: 'title',
@@ -253,26 +235,7 @@ export default config({
           label: 'Background Watermark Word',
           description: 'The large faint word in the background of this section',
         }),
-        primaryButtonLabel: fields.text({ label: 'Primary Button Text' }),
         secondaryButtonLabel: fields.text({ label: 'Secondary Button Text' }),
-      },
-    }),
-
-    aboutPage: singleton({
-      label: 'About Page',
-      path: 'src/content/about-page/company',
-      format: { data: 'yaml' },
-      entryLayout: 'form',
-      schema: {
-        heroTitle: fields.text({ label: 'Title' }),
-        heroBody: fields.text({ label: 'Body Paragraph', multiline: true }),
-        boardMembers: fields.array(
-          fields.text({ label: 'Name' }),
-          {
-            label: 'Board of Directors',
-            itemLabel: (props) => props.value || 'New member',
-          }
-        ),
       },
     }),
 

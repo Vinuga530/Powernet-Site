@@ -66,14 +66,6 @@ const statsCollection = defineCollection({
   }),
 });
 
-const clientsCollection = defineCollection({
-  loader: glob({ pattern: "*.yaml", base: "./src/content/clients" }),
-  schema: z.object({
-    name: z.string(),
-    order: z.number().default(99),
-  }),
-});
-
 const processStepsCollection = defineCollection({
   loader: glob({ pattern: "*.yaml", base: "./src/content/process-steps" }),
   schema: z.object({
@@ -105,17 +97,7 @@ const homepageAboutCollection = defineCollection({
     body: z.string(),
     specialties: z.array(z.string()),
     watermarkWord: z.string(),
-    primaryButtonLabel: z.string(),
     secondaryButtonLabel: z.string(),
-  }),
-});
-
-const aboutPageCollection = defineCollection({
-  loader: glob({ pattern: "*.yaml", base: "./src/content/about-page" }),
-  schema: z.object({
-    heroTitle: z.string(),
-    heroBody: z.string(),
-    boardMembers: z.array(z.string()),
   }),
 });
 
@@ -125,9 +107,7 @@ export const collections = {
   'settings': settingsCollection,
   'hotlines': hotlinesCollection,
   'stats': statsCollection,
-  'clients': clientsCollection,
   'processSteps': processStepsCollection,
   'hero': heroCollection,
   'homepageAbout': homepageAboutCollection,
-  'aboutPage': aboutPageCollection,
 };
